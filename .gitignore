@@ -22,3 +22,5 @@ venv/
 # Build artifacts
 dist/
 build/
+
+.local/
