@@ -1,0 +1,186 @@
+# Project Identity
+
+Kalibra is a self-evaluating visual inspection system for industrial quality
+control. Its purpose is to inspect visual inputs for defects and, for every
+inspection decision, determine whether that decision can be trusted.
+
+Kalibra is not only a defect detector. It is an offline, batch, locally
+reproducible engineering artifact whose claims must be supported by durable,
+inspectable evidence.
+
+All implementation work must remain consistent with the public project
+documentation:
+
+- `README.md`
+- `docs/KALIBRA_FOUNDATION_v1.0.md`
+- `docs/KALIBRA_ARCHITECTURE_v1.0.md`
+- `docs/KALIBRA_EVALUATION_METHODOLOGY_v1.0.md`
+- `docs/KALIBRA_DATASET_STRATEGY_v1.0.md`
+- `docs/KALIBRA_SYSTEM_REQUIREMENTS_v1.0.md`
+- `docs/KALIBRA_IMPLEMENTATION_ROADMAP_v1.0.md`
+- `docs/KALIBRA_ENGINEERING_PLAN_v1.0.md`
+
+# Engineering Philosophy
+
+Agents must preserve Kalibra's engineering commitments:
+
+- Evidence before assertion.
+- Reproducibility as a baseline requirement.
+- Honesty over capability.
+- Depth over breadth.
+- Explicit boundaries.
+- One source of truth for inspection and trust qualification.
+- One focused system before any expansion.
+
+Agents must narrow or withhold claims when supporting evidence is absent,
+incomplete, weak, or not yet implemented.
+
+# Architectural Rules
+
+Kalibra must be engineered as one continuous flow:
+
+1. Stable input intake.
+2. Inspection and raw judgement.
+3. Trust qualification.
+4. Human review routing where required.
+5. Evidence recording and presentation.
+6. Evaluation from recorded evidence.
+
+Agents must not violate the documented architecture. In particular, agents must
+not:
+
+- bypass the Trust Qualification Engine;
+- bypass the Human Review Engine;
+- weaken Evidence requirements;
+- allow decisions to leave the system unqualified;
+- treat raw inspection scores as calibrated confidence;
+- separate trust qualification from the same inspection source it qualifies;
+- introduce live, streaming, hosted, or continuously operating behavior;
+- add operational alerting, scheduling, or production service infrastructure.
+
+# Engineering Domains
+
+Kalibra has five permanent engineering domains:
+
+- Inspection Engine: examines inputs, produces defect judgements,
+  localizations, and raw anomalousness measures.
+- Trust Qualification Engine: converts raw judgements into calibrated,
+  qualified trust statements, abstentions, and drift-aware caution.
+- Human Review Engine: routes uncertain and drifted cases to human judgement
+  with the evidence required for review.
+- Evidence Engine: preserves and presents durable, inspectable records of
+  decisions, confidence, outcomes, routing, abstention, limitations, and
+  supporting artifacts.
+- Evaluation Engine: measures the present system against its documented claims
+  using recorded, reproducible evidence.
+
+Each domain must own one responsibility. Responsibilities must not bleed across
+domain boundaries for convenience.
+
+# Trust & Reliability Rules
+
+Trust is a first-class system output. Every decision must eventually carry a
+defensible statement of how far it can be relied upon.
+
+Agents must not invent:
+
+- capabilities;
+- datasets;
+- metrics;
+- AI behavior;
+- evaluation results;
+- benchmarks;
+- calibration quality;
+- drift response;
+- review quality;
+- inspection performance.
+
+Confidence must be calibrated before it is presented as confidence. Uncertainty,
+abstention, deferral, and drift response must be implemented only when their
+evidence obligations can be satisfied.
+
+Evaluation must keep distinct dimensions separate: detection quality,
+calibration, uncertainty quality, review quality, and drift response. Agents
+must not collapse these into a single flattering result.
+
+# Scope Protection
+
+Agents must protect Kalibra against architectural drift.
+
+Agents must not add:
+
+- multiple inspection settings in parallel;
+- live or streaming input handling;
+- continuous monitoring;
+- hosted services or deployment infrastructure;
+- operational alerting;
+- feedback loops from human decisions into system updates;
+- broad benchmark suites;
+- synthetic claims of generality;
+- data collection workflows outside the documented fixed-dataset strategy.
+
+Deferred scope must remain deferred unless the public documentation is updated by
+the repository owner.
+
+# Documentation Rules
+
+Public documentation is the source of truth. Agents must read the relevant public
+documents before making architectural, domain, evaluation, data, or reliability
+changes.
+
+Documentation changes must be normative, precise, and consistent with existing
+project language. Agents must not document behavior that does not exist or cannot
+be demonstrated.
+
+If implementation and documentation conflict, agents must stop and surface the
+conflict instead of silently changing the architecture.
+
+# Coding Rules
+
+Agents must keep implementation minimal, explicit, and reproducible.
+
+Agents must:
+
+- preserve domain boundaries;
+- use clear names aligned with the documented architecture;
+- prefer small, testable modules;
+- avoid placeholder business logic;
+- avoid fake implementations;
+- avoid TODO comments as substitutes for design;
+- avoid hidden state that prevents reproducibility;
+- keep data provenance and evaluation separation visible when data work begins.
+
+Agents must not implement AI, computer vision, anomaly detection, confidence
+calibration, drift detection, human review logic, evaluation logic, datasets, or
+benchmarks unless the specific task explicitly authorizes that scope.
+
+# Validation Rules
+
+Every change must be validated at the level appropriate to its scope.
+
+At minimum, agents must:
+
+- confirm the changed files are the intended files;
+- run the validation commands requested by the task;
+- run relevant tests when implementation exists;
+- report validation results honestly;
+- report commands that could not be run and why.
+
+Agents must not claim a capability is complete unless it is supported by
+reproducible, inspectable evidence.
+
+# Git Rules
+
+Git history is controlled exclusively by the repository owner.
+
+Agents must never run:
+
+- `git add`
+- `git commit`
+- `git push`
+
+Agents must never create branches.
+
+Agents may inspect Git state with read-only commands such as `git status`,
+`git diff`, `git log`, and `git branch --show-current` when needed for
+validation or orientation.
