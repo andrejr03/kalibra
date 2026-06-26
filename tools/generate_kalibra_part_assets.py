@@ -5,6 +5,7 @@ import hashlib
 import math
 import sys
 from collections import deque
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable
 
@@ -23,13 +24,26 @@ PART_LOCALIZATION_NAME = "part_localization.png"
 PART_CLEAN_SIZE = (960, 600)
 PART_MAIN_SIZE = (960, 600)
 PART_LOCALIZATION_SIZE = (520, 460)
+THUMBNAIL_SIZE = (240, 160)
 LOCALIZATION_CROP_WIDTH = 678
 LOCALIZATION_CROP_HEIGHT = 600
+
+THUMBNAIL_NAMES = (
+    "thumb_01.png",
+    "thumb_02.png",
+    "thumb_03.png",
+    "thumb_04.png",
+    "thumb_05.png",
+    "thumb_06.png",
+    "thumb_07.png",
+    "thumb_08.png",
+)
 
 OUTPUT_SPECS = {
     PART_CLEAN_NAME: PART_CLEAN_SIZE,
     PART_MAIN_NAME: PART_MAIN_SIZE,
     PART_LOCALIZATION_NAME: PART_LOCALIZATION_SIZE,
+    **{thumbnail_name: THUMBNAIL_SIZE for thumbnail_name in THUMBNAIL_NAMES},
 }
 
 FOREGROUND_LUMA_THRESHOLD = 55
@@ -52,6 +66,28 @@ OVERLAY_EDGE_ALPHA = 0.34
 OVERLAY_FEATHER_RADIUS = 12
 OVERLAY_CONTOUR_WIDTH = 5
 OVERLAY_CONTOUR_DASH_PATTERN = (20, 8)
+
+
+@dataclass(frozen=True)
+class ThumbnailSpec:
+    file_name: str
+    crop_center: tuple[int, int]
+    crop_size: tuple[int, int]
+    overlay_center: tuple[int, int] | None = None
+    overlay_intensity: float = 1.0
+    overlay_radius: int = 40
+
+
+THUMBNAIL_SPECS = (
+    ThumbnailSpec("thumb_01.png", (480, 300), (900, 600)),
+    ThumbnailSpec("thumb_02.png", (690, 292), (600, 400), (690, 292)),
+    ThumbnailSpec("thumb_03.png", (340, 302), (600, 400)),
+    ThumbnailSpec("thumb_04.png", (520, 330), (660, 440), (548, 365), 0.42, 34),
+    ThumbnailSpec("thumb_05.png", (330, 310), (600, 400), (322, 318)),
+    ThumbnailSpec("thumb_06.png", (748, 310), (600, 400)),
+    ThumbnailSpec("thumb_07.png", (720, 388), (600, 400), (760, 416), 1.0, 38),
+    ThumbnailSpec("thumb_08.png", (430, 255), (660, 440), (418, 248), 0.40, 34),
+)
 
 
 class AssetPipelineError(RuntimeError):
@@ -225,8 +261,8 @@ def clamp_crop_box(
     return (left, top, left + crop_width, top + crop_height)
 
 
-def scaled_alpha(multiplier: float) -> int:
-    alpha = 255 * ANOMALY_OPACITY * ANOMALY_INTENSITY * multiplier
+def scaled_alpha(multiplier: float, intensity: float = ANOMALY_INTENSITY) -> int:
+    alpha = 255 * ANOMALY_OPACITY * intensity * multiplier
     return max(0, min(255, int(round(alpha))))
 
 
@@ -269,6 +305,7 @@ def apply_anomaly_overlay(
     image: Image.Image,
     center: tuple[int, int] = (ANOMALY_X, ANOMALY_Y),
     radius: int = ANOMALY_RADIUS,
+    intensity: float = ANOMALY_INTENSITY,
 ) -> Image.Image:
     base = image.convert("RGBA")
     center_x, center_y = center
@@ -288,7 +325,7 @@ def apply_anomaly_overlay(
                 center_x + overlay_radius,
                 center_y + overlay_radius,
             ),
-            fill=rgba(color_name, scaled_alpha(alpha_multiplier)),
+            fill=rgba(color_name, scaled_alpha(alpha_multiplier, intensity)),
         )
     heat = heat.filter(ImageFilter.GaussianBlur(OVERLAY_FEATHER_RADIUS))
     composed = Image.alpha_composite(base, heat)
@@ -305,13 +342,13 @@ def apply_anomaly_overlay(
     draw_dashed_ellipse(
         contour_draw,
         contour_bbox,
-        rgba("contour", scaled_alpha(0.95)),
+        rgba("contour", scaled_alpha(0.95, intensity)),
         OVERLAY_CONTOUR_WIDTH,
         OVERLAY_CONTOUR_DASH_PATTERN,
     )
 
     marker_size = max(8, radius // 4)
-    marker_color = rgba("accent", scaled_alpha(0.82))
+    marker_color = rgba("accent", scaled_alpha(0.82, intensity))
     contour_draw.line(
         (center_x - marker_size, center_y, center_x + marker_size, center_y),
         fill=marker_color,
@@ -324,6 +361,37 @@ def apply_anomaly_overlay(
     )
 
     return Image.alpha_composite(composed, contour).convert("RGB")
+
+
+def create_thumbnail_asset(clean_base: Image.Image, spec: ThumbnailSpec) -> Image.Image:
+    crop_box = clamp_crop_box(
+        spec.crop_center[0],
+        spec.crop_center[1],
+        spec.crop_size,
+        clean_base.size,
+    )
+    thumbnail = clean_base.crop(crop_box).resize(
+        THUMBNAIL_SIZE,
+        Image.Resampling.LANCZOS,
+    )
+
+    if spec.overlay_center is None:
+        return thumbnail
+
+    scale_x = THUMBNAIL_SIZE[0] / spec.crop_size[0]
+    scale_y = THUMBNAIL_SIZE[1] / spec.crop_size[1]
+    overlay_center = (
+        int(round((spec.overlay_center[0] - crop_box[0]) * scale_x)),
+        int(round((spec.overlay_center[1] - crop_box[1]) * scale_y)),
+    )
+    overlay_radius = int(round(spec.overlay_radius * (scale_x + scale_y) / 2))
+
+    return apply_anomaly_overlay(
+        thumbnail,
+        overlay_center,
+        overlay_radius,
+        spec.overlay_intensity,
+    )
 
 
 def save_png(image: Image.Image, path: Path) -> None:
@@ -407,6 +475,10 @@ def generate_assets() -> None:
         localization_radius,
     )
     save_png(localization, GENERATED_DIR / PART_LOCALIZATION_NAME)
+
+    for spec in THUMBNAIL_SPECS:
+        thumbnail = create_thumbnail_asset(clean_base, spec)
+        save_png(thumbnail, GENERATED_DIR / spec.file_name)
 
     validate_outputs(expected_source_hash=source_hash)
 

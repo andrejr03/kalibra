@@ -45,6 +45,19 @@ def test_generated_files_exist_with_exact_png_dimensions() -> None:
             assert image.size == expected_size
 
 
+def test_thumbnail_outputs_exist_with_exact_png_dimensions() -> None:
+    pipeline.generate_assets()
+
+    assert set(pipeline.THUMBNAIL_NAMES).issubset(
+        {path.name for path in pipeline.GENERATED_DIR.iterdir()}
+    )
+    for file_name in pipeline.THUMBNAIL_NAMES:
+        output_path = pipeline.GENERATED_DIR / file_name
+        with Image.open(output_path) as image:
+            assert image.format == "PNG"
+            assert image.size == pipeline.THUMBNAIL_SIZE
+
+
 def test_pipeline_execution_is_deterministic() -> None:
     pipeline.generate_assets()
     first_hashes = file_hashes(generated_paths())
@@ -62,8 +75,6 @@ def test_pipeline_writes_only_generated_part_assets() -> None:
 
     assert parts_files_outside_generated() == before
     assert Path("source/master_clean.png") in before
-    assert {path.name for path in pipeline.GENERATED_DIR.iterdir()} == {
-        pipeline.PART_CLEAN_NAME,
-        pipeline.PART_MAIN_NAME,
-        pipeline.PART_LOCALIZATION_NAME,
-    }
+    assert {path.name for path in pipeline.GENERATED_DIR.iterdir()} == set(
+        pipeline.OUTPUT_SPECS
+    )
