@@ -23,6 +23,8 @@ PART_LOCALIZATION_NAME = "part_localization.png"
 PART_CLEAN_SIZE = (960, 600)
 PART_MAIN_SIZE = (960, 600)
 PART_LOCALIZATION_SIZE = (520, 460)
+LOCALIZATION_CROP_WIDTH = 678
+LOCALIZATION_CROP_HEIGHT = 600
 
 OUTPUT_SPECS = {
     PART_CLEAN_NAME: PART_CLEAN_SIZE,
@@ -35,19 +37,21 @@ TARGET_OBJECT_OCCUPANCY = 0.80
 
 ANOMALY_X = 690
 ANOMALY_Y = 292
-ANOMALY_RADIUS = 48
+ANOMALY_RADIUS = 52
 ANOMALY_INTENSITY = 1.0
 ANOMALY_COLORS = {
-    "outer": (255, 196, 57),
-    "middle": (245, 94, 54),
-    "core": (255, 247, 148),
-    "contour": (255, 255, 255),
-    "accent": (60, 150, 255),
+    "outer": (255, 184, 64),
+    "middle": (255, 111, 54),
+    "core": (255, 232, 112),
+    "contour": (72, 218, 255),
+    "accent": (255, 255, 255),
 }
-ANOMALY_OPACITY = 0.56
-OVERLAY_FEATHER_RADIUS = 16
-OVERLAY_CONTOUR_WIDTH = 4
-OVERLAY_CONTOUR_DASH_PATTERN = (18, 10)
+ANOMALY_OPACITY = 0.72
+OVERLAY_CENTER_ALPHA = 0.78
+OVERLAY_EDGE_ALPHA = 0.34
+OVERLAY_FEATHER_RADIUS = 12
+OVERLAY_CONTOUR_WIDTH = 5
+OVERLAY_CONTOUR_DASH_PATTERN = (20, 8)
 
 
 class AssetPipelineError(RuntimeError):
@@ -264,6 +268,7 @@ def draw_dashed_ellipse(
 def apply_anomaly_overlay(
     image: Image.Image,
     center: tuple[int, int] = (ANOMALY_X, ANOMALY_Y),
+    radius: int = ANOMALY_RADIUS,
 ) -> Image.Image:
     base = image.convert("RGBA")
     center_x, center_y = center
@@ -271,17 +276,17 @@ def apply_anomaly_overlay(
     heat = Image.new("RGBA", base.size, (0, 0, 0, 0))
     heat_draw = ImageDraw.Draw(heat, "RGBA")
     for radius_multiplier, color_name, alpha_multiplier in (
-        (1.35, "outer", 0.42),
-        (0.92, "middle", 0.68),
-        (0.48, "core", 0.82),
+        (1.48, "outer", OVERLAY_EDGE_ALPHA),
+        (1.00, "middle", (OVERLAY_CENTER_ALPHA + OVERLAY_EDGE_ALPHA) / 2),
+        (0.48, "core", OVERLAY_CENTER_ALPHA),
     ):
-        radius = int(round(ANOMALY_RADIUS * radius_multiplier))
+        overlay_radius = int(round(radius * radius_multiplier))
         heat_draw.ellipse(
             (
-                center_x - radius,
-                center_y - radius,
-                center_x + radius,
-                center_y + radius,
+                center_x - overlay_radius,
+                center_y - overlay_radius,
+                center_x + overlay_radius,
+                center_y + overlay_radius,
             ),
             fill=rgba(color_name, scaled_alpha(alpha_multiplier)),
         )
@@ -290,7 +295,7 @@ def apply_anomaly_overlay(
 
     contour = Image.new("RGBA", base.size, (0, 0, 0, 0))
     contour_draw = ImageDraw.Draw(contour, "RGBA")
-    contour_radius = ANOMALY_RADIUS + OVERLAY_CONTOUR_WIDTH
+    contour_radius = radius + OVERLAY_CONTOUR_WIDTH
     contour_bbox = (
         center_x - contour_radius,
         center_y - contour_radius,
@@ -305,8 +310,8 @@ def apply_anomaly_overlay(
         OVERLAY_CONTOUR_DASH_PATTERN,
     )
 
-    marker_size = max(8, ANOMALY_RADIUS // 4)
-    marker_color = rgba("accent", scaled_alpha(0.9))
+    marker_size = max(8, radius // 4)
+    marker_color = rgba("accent", scaled_alpha(0.82))
     contour_draw.line(
         (center_x - marker_size, center_y, center_x + marker_size, center_y),
         fill=marker_color,
@@ -382,15 +387,25 @@ def generate_assets() -> None:
     localization_box = clamp_crop_box(
         ANOMALY_X,
         ANOMALY_Y,
-        PART_LOCALIZATION_SIZE,
+        (LOCALIZATION_CROP_WIDTH, LOCALIZATION_CROP_HEIGHT),
         clean_base.size,
     )
-    localization_clean = clean_base.crop(localization_box)
-    localization_center = (
-        ANOMALY_X - localization_box[0],
-        ANOMALY_Y - localization_box[1],
+    localization_clean = clean_base.crop(localization_box).resize(
+        PART_LOCALIZATION_SIZE,
+        Image.Resampling.LANCZOS,
     )
-    localization = apply_anomaly_overlay(localization_clean, localization_center)
+    scale_x = PART_LOCALIZATION_SIZE[0] / LOCALIZATION_CROP_WIDTH
+    scale_y = PART_LOCALIZATION_SIZE[1] / LOCALIZATION_CROP_HEIGHT
+    localization_center = (
+        int(round((ANOMALY_X - localization_box[0]) * scale_x)),
+        int(round((ANOMALY_Y - localization_box[1]) * scale_y)),
+    )
+    localization_radius = int(round(ANOMALY_RADIUS * (scale_x + scale_y) / 2))
+    localization = apply_anomaly_overlay(
+        localization_clean,
+        localization_center,
+        localization_radius,
+    )
     save_png(localization, GENERATED_DIR / PART_LOCALIZATION_NAME)
 
     validate_outputs(expected_source_hash=source_hash)

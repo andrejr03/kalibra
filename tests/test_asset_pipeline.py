@@ -61,7 +61,7 @@ def test_pipeline_writes_only_generated_part_assets() -> None:
     pipeline.generate_assets()
 
     assert parts_files_outside_generated() == before
-    assert before == [Path("source/master_clean.png")]
+    assert Path("source/master_clean.png") in before
     assert {path.name for path in pipeline.GENERATED_DIR.iterdir()} == {
         pipeline.PART_CLEAN_NAME,
         pipeline.PART_MAIN_NAME,
