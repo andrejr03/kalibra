@@ -194,11 +194,24 @@ responsibility is to route and present them, not to revise them (Engineering Pla
 §Human Review Engine). Review arrives as a *qualified outcome*, never as an
 Inspection Engine failure (core boundary).
 
-**Lateral seam — Human Review ↔ Evidence.**
-The engine **draws** the supporting material it presents from the Evidence Engine
-and **records** the routing and reviewer decision back into the Evidence Engine
-(Engineering Plan §Human Review Engine). It emits into and draws from the evidence
-backbone; it does not own or present that surface.
+**Lateral seam — Human Review → Evidence.**
+The engine **records** the routing and reviewer decision into the Evidence Engine
+(Engineering Plan §Human Review Engine). It emits into the evidence backbone; it
+does not own or present that surface.
+
+**Runtime independence from the Evidence Engine.** The engine prepares the review
+hand-off from the **Review-Qualified Case it receives** across the upstream seam —
+which already carries the full upstream chain (source-input reference, raw
+inspection result, localization reference, trust qualification, and the reason for
+review). It must **not** depend on the Evidence Engine for its runtime operation,
+and nothing in this engine requires the Evidence Engine to exist in order to
+assemble or record a hand-off. This keeps the engine consistent with the fixed
+implementation sequence, in which Human Review (third) is built before the
+Evidence Engine (fourth). The Evidence Engine remains the canonical preservation
+layer: where the Engineering Plan describes Human Review *drawing* supporting
+material from Evidence, that is a property of the later, integrated system once the
+Evidence Engine exists — a read of already-recorded material — not a runtime
+dependency of this engine, which carries everything it needs in the case itself.
 
 Boundaries the engine must hold:
 
@@ -234,8 +247,10 @@ implemented. No UI, storage, or training mechanism is chosen here.
 
 3. **Evidence hand-off preparation.** Assemble the complete evidence for the
    reviewer: the source input reference, the localization, the raw inspection
-   result, and the trust qualification — drawing supporting material from the
-   Evidence Engine. The assembly reads upstream artifacts; it must not modify them.
+   result, and the trust qualification — **from the Review-Qualified Case the
+   engine received**, which already carries this full chain. The assembly reads the
+   upstream artifacts carried in the case; it must not modify them, and it must not
+   depend on the Evidence Engine to perform this assembly.
 
 4. **Reviewer decision capture.** Receive the human's judgement for the case and
    capture it as a durable artifact bound to the review case. The engine collects

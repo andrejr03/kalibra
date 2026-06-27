@@ -111,6 +111,15 @@ The Inspection Engine accepts a single kind of input:
   through the system's intake and been placed into a stable, reproducible form.
   The engine treats this stabilized form as immutable and authoritative.
 
+**Input Intake is a prerequisite subsystem, not a domain.** Intake is the
+system's single, well-defined entry point — the prerequisite subsystem that
+places a raw visual input into the stable, reproducible form the Inspection
+Engine consumes (Architecture §Core System; Requirement F1). It sits *upstream*
+of the five permanent engineering domains and is **not** one of them: it is not a
+sixth domain and not a separate engine. The Inspection Engine consumes intake's
+product across the upstream seam; it does not perform intake. This consumes/emits
+relationship is `Input Intake → Inspection Engine`.
+
 Properties the input **must** satisfy before the engine reasons about it:
 
 - It originates from the single, well-defined entry point (F1); the engine never
@@ -131,9 +140,9 @@ What the engine **must not** require or assume:
   (C1, C4, X8).
 
 The concrete representation of the stabilized input (its container, encoding, or
-on-disk form) is intentionally left to implementation and to the intake
-definition. This plan fixes the engine's *contract* with its input, not its
-storage.
+on-disk form) is intentionally left to implementation and to the Input Intake
+subsystem (the prerequisite entry point described above). This plan fixes the
+engine's *contract* with its input, not its storage.
 
 ---
 
@@ -174,8 +183,10 @@ trust is built on top of this raw result without modifying it.
 The Inspection Engine sits first in Kalibra's directed flow and touches exactly
 two other domains directly.
 
-**Upstream seam — Intake → Inspection.**
-The engine receives stabilized inputs from the system's single entry point. It
+**Upstream seam — Input Intake → Inspection.**
+The engine receives stabilized inputs from the Input Intake subsystem — the
+single system entry point, a prerequisite subsystem that sits outside the five
+engineering domains (it is not a sixth domain or a separate engine). The engine
 treats what crosses this seam as immutable and reasons about nothing that has not
 crossed it. The engine does not perform intake itself; it consumes its product.
 

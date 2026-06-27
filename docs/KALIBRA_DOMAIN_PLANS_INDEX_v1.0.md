@@ -153,13 +153,23 @@ The system is one continuous flow. Each artifact is produced by exactly one doma
 and consumed downstream without being reconstructed or mutated:
 
 ```
-source input
+source input                         (Input Intake — prerequisite subsystem)
   → raw inspection result            (Inspection Engine)
     → trust qualification result     (Trust Qualification Engine)
       → review case / reviewer decision   (Human Review Engine)
         → evidence records           (Evidence Engine)
           → evaluation report        (Evaluation Engine)
 ```
+
+**Input Intake is a prerequisite subsystem, not a domain.** The chain begins with
+the source input produced by **Input Intake** — the system's single, well-defined
+entry point that places a raw visual input into the stable, reproducible form the
+Inspection Engine consumes (Architecture §Core System; Requirement F1). Input
+Intake sits *upstream* of the five permanent engineering domains and is **not**
+one of them: it is not a sixth domain and not a separate engine, and adding it
+does not alter the five-domain decomposition, the boundaries, or the
+implementation sequence. The relationship is `Input Intake → Inspection Engine`;
+the Inspection Engine consumes intake's product and does not perform intake.
 
 Properties the chain must preserve:
 
