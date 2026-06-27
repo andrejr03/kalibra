@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Protocol
 
+from .domain import ReviewEvidenceRecord, ReviewHandoff, ReviewerDecision
 from .types import HumanReviewRequest, HumanReviewResult
 
 
@@ -17,3 +18,11 @@ class HumanReviewMethod(Protocol):
     def review(self, review_request: HumanReviewRequest) -> HumanReviewResult:
         ...
 
+
+class HumanReviewEvidenceEmitterProtocol(Protocol):
+    def emit(
+        self,
+        review_handoff: ReviewHandoff,
+        reviewer_decision: ReviewerDecision,
+    ) -> ReviewEvidenceRecord:
+        ...

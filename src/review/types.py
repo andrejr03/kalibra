@@ -7,6 +7,16 @@ from typing import Mapping
 
 from src.trust import QualificationOutcome, TrustQualifiedResult
 
+from .domain import (
+    HUMAN_REVIEW_EVIDENCE_KIND,
+    HumanReviewEngineOutput,
+    ReviewEvidenceRecord,
+    ReviewHandoff,
+    ReviewQualifiedCase,
+    ReviewUpstreamChain,
+    ReviewerDecision,
+    ReviewerDecisionValue,
+)
 from .errors import InvalidHumanReviewRequest, InvalidHumanReviewResult
 
 
@@ -99,4 +109,3 @@ class HumanReviewResult:
             )
         normalized_metadata = MappingProxyType(dict(self.metadata))
         object.__setattr__(self, "metadata", normalized_metadata)
-
