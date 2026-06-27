@@ -1,29 +1,60 @@
 from .engine import EvaluationEngine
+from .domain import (
+    EVALUATION_REPORT_KIND,
+    WEAK_PERFORMANCE_EVIDENCE_KIND,
+    AbsenceDisclosure,
+    DimensionFinding,
+    EvaluationDimension,
+    EvaluationFindingStatus,
+    EvidenceBackedEvaluationReport,
+    FailureCategory,
+    FailureCategoryFinding,
+    PreservedEvidenceInput,
+)
 from .errors import (
+    EvidenceMutationAttempt,
     EvaluationError,
+    FabricatedEvaluationEvidence,
     InvalidEvaluationReport,
     InvalidEvaluationResult,
+    MalformedPreservedEvidenceInput,
+    NonReproducibleEvaluation,
+    PrototypePerformanceEvaluationRejected,
+    UntraceableEvaluationFinding,
 )
-from .interfaces import EvaluationMethod
+from .interfaces import EvidenceBackedEvaluator, EvaluationMethod
 from .types import (
-    EvaluationDimension,
     EvaluationFinding,
     EvaluationReport,
     EvaluationResult,
     EvaluationStatus,
-    FailureCategory,
 )
 
 __all__ = [
+    "AbsenceDisclosure",
+    "DimensionFinding",
+    "EVALUATION_REPORT_KIND",
+    "EvidenceBackedEvaluationReport",
+    "EvidenceBackedEvaluator",
+    "EvidenceMutationAttempt",
     "EvaluationDimension",
     "EvaluationEngine",
     "EvaluationError",
+    "EvaluationFindingStatus",
     "EvaluationFinding",
     "EvaluationMethod",
     "EvaluationReport",
     "EvaluationResult",
     "EvaluationStatus",
+    "FabricatedEvaluationEvidence",
     "FailureCategory",
+    "FailureCategoryFinding",
     "InvalidEvaluationReport",
     "InvalidEvaluationResult",
+    "MalformedPreservedEvidenceInput",
+    "NonReproducibleEvaluation",
+    "PreservedEvidenceInput",
+    "PrototypePerformanceEvaluationRejected",
+    "UntraceableEvaluationFinding",
+    "WEAK_PERFORMANCE_EVIDENCE_KIND",
 ]

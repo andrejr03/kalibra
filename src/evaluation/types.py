@@ -7,24 +7,8 @@ from typing import Mapping
 
 from src.evidence import EvidenceResult
 
+from .domain import EvaluationDimension, FailureCategory
 from .errors import InvalidEvaluationReport, InvalidEvaluationResult
-
-
-class EvaluationDimension(str, Enum):
-    DETECTION_QUALITY = "detection_quality"
-    CALIBRATION = "calibration"
-    UNCERTAINTY_QUALITY = "uncertainty_quality"
-    REVIEW_QUALITY = "review_quality"
-    DRIFT_RESPONSE = "drift_response"
-
-
-class FailureCategory(str, Enum):
-    MISSED_DEFECT = "missed_defect"
-    FALSE_ALARM = "false_alarm"
-    CONFIDENT_ERROR = "confident_error"
-    MISPLACED_UNCERTAINTY = "misplaced_uncertainty"
-    MISLOCALIZED_DEFECT = "mislocalized_defect"
-    UNRESPONSIVE_DRIFT = "unresponsive_drift"
 
 
 class EvaluationStatus(str, Enum):
