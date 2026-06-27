@@ -9,6 +9,15 @@ from src.inspection import InspectionResult
 from src.review import HumanReviewResult
 from src.trust import TrustQualifiedResult
 
+from .domain import (
+    EvidenceAbsenceMarker,
+    EvidenceChainLink,
+    EvidenceRecordLink,
+    EvidenceSourceDomain,
+    EvidenceView,
+    InboundEvidenceRecord,
+    PreservedEvidenceRecord,
+)
 from .errors import InvalidEvidenceBundle, InvalidEvidenceResult
 
 

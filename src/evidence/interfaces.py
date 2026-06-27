@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Protocol
 
+from .domain import EvidenceView, InboundEvidenceRecord
 from .types import EvidenceBundle, EvidenceResult
 
 
@@ -17,3 +18,10 @@ class EvidenceMethod(Protocol):
     def collect(self, evidence_bundle: EvidenceBundle) -> EvidenceResult:
         ...
 
+
+class EvidencePreserver(Protocol):
+    def preserve(
+        self,
+        evidence_records: tuple[InboundEvidenceRecord, ...],
+    ) -> EvidenceView:
+        ...

@@ -1,10 +1,29 @@
 from .engine import EvidenceEngine
+from .domain import (
+    PERFORMANCE_EVIDENCE_KIND,
+    EvidenceAbsenceMarker,
+    EvidenceChainLink,
+    EvidenceRecordLink,
+    EvidenceSourceDomain,
+    EvidenceView,
+    InboundEvidenceRecord,
+    PreservedEvidenceRecord,
+)
 from .errors import (
+    EvidenceAbsenceFailure,
     EvidenceError,
+    EvidenceLinkingFailure,
+    EvidencePreservationFailure,
+    EvidenceViewFailure,
+    FabricatedEvidenceRecord,
     InvalidEvidenceBundle,
     InvalidEvidenceResult,
+    MalformedInboundEvidenceRecord,
+    NonReproducibleEvidencePreservation,
+    PrototypePerformanceEvidenceRejected,
+    UnauthorizedUpstreamRerun,
 )
-from .interfaces import EvidenceMethod
+from .interfaces import EvidenceMethod, EvidencePreserver
 from .types import (
     EvidenceArtifact,
     EvidenceBundle,
@@ -15,15 +34,33 @@ from .types import (
 )
 
 __all__ = [
+    "EvidenceAbsenceFailure",
+    "EvidenceAbsenceMarker",
     "EvidenceArtifact",
     "EvidenceBundle",
+    "EvidenceChainLink",
     "EvidenceDomain",
     "EvidenceEngine",
     "EvidenceError",
+    "EvidenceLinkingFailure",
     "EvidenceMethod",
+    "EvidencePreservationFailure",
+    "EvidencePreserver",
+    "EvidenceRecordLink",
     "EvidenceReference",
     "EvidenceResult",
+    "EvidenceSourceDomain",
     "EvidenceStatus",
+    "EvidenceView",
+    "EvidenceViewFailure",
+    "FabricatedEvidenceRecord",
+    "InboundEvidenceRecord",
     "InvalidEvidenceBundle",
     "InvalidEvidenceResult",
+    "MalformedInboundEvidenceRecord",
+    "NonReproducibleEvidencePreservation",
+    "PERFORMANCE_EVIDENCE_KIND",
+    "PreservedEvidenceRecord",
+    "PrototypePerformanceEvidenceRejected",
+    "UnauthorizedUpstreamRerun",
 ]
