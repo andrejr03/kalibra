@@ -1,31 +1,72 @@
-from .engine import InspectionEngine
-from .errors import (
-    InspectionError,
-    InvalidInspectionInput,
-    InvalidInspectionResult,
-)
-from .input import InputPreparer
-from .interfaces import InspectionMethod
-from .types import (
+from .domain import (
+    INSPECTION_EVIDENCE_KIND,
+    PLACEHOLDER_EXAMINATION_KIND,
+    RAW_MEASURE_KIND,
+    RAW_MEASURE_SCALE,
     DefectJudgment,
     DefectLocalization,
+    InspectionEngineOutput,
+    InspectionEvidenceRecord,
     InspectionInput,
+    InspectionJudgement,
     InspectionResult,
     NormalizedBoundingBox,
+    PlaceholderExamination,
     RawAnomalyScore,
+    RawInspectionResult,
+    StabilizedInspectionInput,
 )
+from .engine import (
+    DeterministicPlaceholderExaminer,
+    InspectionEngine,
+    InspectionEvidenceEmitter,
+)
+from .errors import (
+    EvidenceEmissionFailure,
+    InspectionError,
+    InspectionExaminationFailure,
+    InvalidInspectionInput,
+    InvalidInspectionResult,
+    MalformedInspectionInput,
+    MissingContentHash,
+    MissingInputIdentity,
+    NonReproducibleInspection,
+    PartialInspectionResult,
+    UnstabilizedInspectionInput,
+)
+from .interfaces import InspectionEvidenceEmitterProtocol, InspectionExaminer
 
 __all__ = [
     "DefectJudgment",
     "DefectLocalization",
-    "InputPreparer",
+    "DeterministicPlaceholderExaminer",
+    "EvidenceEmissionFailure",
+    "INSPECTION_EVIDENCE_KIND",
     "InspectionEngine",
+    "InspectionEngineOutput",
     "InspectionError",
+    "InspectionEvidenceEmitter",
+    "InspectionEvidenceEmitterProtocol",
+    "InspectionEvidenceRecord",
+    "InspectionExaminationFailure",
+    "InspectionExaminer",
     "InspectionInput",
-    "InspectionMethod",
+    "InspectionJudgement",
     "InspectionResult",
     "InvalidInspectionInput",
     "InvalidInspectionResult",
+    "MalformedInspectionInput",
+    "MissingContentHash",
+    "MissingInputIdentity",
+    "NonReproducibleInspection",
     "NormalizedBoundingBox",
+    "PLACEHOLDER_EXAMINATION_KIND",
+    "PartialInspectionResult",
+    "PlaceholderExamination",
+    "RAW_MEASURE_KIND",
+    "RAW_MEASURE_SCALE",
     "RawAnomalyScore",
+    "RawInspectionResult",
+    "StabilizedInspectionInput",
+    "UnstabilizedInspectionInput",
 ]

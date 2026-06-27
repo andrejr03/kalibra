@@ -2,18 +2,21 @@ from __future__ import annotations
 
 from typing import Protocol
 
-from .types import InspectionInput, InspectionResult
+from .domain import (
+    InspectionEvidenceRecord,
+    PlaceholderExamination,
+    RawInspectionResult,
+    StabilizedInspectionInput,
+)
 
 
-class InspectionMethod(Protocol):
-    @property
-    def method_id(self) -> str:
+class InspectionExaminer(Protocol):
+    def examine(
+        self, inspection_input: StabilizedInspectionInput
+    ) -> PlaceholderExamination:
         ...
 
-    @property
-    def method_version(self) -> str | None:
-        ...
 
-    def inspect(self, inspection_input: InspectionInput) -> InspectionResult:
+class InspectionEvidenceEmitterProtocol(Protocol):
+    def emit(self, raw_result: RawInspectionResult) -> InspectionEvidenceRecord:
         ...
-
