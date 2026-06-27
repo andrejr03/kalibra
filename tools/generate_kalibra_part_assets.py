@@ -5,7 +5,7 @@ import hashlib
 import math
 import sys
 from collections import deque
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Iterable
 
@@ -14,7 +14,8 @@ from PIL import Image, ImageDraw, ImageFilter, UnidentifiedImageError
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 PARTS_DIR = REPO_ROOT / "assets" / "parts"
-SOURCE_IMAGE_PATH = PARTS_DIR / "source" / "master_clean.png"
+SOURCE_DIR = PARTS_DIR / "source"
+MASTER_IMAGE_PATTERN = "master_clean*.png"
 GENERATED_DIR = PARTS_DIR / "generated"
 
 PART_CLEAN_NAME = "part_clean.png"
@@ -53,6 +54,12 @@ ANOMALY_X = 690
 ANOMALY_Y = 292
 ANOMALY_RADIUS = 52
 ANOMALY_INTENSITY = 1.0
+ANOMALY_CENTER_OVERRIDES = {
+    "master_clean_v2": (620, 292),
+}
+LOCALIZATION_CROP_SIZE_OVERRIDES = {
+    "master_clean_v2": (620, 548),
+}
 ANOMALY_COLORS = {
     "outer": (255, 184, 64),
     "middle": (255, 111, 54),
@@ -89,9 +96,72 @@ THUMBNAIL_SPECS = (
     ThumbnailSpec("thumb_08.png", (430, 255), (660, 440), (418, 248), 0.40, 34),
 )
 
+THUMBNAIL_SPEC_OVERRIDES = {
+    "master_clean_v2": {
+        "thumb_02.png": {
+            "crop_center": (620, 292),
+            "overlay_center": (620, 292),
+        },
+        "thumb_07.png": {
+            "crop_center": (660, 388),
+            "overlay_center": (690, 416),
+        },
+        "thumb_08.png": {
+            "overlay_center": (390, 248),
+        },
+    },
+}
+
 
 class AssetPipelineError(RuntimeError):
     """Raised when the deterministic asset pipeline cannot complete safely."""
+
+
+def discover_master_images() -> tuple[Path, ...]:
+    if not SOURCE_DIR.exists():
+        raise AssetPipelineError(f"source folder is missing: {SOURCE_DIR}")
+    if not SOURCE_DIR.is_dir():
+        raise AssetPipelineError(f"source path is not a folder: {SOURCE_DIR}")
+
+    master_paths = tuple(
+        path
+        for path in sorted(
+            SOURCE_DIR.glob(MASTER_IMAGE_PATTERN),
+            key=lambda item: item.name,
+        )
+        if path.is_file() and path.suffix == ".png"
+    )
+    if not master_paths:
+        raise AssetPipelineError(
+            f"no source images found matching {SOURCE_DIR / MASTER_IMAGE_PATTERN}"
+        )
+    return master_paths
+
+
+def output_dir_for_source(source_path: Path) -> Path:
+    return GENERATED_DIR / source_path.stem
+
+
+def anomaly_center_for_source(source_path: Path) -> tuple[int, int]:
+    return ANOMALY_CENTER_OVERRIDES.get(source_path.stem, (ANOMALY_X, ANOMALY_Y))
+
+
+def localization_crop_size_for_source(source_path: Path) -> tuple[int, int]:
+    return LOCALIZATION_CROP_SIZE_OVERRIDES.get(
+        source_path.stem,
+        (LOCALIZATION_CROP_WIDTH, LOCALIZATION_CROP_HEIGHT),
+    )
+
+
+def thumbnail_specs_for_source(source_path: Path) -> tuple[ThumbnailSpec, ...]:
+    overrides = THUMBNAIL_SPEC_OVERRIDES.get(source_path.stem, {})
+    specs = []
+    for spec in THUMBNAIL_SPECS:
+        spec_overrides = overrides.get(spec.file_name)
+        if spec_overrides is not None:
+            spec = replace(spec, **spec_overrides)
+        specs.append(spec)
+    return tuple(specs)
 
 
 def sha256_file(path: Path) -> str:
@@ -107,14 +177,14 @@ def sha256_file(path: Path) -> str:
     return digest.hexdigest()
 
 
-def load_source_image() -> Image.Image:
-    if not SOURCE_IMAGE_PATH.exists():
-        raise AssetPipelineError(f"source image is missing: {SOURCE_IMAGE_PATH}")
-    if not SOURCE_IMAGE_PATH.is_file():
-        raise AssetPipelineError(f"source image is not a file: {SOURCE_IMAGE_PATH}")
+def load_source_image(source_path: Path) -> Image.Image:
+    if not source_path.exists():
+        raise AssetPipelineError(f"source image is missing: {source_path}")
+    if not source_path.is_file():
+        raise AssetPipelineError(f"source image is not a file: {source_path}")
 
     try:
-        with Image.open(SOURCE_IMAGE_PATH) as image:
+        with Image.open(source_path) as image:
             if image.format != "PNG":
                 raise AssetPipelineError(
                     f"source image must be PNG, found {image.format!r}"
@@ -398,12 +468,65 @@ def save_png(image: Image.Image, path: Path) -> None:
     image.save(path, format="PNG", optimize=False)
 
 
-def validate_outputs(expected_source_hash: str | None = None) -> None:
-    current_hash = sha256_file(SOURCE_IMAGE_PATH)
-    load_source_image()
+def visible_children(path: Path) -> tuple[Path, ...]:
+    return tuple(child for child in path.iterdir() if not child.name.startswith("."))
 
-    if expected_source_hash is not None:
-        if current_hash != expected_source_hash:
+
+def remove_legacy_root_outputs() -> None:
+    for file_name in OUTPUT_SPECS:
+        legacy_path = GENERATED_DIR / file_name
+        if not legacy_path.exists():
+            continue
+        if not legacy_path.is_file():
+            raise AssetPipelineError(f"legacy output path is not a file: {legacy_path}")
+        legacy_path.unlink()
+
+
+def validate_output_set(output_dir: Path) -> None:
+    if not output_dir.exists():
+        raise AssetPipelineError(f"generated folder is missing: {output_dir}")
+    if not output_dir.is_dir():
+        raise AssetPipelineError(f"generated path is not a folder: {output_dir}")
+
+    expected_names = set(OUTPUT_SPECS)
+    actual_names = {path.name for path in visible_children(output_dir)}
+    missing = sorted(expected_names - actual_names)
+    unexpected = sorted(actual_names - expected_names)
+    if missing:
+        raise AssetPipelineError(
+            f"missing generated files in {output_dir.name}: {', '.join(missing)}"
+        )
+    if unexpected:
+        raise AssetPipelineError(
+            f"unexpected generated files in {output_dir.name}: {', '.join(unexpected)}"
+        )
+
+    for file_name, expected_size in OUTPUT_SPECS.items():
+        path = output_dir / file_name
+        if not path.is_file():
+            raise AssetPipelineError(f"generated output is not a file: {path}")
+        try:
+            with Image.open(path) as image:
+                if image.format != "PNG":
+                    raise AssetPipelineError(f"{path} is not a PNG")
+                if image.size != expected_size:
+                    raise AssetPipelineError(
+                        f"{path} has size {image.size}, expected {expected_size}"
+                    )
+        except UnidentifiedImageError as error:
+            raise AssetPipelineError(f"{path} cannot be decoded as a PNG") from error
+
+
+def validate_outputs(expected_source_hashes: dict[Path, str] | None = None) -> None:
+    master_paths = discover_master_images()
+    current_hashes = {path: sha256_file(path) for path in master_paths}
+    for source_path in master_paths:
+        load_source_image(source_path)
+
+    if expected_source_hashes is not None:
+        if set(current_hashes) != set(expected_source_hashes):
+            raise AssetPipelineError("source image set changed during pipeline execution")
+        if current_hashes != expected_source_hashes:
             raise AssetPipelineError("source image changed during pipeline execution")
 
     if not GENERATED_DIR.exists():
@@ -411,62 +534,60 @@ def validate_outputs(expected_source_hash: str | None = None) -> None:
     if not GENERATED_DIR.is_dir():
         raise AssetPipelineError(f"generated path is not a folder: {GENERATED_DIR}")
 
-    expected_names = set(OUTPUT_SPECS)
-    actual_names = {path.name for path in GENERATED_DIR.iterdir()}
+    expected_names = {path.stem for path in master_paths}
+    actual_children = visible_children(GENERATED_DIR)
+    actual_names = {path.name for path in actual_children}
     missing = sorted(expected_names - actual_names)
     unexpected = sorted(actual_names - expected_names)
     if missing:
-        raise AssetPipelineError(f"missing generated files: {', '.join(missing)}")
+        raise AssetPipelineError(
+            f"missing generated master folders: {', '.join(missing)}"
+        )
     if unexpected:
-        raise AssetPipelineError(f"unexpected generated files: {', '.join(unexpected)}")
+        raise AssetPipelineError(
+            f"unexpected generated entries: {', '.join(unexpected)}"
+        )
 
-    for file_name, expected_size in OUTPUT_SPECS.items():
-        path = GENERATED_DIR / file_name
-        if not path.is_file():
-            raise AssetPipelineError(f"generated output is not a file: {path}")
-        try:
-            with Image.open(path) as image:
-                if image.format != "PNG":
-                    raise AssetPipelineError(f"{file_name} is not a PNG")
-                if image.size != expected_size:
-                    raise AssetPipelineError(
-                        f"{file_name} has size {image.size}, expected {expected_size}"
-                    )
-        except UnidentifiedImageError as error:
-            raise AssetPipelineError(f"{file_name} cannot be decoded as a PNG") from error
+    for source_path in master_paths:
+        output_dir = output_dir_for_source(source_path)
+        validate_output_set(output_dir)
 
 
-def generate_assets() -> None:
-    source_hash = sha256_file(SOURCE_IMAGE_PATH)
-    source_image = load_source_image()
-    GENERATED_DIR.mkdir(parents=True, exist_ok=True)
+def generate_output_set(
+    source_image: Image.Image,
+    output_dir: Path,
+    anomaly_center: tuple[int, int],
+    localization_crop_size: tuple[int, int],
+    thumbnail_specs: tuple[ThumbnailSpec, ...],
+) -> None:
+    output_dir.mkdir(parents=True, exist_ok=True)
 
     clean = create_clean_asset(source_image)
-    clean_path = GENERATED_DIR / PART_CLEAN_NAME
+    clean_path = output_dir / PART_CLEAN_NAME
     save_png(clean, clean_path)
 
     with Image.open(clean_path) as clean_image:
         clean_image.load()
         clean_base = clean_image.convert("RGB")
 
-    main = apply_anomaly_overlay(clean_base)
-    save_png(main, GENERATED_DIR / PART_MAIN_NAME)
+    main = apply_anomaly_overlay(clean_base, anomaly_center)
+    save_png(main, output_dir / PART_MAIN_NAME)
 
     localization_box = clamp_crop_box(
-        ANOMALY_X,
-        ANOMALY_Y,
-        (LOCALIZATION_CROP_WIDTH, LOCALIZATION_CROP_HEIGHT),
+        anomaly_center[0],
+        anomaly_center[1],
+        localization_crop_size,
         clean_base.size,
     )
     localization_clean = clean_base.crop(localization_box).resize(
         PART_LOCALIZATION_SIZE,
         Image.Resampling.LANCZOS,
     )
-    scale_x = PART_LOCALIZATION_SIZE[0] / LOCALIZATION_CROP_WIDTH
-    scale_y = PART_LOCALIZATION_SIZE[1] / LOCALIZATION_CROP_HEIGHT
+    scale_x = PART_LOCALIZATION_SIZE[0] / localization_crop_size[0]
+    scale_y = PART_LOCALIZATION_SIZE[1] / localization_crop_size[1]
     localization_center = (
-        int(round((ANOMALY_X - localization_box[0]) * scale_x)),
-        int(round((ANOMALY_Y - localization_box[1]) * scale_y)),
+        int(round((anomaly_center[0] - localization_box[0]) * scale_x)),
+        int(round((anomaly_center[1] - localization_box[1]) * scale_y)),
     )
     localization_radius = int(round(ANOMALY_RADIUS * (scale_x + scale_y) / 2))
     localization = apply_anomaly_overlay(
@@ -474,13 +595,30 @@ def generate_assets() -> None:
         localization_center,
         localization_radius,
     )
-    save_png(localization, GENERATED_DIR / PART_LOCALIZATION_NAME)
+    save_png(localization, output_dir / PART_LOCALIZATION_NAME)
 
-    for spec in THUMBNAIL_SPECS:
+    for spec in thumbnail_specs:
         thumbnail = create_thumbnail_asset(clean_base, spec)
-        save_png(thumbnail, GENERATED_DIR / spec.file_name)
+        save_png(thumbnail, output_dir / spec.file_name)
 
-    validate_outputs(expected_source_hash=source_hash)
+
+def generate_assets() -> None:
+    master_paths = discover_master_images()
+    source_hashes = {path: sha256_file(path) for path in master_paths}
+    GENERATED_DIR.mkdir(parents=True, exist_ok=True)
+    remove_legacy_root_outputs()
+
+    for source_path in master_paths:
+        source_image = load_source_image(source_path)
+        generate_output_set(
+            source_image,
+            output_dir_for_source(source_path),
+            anomaly_center_for_source(source_path),
+            localization_crop_size_for_source(source_path),
+            thumbnail_specs_for_source(source_path),
+        )
+
+    validate_outputs(expected_source_hashes=source_hashes)
 
 
 def parse_args(argv: list[str]) -> argparse.Namespace:

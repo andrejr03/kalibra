@@ -8,11 +8,26 @@ from tools import generate_kalibra_part_assets as pipeline
 
 
 def file_hashes(paths: list[Path]) -> dict[str, str]:
-    return {path.name: pipeline.sha256_file(path) for path in paths}
+    return {
+        str(path.relative_to(pipeline.GENERATED_DIR)): pipeline.sha256_file(path)
+        for path in paths
+    }
 
 
 def generated_paths() -> list[Path]:
-    return [pipeline.GENERATED_DIR / name for name in sorted(pipeline.OUTPUT_SPECS)]
+    return [
+        pipeline.output_dir_for_source(source_path) / name
+        for source_path in pipeline.discover_master_images()
+        for name in sorted(pipeline.OUTPUT_SPECS)
+    ]
+
+
+def generated_root_entries() -> set[str]:
+    return {path.name for path in pipeline.visible_children(pipeline.GENERATED_DIR)}
+
+
+def expected_generated_directories() -> set[str]:
+    return {path.stem for path in pipeline.discover_master_images()}
 
 
 def parts_files_outside_generated() -> list[Path]:
@@ -23,39 +38,61 @@ def parts_files_outside_generated() -> list[Path]:
     )
 
 
-def test_pipeline_preserves_source_image() -> None:
-    source_hash_before = pipeline.sha256_file(pipeline.SOURCE_IMAGE_PATH)
+def test_pipeline_detects_multiple_master_images() -> None:
+    master_paths = pipeline.discover_master_images()
+
+    assert len(master_paths) >= 2
+    assert [path.name for path in master_paths] == sorted(
+        path.name for path in master_paths
+    )
+    assert {"master_clean.png", "master_clean_v2.png"}.issubset(
+        {path.name for path in master_paths}
+    )
+
+
+def test_pipeline_preserves_source_images() -> None:
+    source_hashes_before = {
+        path: pipeline.sha256_file(path) for path in pipeline.discover_master_images()
+    }
 
     pipeline.generate_assets()
 
-    assert pipeline.sha256_file(pipeline.SOURCE_IMAGE_PATH) == source_hash_before
+    assert {
+        path: pipeline.sha256_file(path) for path in pipeline.discover_master_images()
+    } == source_hashes_before
 
 
 def test_generated_files_exist_with_exact_png_dimensions() -> None:
     pipeline.generate_assets()
 
-    assert {path.name for path in pipeline.GENERATED_DIR.iterdir()} == set(
-        pipeline.OUTPUT_SPECS
-    )
-    for file_name, expected_size in pipeline.OUTPUT_SPECS.items():
-        output_path = pipeline.GENERATED_DIR / file_name
-        assert output_path.exists()
-        with Image.open(output_path) as image:
-            assert image.format == "PNG"
-            assert image.size == expected_size
+    assert generated_root_entries() == expected_generated_directories()
+    for source_path in pipeline.discover_master_images():
+        output_dir = pipeline.output_dir_for_source(source_path)
+        assert output_dir.is_dir()
+        assert {path.name for path in pipeline.visible_children(output_dir)} == set(
+            pipeline.OUTPUT_SPECS
+        )
+        for file_name, expected_size in pipeline.OUTPUT_SPECS.items():
+            output_path = output_dir / file_name
+            assert output_path.exists()
+            with Image.open(output_path) as image:
+                assert image.format == "PNG"
+                assert image.size == expected_size
 
 
 def test_thumbnail_outputs_exist_with_exact_png_dimensions() -> None:
     pipeline.generate_assets()
 
-    assert set(pipeline.THUMBNAIL_NAMES).issubset(
-        {path.name for path in pipeline.GENERATED_DIR.iterdir()}
-    )
-    for file_name in pipeline.THUMBNAIL_NAMES:
-        output_path = pipeline.GENERATED_DIR / file_name
-        with Image.open(output_path) as image:
-            assert image.format == "PNG"
-            assert image.size == pipeline.THUMBNAIL_SIZE
+    for source_path in pipeline.discover_master_images():
+        output_dir = pipeline.output_dir_for_source(source_path)
+        assert set(pipeline.THUMBNAIL_NAMES).issubset(
+            {path.name for path in pipeline.visible_children(output_dir)}
+        )
+        for file_name in pipeline.THUMBNAIL_NAMES:
+            output_path = output_dir / file_name
+            with Image.open(output_path) as image:
+                assert image.format == "PNG"
+                assert image.size == pipeline.THUMBNAIL_SIZE
 
 
 def test_pipeline_execution_is_deterministic() -> None:
@@ -74,7 +111,7 @@ def test_pipeline_writes_only_generated_part_assets() -> None:
     pipeline.generate_assets()
 
     assert parts_files_outside_generated() == before
-    assert Path("source/master_clean.png") in before
-    assert {path.name for path in pipeline.GENERATED_DIR.iterdir()} == set(
-        pipeline.OUTPUT_SPECS
-    )
+    assert {
+        Path("source") / path.name for path in pipeline.discover_master_images()
+    }.issubset(set(before))
+    assert generated_root_entries() == expected_generated_directories()
