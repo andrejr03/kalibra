@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from copy import deepcopy
 from dataclasses import replace
 from pathlib import Path
 
@@ -9,18 +10,32 @@ from src.inspection import (
     DefectJudgment,
     DefectLocalization,
     InspectionInput,
+    InspectionJudgement,
     InspectionResult,
     NormalizedBoundingBox,
     RawAnomalyScore,
+    RawInspectionResult,
 )
 from src.trust import (
     AbstentionStatus,
+    CalibratedTrustConfidence,
+    CalibrationFailure,
     CalibratedConfidence,
+    DriftCautionStatus,
     DriftAssessment,
     DriftAssessmentStatus,
+    DriftReference,
     InvalidTrustQualificationResult,
+    MalformedRawInspectionResult,
+    NonReproducibleTrustQualification,
+    QualifiedOutcome,
     QualificationOutcome,
+    RawInspectionMutationError,
+    TrustEvidenceEmissionFailure,
     TrustQualificationEngine,
+    TrustQualificationEngineOutput,
+    TrustQualificationEvidenceRecord,
+    TrustQualificationResult,
     TrustQualifiedResult,
 )
 
@@ -51,6 +66,31 @@ def make_inspection_result() -> InspectionResult:
         ),
         method_id="inspection-method",
         method_version="1",
+    )
+
+
+def make_raw_result(
+    raw_measure: float = 5.0,
+    judgement: InspectionJudgement = InspectionJudgement.OK,
+    result_id: str = "raw-result-1",
+) -> RawInspectionResult:
+    localization = None
+    if judgement is InspectionJudgement.DEFECT:
+        localization = DefectLocalization(
+            region=NormalizedBoundingBox(
+                x_min=0.1,
+                y_min=0.1,
+                x_max=0.5,
+                y_max=0.5,
+            )
+        )
+    return RawInspectionResult(
+        inspection_result_id=result_id,
+        input_id="input-raw-1",
+        judgement=judgement,
+        localization=localization,
+        raw_anomaly_measure=raw_measure,
+        examination_id="examination-raw-1",
     )
 
 
@@ -101,6 +141,231 @@ def test_inspection_result_can_be_qualified_without_mutation():
     assert qualified.inspection_result == make_inspection_result()
     assert qualified.calibrated_confidence.value == 0.8
     assert qualified.qualification_outcome is QualificationOutcome.ACCEPT
+
+
+def test_valid_raw_result_produces_one_trust_qualification_result():
+    raw_result = make_raw_result()
+
+    output = TrustQualificationEngine().qualify(raw_result)
+
+    assert isinstance(output, TrustQualificationEngineOutput)
+    assert isinstance(output.trust_qualification_result, TrustQualificationResult)
+    assert output.trust_qualification_result.inspection_result_id == (
+        raw_result.inspection_result_id
+    )
+    assert output.trust_qualification_result.input_id == raw_result.input_id
+
+
+def test_raw_anomaly_measure_is_not_exposed_as_calibrated_confidence():
+    raw_result = make_raw_result(raw_measure=5.0)
+
+    qualification = TrustQualificationEngine().qualify(
+        raw_result
+    ).trust_qualification_result
+
+    assert raw_result.raw_anomaly_measure == 5.0
+    assert qualification.calibrated_confidence.value == 0.9
+    assert not hasattr(qualification, "raw_anomaly_measure")
+
+
+def test_calibrated_confidence_is_explicitly_marked_calibrated():
+    qualification = TrustQualificationEngine().qualify(
+        make_raw_result()
+    ).trust_qualification_result
+
+    assert qualification.confidence_kind == "calibrated_confidence"
+    assert qualification.calibrated_confidence.confidence_kind == (
+        "calibrated_confidence"
+    )
+    assert qualification.calibrated_confidence.calibration_kind == (
+        "deterministic_placeholder_calibration"
+    )
+
+
+def test_raw_qualified_outcomes_are_explicit_and_complete():
+    assert {outcome.value for outcome in QualifiedOutcome} == {
+        "accept",
+        "reject",
+        "review",
+        "abstain",
+    }
+
+
+def test_accept_reject_review_and_abstain_can_be_produced():
+    accept = TrustQualificationEngine().qualify(
+        make_raw_result(raw_measure=5.0, judgement=InspectionJudgement.OK)
+    ).trust_qualification_result
+    reject = TrustQualificationEngine().qualify(
+        make_raw_result(
+            raw_measure=95.0,
+            judgement=InspectionJudgement.DEFECT,
+            result_id="raw-result-defect",
+        )
+    ).trust_qualification_result
+    review = TrustQualificationEngine().qualify(
+        make_raw_result(raw_measure=35.0, judgement=InspectionJudgement.OK)
+    ).trust_qualification_result
+    abstain = TrustQualificationEngine().qualify(
+        make_raw_result(raw_measure=49.0, judgement=InspectionJudgement.OK)
+    ).trust_qualification_result
+
+    assert accept.qualified_outcome is QualifiedOutcome.ACCEPT
+    assert reject.qualified_outcome is QualifiedOutcome.REJECT
+    assert review.qualified_outcome is QualifiedOutcome.REVIEW
+    assert abstain.qualified_outcome is QualifiedOutcome.ABSTAIN
+
+
+def test_missing_drift_reference_is_absence_not_failure():
+    qualification = TrustQualificationEngine().qualify(
+        make_raw_result()
+    ).trust_qualification_result
+
+    assert qualification.drift_caution.status is DriftCautionStatus.UNAVAILABLE
+    assert qualification.drift_caution.absence_reason == (
+        "drift_reference_unavailable"
+    )
+
+
+def test_drift_caution_can_increase_caution_without_mutating_raw_result():
+    raw_result = make_raw_result(raw_measure=5.0, judgement=InspectionJudgement.OK)
+    raw_before = deepcopy(raw_result)
+
+    without_drift = TrustQualificationEngine().qualify(
+        raw_result
+    ).trust_qualification_result
+    with_drift = TrustQualificationEngine().qualify(
+        raw_result,
+        drift_reference=DriftReference(
+            reference_id="drift-reference-1",
+            available=True,
+            drift_score=0.9,
+        ),
+    ).trust_qualification_result
+
+    assert without_drift.qualified_outcome is QualifiedOutcome.ACCEPT
+    assert with_drift.qualified_outcome is QualifiedOutcome.REVIEW
+    assert with_drift.drift_caution.caution_applied is True
+    assert raw_result == raw_before
+
+
+def test_raw_inspection_result_is_unchanged_after_qualification():
+    raw_result = make_raw_result(raw_measure=95.0, judgement=InspectionJudgement.DEFECT)
+    raw_before = deepcopy(raw_result)
+
+    TrustQualificationEngine().qualify(raw_result)
+
+    assert raw_result == raw_before
+
+
+def test_trust_evidence_record_preserves_raw_result_and_qualification():
+    raw_result = make_raw_result()
+
+    output = TrustQualificationEngine().qualify(raw_result)
+    qualification = output.trust_qualification_result
+    evidence = output.trust_qualification_evidence_record
+
+    assert isinstance(evidence, TrustQualificationEvidenceRecord)
+    assert evidence.raw_inspection_result == raw_result
+    assert evidence.trust_qualification_result == qualification
+    assert evidence.inspection_result_id == raw_result.inspection_result_id
+    assert evidence.qualification_result_id == qualification.qualification_result_id
+
+
+def test_raw_trust_engine_does_not_require_or_inspect_images():
+    engine = TrustQualificationEngine()
+
+    output = engine.qualify(make_raw_result())
+
+    assert output.trust_qualification_result.input_id == "input-raw-1"
+    assert not hasattr(engine, "inspect")
+    assert not hasattr(engine, "inspect_path")
+
+
+def test_raw_trust_engine_exposes_no_downstream_or_model_behaviour():
+    engine = TrustQualificationEngine()
+
+    assert not hasattr(engine, "review")
+    assert not hasattr(engine, "route_for_review")
+    assert not hasattr(engine, "present_evidence")
+    assert not hasattr(engine, "evaluate")
+    assert not hasattr(engine, "train")
+    assert not hasattr(engine, "update_model")
+
+
+def test_same_raw_input_produces_identical_qualification_and_record():
+    engine = TrustQualificationEngine()
+    raw_result = make_raw_result()
+
+    first = engine.qualify(raw_result)
+    second = engine.qualify(raw_result)
+
+    assert first.trust_qualification_result == second.trust_qualification_result
+    assert (
+        first.trust_qualification_evidence_record
+        == second.trust_qualification_evidence_record
+    )
+
+
+def test_malformed_raw_inspection_result_is_refused():
+    with pytest.raises(MalformedRawInspectionResult):
+        TrustQualificationEngine().qualify(object())  # type: ignore[arg-type]
+
+
+def test_calibration_failure_is_explicit_and_not_disguised_as_abstain():
+    class FailingCalibrator:
+        def calibrate(self, raw_result: RawInspectionResult) -> object:
+            raise RuntimeError("calibration unavailable")
+
+    with pytest.raises(CalibrationFailure):
+        TrustQualificationEngine(calibrator=FailingCalibrator()).qualify(
+            make_raw_result(raw_measure=49.0)
+        )
+
+
+def test_evidence_emission_failure_is_explicit():
+    class FailingEvidenceEmitter:
+        def emit(
+            self,
+            raw_result: RawInspectionResult,
+            qualification: TrustQualificationResult,
+        ) -> object:
+            return object()
+
+    with pytest.raises(TrustEvidenceEmissionFailure):
+        TrustQualificationEngine(evidence_emitter=FailingEvidenceEmitter()).qualify(
+            make_raw_result()
+        )
+
+
+def test_detectable_raw_result_mutation_is_refused():
+    class MutatingCalibrator:
+        def calibrate(
+            self, raw_result: RawInspectionResult
+        ) -> CalibratedTrustConfidence:
+            object.__setattr__(raw_result, "raw_anomaly_measure", 1.0)
+            return CalibratedTrustConfidence(value=0.9)
+
+    with pytest.raises(RawInspectionMutationError):
+        TrustQualificationEngine(calibrator=MutatingCalibrator()).qualify(
+            make_raw_result()
+        )
+
+
+def test_detectable_non_reproducibility_is_refused():
+    class NonReproducibleCalibrator:
+        def __init__(self) -> None:
+            self.count = 0
+
+        def calibrate(
+            self, raw_result: RawInspectionResult
+        ) -> CalibratedTrustConfidence:
+            self.count += 1
+            return CalibratedTrustConfidence(value=0.8 + (self.count / 100.0))
+
+    with pytest.raises(NonReproducibleTrustQualification):
+        TrustQualificationEngine(calibrator=NonReproducibleCalibrator()).qualify(
+            make_raw_result()
+        )
 
 
 def test_calibrated_confidence_is_bounded_as_confidence():
