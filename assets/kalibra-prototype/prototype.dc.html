@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<meta name="ext-resource-dependency" content="../parts/generated/part_main.png">
+<meta name="ext-resource-dependency" content="../parts/generated/part_clean.png">
+<meta name="ext-resource-dependency" content="../parts/generated/part_localization.png">
+<meta name="ext-resource-dependency" content="../parts/generated/thumb_01.png">
+<meta name="ext-resource-dependency" content="../parts/generated/thumb_02.png">
+<meta name="ext-resource-dependency" content="../parts/generated/thumb_03.png">
+<meta name="ext-resource-dependency" content="../parts/generated/thumb_04.png">
+<meta name="ext-resource-dependency" content="../parts/generated/thumb_05.png">
+<meta name="ext-resource-dependency" content="../parts/generated/thumb_06.png">
+<meta name="ext-resource-dependency" content="../parts/generated/thumb_07.png">
+<meta name="ext-resource-dependency" content="../parts/generated/thumb_08.png">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{background:#07090d;font-family:'IBM Plex Sans',sans-serif;-webkit-font-smoothing:antialiased}
+  ::-webkit-scrollbar{width:10px;height:10px}
+  ::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:6px;border:2px solid #07090d}
+  ::-webkit-scrollbar-track{background:transparent}
+  .ph{line-height:1}
+  @keyframes kpulse{0%,100%{opacity:0.55;transform:scale(1)}50%{opacity:1;transform:scale(1.25)}}
+  @keyframes kfade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</helmet>
+
+<div style="height:100vh;display:grid;grid-template-rows:auto 1fr auto;background:#07090d;color:#eef1f5;overflow:hidden">
+
+  <!-- ===================== HEADER ===================== -->
+  <header style="position:relative;display:flex;align-items:center;justify-content:space-between;padding:16px 22px;min-height:104px;background:linear-gradient(180deg,#0a0e15,#07090d);border-bottom:1px solid rgba(255,255,255,0.06)">
+    <div style="display:flex;align-items:center;gap:11px;background:#0e141c;border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:11px 16px">
+      <svg width="22" height="25" viewBox="0 0 34 38"><polygon points="17,2 32,10.5 32,27.5 17,36 2,27.5 2,10.5" fill="none" stroke="#e6a23c" stroke-width="2.4"></polygon><circle cx="17" cy="19" r="3.6" fill="#e6a23c"></circle></svg>
+      <span style="font:600 13px 'Space Grotesk';letter-spacing:0.16em;color:#e6a23c">WORKBENCH</span>
+    </div>
+
+    <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center">
+      <div style="display:flex;align-items:center;justify-content:center;gap:16px">
+        <svg width="38" height="42" viewBox="0 0 34 38"><polygon points="17,2 32,10.5 32,27.5 17,36 2,27.5 2,10.5" fill="none" stroke="#e6a23c" stroke-width="2"></polygon><polygon points="17,9 26,14 26,24 17,29 8,24 8,14" fill="none" stroke="#e6a23c" stroke-width="1.4" opacity="0.65"></polygon><circle cx="17" cy="19" r="2.6" fill="#e6a23c"></circle></svg>
+        <span style="font:300 44px 'Space Grotesk';letter-spacing:0.32em;color:#f3f5f8;padding-left:0.32em">KALIBRA</span>
+      </div>
+      <div style="font:500 12px 'Space Grotesk';letter-spacing:0.42em;color:#e6a23c;margin-top:4px">TRUSTWORTHY VISUAL INSPECTION</div>
+      <div style="font:300 14px 'IBM Plex Sans';letter-spacing:0.04em;color:#8a93a0;margin-top:7px">Inspect. Qualify. Trust.</div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="display:flex;align-items:center;gap:8px;background:#0e141c;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:9px 13px">
+        <span style="width:7px;height:7px;border-radius:50%;background:#45c46a;box-shadow:0 0 8px #45c46a"></span>
+        <span style="font:500 11px 'Space Grotesk';letter-spacing:0.12em;color:#c4ccd6">OFFLINE MODE</span>
+      </div>
+      <button style="width:38px;height:38px;display:grid;place-items:center;background:#0e141c;border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:#9aa3af;cursor:pointer"><i class="ph ph-file-text" style="font-size:17px"></i></button>
+      <button style="width:38px;height:38px;display:grid;place-items:center;background:#0e141c;border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:#9aa3af;cursor:pointer"><i class="ph ph-gear" style="font-size:17px"></i></button>
+      <button style="width:38px;height:38px;display:grid;place-items:center;background:#0e141c;border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:#9aa3af;cursor:pointer"><i class="ph ph-user" style="font-size:17px"></i></button>
+    </div>
+  </header>
+
+  <!-- ===================== BODY ===================== -->
+  <div style="display:grid;grid-template-columns:212px 1fr;min-height:0">
+
+    <!-- SIDEBAR -->
+    <aside style="border-right:1px solid rgba(255,255,255,0.06);padding:18px 14px;display:flex;flex-direction:column;gap:5px;overflow-y:auto;background:#080b10">
+      <sc-for list="{{ nav }}" as="item" hint-placeholder-count="7">
+        <button onClick="{{ item.go }}" style="{{ item.style }}">
+          <i class="ph {{ item.icon }}" style="font-size:18px"></i>
+          <span>{{ item.label }}</span>
+        </button>
+      </sc-for>
+
+      <div style="height:1px;background:rgba(255,255,255,0.06);margin:16px 4px 14px"></div>
+
+      <div style="padding:0 6px;display:flex;flex-direction:column;gap:16px">
+        <div>
+          <div style="font:600 10px 'Space Grotesk';letter-spacing:0.16em;color:#5f6975;margin-bottom:7px">SYSTEM STATUS</div>
+          <div style="display:flex;align-items:center;gap:8px"><span style="width:8px;height:8px;border-radius:50%;background:#45c46a;box-shadow:0 0 7px #45c46a"></span><span style="font:400 14px 'IBM Plex Sans';color:#45c46a">Ready</span></div>
+        </div>
+        <div>
+          <div style="font:600 10px 'Space Grotesk';letter-spacing:0.16em;color:#5f6975;margin-bottom:6px">MODE</div>
+          <div style="font:400 14px 'IBM Plex Sans';color:#d2d8e0">Offline (Batch)</div>
+        </div>
+        <div>
+          <div style="font:600 10px 'Space Grotesk';letter-spacing:0.16em;color:#5f6975;margin-bottom:6px">DATASET</div>
+          <div style="font:400 14px 'IBM Plex Sans';color:#d2d8e0">Kalibra Industrial v1.0</div>
+        </div>
+        <div>
+          <div style="font:600 10px 'Space Grotesk';letter-spacing:0.16em;color:#5f6975;margin-bottom:6px">RUN</div>
+          <div style="font:400 13px 'IBM Plex Mono';color:#d2d8e0">2025-05-21 14:32:07</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- CONTENT -->
+    <main style="overflow:auto;padding:20px">
+
+      <!-- ================= OVERVIEW ================= -->
+      <sc-if value="{{ isOverview }}" hint-placeholder-val="{{ true }}">
+      <div style="display:grid;grid-template-columns:1fr 340px;gap:18px;align-items:start;min-width:1180px;animation:kfade .3s ease">
+
+        <!-- LEFT COLUMN -->
+        <div style="display:flex;flex-direction:column;gap:18px;min-width:0">
+
+          <!-- CURRENT INSPECTION -->
+          <section style="background:#0e141c;border:1px solid rgba(255,255,255,0.06);border-radius:11px;padding:18px 20px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+              <span style="font:600 12px 'Space Grotesk';letter-spacing:0.15em;color:#7b8693">CURRENT INSPECTION</span>
+              <div style="display:flex;align-items:center;gap:4px;background:#090d12;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:4px 4px">
+                <button onClick="{{ prevCase }}" style="width:26px;height:24px;display:grid;place-items:center;background:transparent;border:none;color:#9aa3af;cursor:pointer"><i class="ph ph-caret-left" style="font-size:14px"></i></button>
+                <span style="font:400 13px 'IBM Plex Mono';color:#c4ccd6;padding:0 6px">{{ featured.seqText }}</span>
+                <button onClick="{{ nextCase }}" style="width:26px;height:24px;display:grid;place-items:center;background:transparent;border:none;color:#9aa3af;cursor:pointer"><i class="ph ph-caret-right" style="font-size:14px"></i></button>
+              </div>
+            </div>
+
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
+              <span style="font:500 16px 'IBM Plex Mono';color:#eef1f5">{{ featured.file }}</span>
+              <span style="font:500 11px 'Space Grotesk';letter-spacing:0.06em;color:#9aa3af;background:#121922;border:1px solid rgba(255,255,255,0.08);border-radius:5px;padding:3px 9px">{{ featured.partType }}</span>
+            </div>
+            <div style="font:400 13px 'IBM Plex Mono';color:#6b7682;margin-bottom:2px">Run ID: {{ featured.runId }}</div>
+            <div style="font:400 13px 'IBM Plex Mono';color:#6b7682;margin-bottom:16px">Batch: {{ featured.batch }}</div>
+
+            <div style="display:flex;gap:16px">
+              <!-- main image -->
+              <div style="position:relative;flex:1;min-width:0;border-radius:9px;overflow:hidden;background:#070a0e;border:1px solid rgba(255,255,255,0.05)">
+                <img src="../parts/generated/part_main.png" alt="inspected part" style="width:100%;display:block">
+                <div style="position:absolute;left:14px;bottom:14px;display:flex;align-items:center;gap:2px;background:rgba(10,14,20,0.82);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:5px 6px">
+                  <span style="font:500 12px 'IBM Plex Sans';color:#c4ccd6;padding:0 8px">Fit</span>
+                  <span style="width:1px;height:16px;background:rgba(255,255,255,0.12)"></span>
+                  <i class="ph ph-magnifying-glass" style="font-size:13px;color:#9aa3af;padding:0 4px 0 8px"></i>
+                  <span style="font:400 12px 'IBM Plex Mono';color:#c4ccd6;padding:0 6px">124%</span>
+                  <button onClick="{{ noop }}" style="width:24px;height:22px;display:grid;place-items:center;background:transparent;border:none;color:#9aa3af;cursor:pointer"><i class="ph ph-caret-right" style="font-size:12px"></i></button>
+                  <span style="width:1px;height:16px;background:rgba(255,255,255,0.12)"></span>
+                  <button onClick="{{ noop }}" style="width:24px;height:22px;display:grid;place-items:center;background:transparent;border:none;color:#9aa3af;cursor:pointer"><i class="ph ph-arrows-out" style="font-size:13px"></i></button>
+                </div>
+              </div>
+              <!-- localization inset -->
+              <div style="width:268px;flex:none;background:#090d12;border:1px solid rgba(255,255,255,0.06);border-radius:9px;padding:13px">
+                <div style="font:600 11px 'Space Grotesk';letter-spacing:0.14em;color:#7b8693;margin-bottom:11px">DEFECT LOCALIZATION</div>
+                <div style="border-radius:7px;overflow:hidden;background:#070a0e;border:1px solid rgba(255,255,255,0.05)"><img src="../parts/generated/part_localization.png" alt="defect localization" style="width:100%;display:block"></div>
+                <div style="display:flex;align-items:center;gap:8px;margin:12px 0 10px"><span style="width:9px;height:9px;border-radius:50%;background:#e5514e;animation:kpulse 2.4s ease-in-out infinite"></span><span style="font:400 13px 'IBM Plex Sans';color:#d2d8e0">Suspected Defect</span></div>
+                <div style="height:1px;background:rgba(255,255,255,0.06);margin-bottom:10px"></div>
+                <div style="display:flex;align-items:center;justify-content:space-between"><span style="font:400 13px 'IBM Plex Sans';color:#8a93a0">Region Confidence</span><span style="font:500 14px 'IBM Plex Mono';color:#eef1f5">{{ featured.regionConfText }}</span></div>
+              </div>
+            </div>
+
+            <div style="height:1px;background:rgba(255,255,255,0.06);margin:18px 0 16px"></div>
+
+            <div style="display:grid;grid-template-columns:0.7fr 1.3fr;gap:28px;align-items:start">
+              <div>
+                <div style="font:600 11px 'Space Grotesk';letter-spacing:0.14em;color:#7b8693;margin-bottom:12px">INSPECTION RESULT</div>
+                <div style="display:inline-flex;align-items:center;gap:9px;background:{{ featured.resultBg }};border:1px solid {{ featured.resultBorder }};border-radius:8px;padding:10px 16px">
+                  <i class="ph ph-hexagon" style="font-size:17px;color:{{ featured.resultColor }}"></i>
+                  <span style="font:600 16px 'Space Grotesk';letter-spacing:0.08em;color:{{ featured.resultColor }}">{{ featured.result }}</span>
+                </div>
+              </div>
+              <div>
+                <div style="font:600 11px 'Space Grotesk';letter-spacing:0.14em;color:#7b8693;margin-bottom:12px">RAW ANOMALY SCORE</div>
+                <div style="display:flex;align-items:center;gap:18px">
+                  <span style="font:300 38px 'IBM Plex Sans';color:#f3f5f8;line-height:1">{{ featured.rawText }}</span>
+                  <div style="flex:1">
+                    <div style="height:8px;border-radius:5px;background:rgba(255,255,255,0.08);overflow:hidden"><div style="{{ featured.rawBarStyle }}"></div></div>
+                    <div style="display:flex;justify-content:space-between;margin-top:6px"><span style="font:400 12px 'IBM Plex Mono';color:#6b7682">0</span><span style="font:400 12px 'IBM Plex Mono';color:#6b7682">1</span></div>
+                  </div>
+                </div>
+                <div style="font:400 11px 'IBM Plex Sans';color:#5f6975;margin-top:9px;font-style:italic">Not yet calibrated confidence &mdash; see Trust Qualification.</div>
+              </div>
+            </div>
+          </section>
+
+          <!-- bottom row -->
+          <div style="display:grid;grid-template-columns:auto 1fr;gap:18px">
+            <!-- recent cases -->
+            <section style="background:#0e141c;border:1px solid rgba(255,255,255,0.06);border-radius:11px;padding:18px 20px">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+                <span style="font:600 12px 'Space Grotesk';letter-spacing:0.15em;color:#7b8693">RECENT CASES</span>
+                <button onClick="{{ goEvidence }}" style="font:500 12px 'IBM Plex Sans';color:#e6a23c;background:none;border:none;cursor:pointer">View All</button>
+              </div>
+              <div style="display:flex;gap:11px">
+                <sc-for list="{{ recentCases }}" as="c" hint-placeholder-count="5">
+                  <button onClick="{{ c.go }}" style="background:#090d12;border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:7px;cursor:pointer;width:106px;text-align:left">
+                    <div style="border-radius:5px;overflow:hidden;margin-bottom:8px;aspect-ratio:240/150;background-color:#070a0e;background-size:cover;background-position:center;{{ c.bg }}"></div>
+                    <div style="display:flex;align-items:center;gap:6px">
+                      <span style="width:7px;height:7px;border-radius:50%;background:{{ c.resultColor }}"></span>
+                      <span style="font:600 10px 'Space Grotesk';letter-spacing:0.04em;color:{{ c.resultColor }}">{{ c.result }}</span>
+                      <span style="font:400 11px 'IBM Plex Mono';color:#8a93a0;margin-left:auto">{{ c.rawText }}</span>
+                    </div>
+                  </button>
+                </sc-for>
+              </div>
+            </section>
+
+            <!-- evaluation overview -->
+            <section style="background:#0e141c;border:1px solid rgba(255,255,255,0.06);border-radius:11px;padding:18px 20px">
+              <div style="margin-bottom:16px"><span style="font:600 12px 'Space Grotesk';letter-spacing:0.15em;color:#7b8693">EVALUATION OVERVIEW</span><span style="font:400 12px 'IBM Plex Sans';color:#5f6975;margin-left:8px">(Current Run)</span></div>
+              <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px">
+                <sc-for list="{{ evalCells }}" as="m" hint-placeholder-count="5">
+                  <button onClick="{{ goEval }}" style="background:none;border:none;text-align:left;cursor:pointer;padding:0">
+                    <div style="font:600 9.5px 'Space Grotesk';letter-spacing:0.08em;color:#6b7682;margin-bottom:9px;height:24px;line-height:1.25">{{ m.label }}</div>
+                    <div style="font:300 30px 'IBM Plex Sans';color:#f3f5f8;line-height:1">{{ m.value }}</div>
+                    <div style="font:400 12px 'IBM Plex Mono';color:#6b7682;margin-top:5px">{{ m.metric }}</div>
+                  </button>
+                </sc-for>
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <!-- RIGHT RAIL -->
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <!-- trust qualification -->
+          <section style="background:#0e141c;border:1px solid rgba(255,255,255,0.06);border-radius:11px;padding:18px 20px">
+            <div style="font:600 12px 'Space Grotesk';letter-spacing:0.15em;color:#7b8693;margin-bottom:6px">TRUST QUALIFICATION</div>
+            <div style="display:flex;flex-direction:column;align-items:center;margin:6px 0 2px">
+              <div style="position:relative;width:220px;height:124px">
+                <svg width="220" height="124" viewBox="0 0 220 124" style="display:block">
+                  <defs><linearGradient id="gaugeg" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#e5514e"></stop><stop offset="0.5" stop-color="#e6a23c"></stop><stop offset="1" stop-color="#45c46a"></stop></linearGradient></defs>
+                  <path d="M 18 108 A 92 92 0 0 1 202 108" fill="none" stroke="#161d27" stroke-width="13" stroke-linecap="round"></path>
+                  <path d="M 18 108 A 92 92 0 0 1 202 108" fill="none" stroke="url(#gaugeg)" stroke-width="13" stroke-linecap="round"></path>
+                  <circle cx="{{ gauge.mx }}" cy="{{ gauge.my }}" r="7" fill="#0e141c" stroke="#f3f5f8" stroke-width="3"></circle>
+                </svg>
+                <div style="position:absolute;left:0;right:0;top:56px;text-align:center;font:400 44px 'IBM Plex Sans';color:#e6a23c;line-height:1;letter-spacing:0.01em">{{ featured.confText }}</div>
+              </div>
+              <div style="font:400 13px 'IBM Plex Sans';color:#8a93a0;margin-top:-2px">Calibrated Confidence</div>
+            </div>
+
+            <div style="height:1px;background:rgba(255,255,255,0.06);margin:14px 0"></div>
+
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+              <span style="font:600 11px 'Space Grotesk';letter-spacing:0.14em;color:#7b8693">OUTCOME</span>
+              <span style="display:inline-flex;align-items:center;gap:6px;background:{{ featured.outcomeBg }};border:1px solid {{ featured.outcomeBorder }};border-radius:6px;padding:4px 11px"><span style="width:6px;height:6px;border-radius:50%;background:{{ featured.outcomeColor }}"></span><span style="font:600 12px 'Space Grotesk';letter-spacing:0.08em;color:{{ featured.outcomeColor }}">{{ featured.outcome }}</span></span>
+            </div>
+
+            <div style="font:600 11px 'Space Grotesk';letter-spacing:0.14em;color:#7b8693;margin-bottom:10px">REASON FOR REVIEW</div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <sc-for list="{{ featured.reasons }}" as="r" hint-placeholder-count="3">
+                <div style="display:flex;align-items:flex-start;gap:9px"><span style="width:5px;height:5px;border-radius:50%;background:#6b7682;margin-top:7px;flex:none"></span><span style="font:400 13px 'IBM Plex Sans';color:#c4ccd6">{{ r.text }}</span></div>
+              </sc-for>
+            </div>
+          </section>
+
+          <!-- routing -->
+          <section style="background:#0e141c;border:1px solid rgba(255,255,255,0.06);border-radius:11px;padding:16px 18px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:13px"><span style="font:600 11px 'Space Grotesk';letter-spacing:0.14em;color:#7b8693">ROUTING</span><span style="width:8px;height:8px;border-radius:50%;background:#e6a23c;box-shadow:0 0 7px #e6a23c"></span></div>
+            <div style="display:flex;align-items:center;gap:13px">
+              <div style="width:42px;height:42px;flex:none;display:grid;place-items:center;background:#121922;border:1px solid rgba(230,162,60,0.3);border-radius:9px"><i class="ph ph-user" style="font-size:20px;color:#e6a23c"></i></div>
+              <div><div style="font:500 14px 'IBM Plex Sans';color:#eef1f5">Human Review Required</div><div style="font:400 12px 'IBM Plex Sans';color:#8a93a0;margin-top:2px">Case routed to review queue</div></div>
+            </div>
+          </section>
+
+          <!-- drift -->
+          <section style="background:#0e141c;border:1px solid rgba(255,255,255,0.06);border-radius:11px;padding:16px 18px">
+            <div style="font:600 11px 'Space Grotesk';letter-spacing:0.14em;color:#7b8693;margin-bottom:12px">DRIFT ASSESSMENT</div>
+            <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:14px">
+              <div><div style="font:500 17px 'IBM Plex Sans';color:{{ featured.driftColor }}">{{ featured.driftLabel }}</div></div>
+              <svg width="150" height="40" viewBox="0 0 150 40" style="flex:none"><polyline points="2,28 16,22 30,26 44,16 58,20 72,12 86,24 100,18 114,9 128,19 148,14" fill="none" stroke="#e6a23c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></polyline></svg>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px"><span style="font:400 12px 'IBM Plex Sans';color:#8a93a0">Drift Score</span><span style="font:500 14px 'IBM Plex Mono';color:#eef1f5">{{ featured.driftText }}</span></div>
+          </section>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- placeholders for other screens -->
+      <sc-if value="{{ isInspection }}" hint-placeholder-val="{{ true }}">
+      <div data-screen-label="Inspection" style="min-width:1180px;display:flex;flex-direction:column;gap:18px;animation:kfade .3s ease">
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.06);padding-bottom:15px">
+          <div>
+            <div style="font:600 11px 'Space Grotesk';letter-spacing:0.18em;color:#e6a23c;margin-bottom:7px">INSPECTION ENGINE</div>
+            <div style="font:300 26px 'Space Grotesk';color:#f3f5f8">What the system sees</div>
+          </div>
+          <div style="font:400 13px 'IBM Plex Sans';color:#6b7682;max-width:440px;text-align:right;line-height:1.5">Reaches a defect judgement and locates it. It does not decide whether that judgement can be trusted &mdash; that is qualified separately.</div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:328px 1fr;gap:18px;align-items:start">
+          <!-- list -->
+          <section style="background:#0e141c;border:1px solid rgba(255,255,255,0.06);border-radius:11px;padding:16px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><span style="font:600 12px 'Space Grotesk';letter-spacing:0.15em;color:#7b8693">INSPECTED PARTS</span><span style="font:400 12px 'IBM Plex Mono';color:#5f6975">10,000</span></div>
+            <div style="display:flex;flex-direction:column;gap:3px;max-height:560px;overflow-y:auto">
+              <sc-for list="{{ inspectList }}" as="p" hint-placeholder-count="8">
+                <button onClick="{{ p.go }}" style="{{ p.rowStyle }}">
+                  <div style="width:54px;height:34px;border-radius:5px;flex:none;background-color:#070a0e;background-size:cover;background-position:center;{{ p.bg }}"></div>
+                  <div style="min-width:0;flex:1">
+                    <div style="font:400 12px 'IBM Plex Mono';color:#d2d8e0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ p.file }}</div>
+                    <div style="display:flex;align-items:center;gap:6px;margin-top:4px"><span style="width:6px;height:6px;border-radius:50%;background:{{ p.resultColor }}"></span><span style="font:600 10px 'Space Grotesk';letter-spacing:0.05em;color:{{ p.resultColor }}">{{ p.result }}</span></div>
+                  </div>
+                  <span style="font:500 13px 'IBM Plex Mono';color:#9aa3af;flex:none">{{ p.rawText }}</span>
+                </button>
+              </sc-for>
+            </div>
+          </section>
+
+          <!-- detail -->
+          <section style="background:#0e141c;border:1px solid rgba(255,255,255,0.06);border-radius:11px;padding:18px 20px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+              <div style="display:flex;align-items:center;gap:12px">
+                <span style="font:500 16px 'IBM Plex Mono';color:#eef1f5">{{ inspectSel.file }}</span>
+                <span style="font:500 11px 'Space Grotesk';letter-spacing:0.06em;color:#9aa3af;background:#121922;border:1px solid rgba(255,255,255,0.08);border-radius:5px;padding:3px 9px">{{ inspectSel.partType }}</span>
+              </div>
+              <span style="font:400 13px 'IBM Plex Mono';color:#6b7682">{{ inspectSel.runId }}</span>
+            </div>
+
+            <div style="display:flex;gap:16px">
+              <div style="flex:1;min-width:0;border-radius:9px;overflow:hidden;background:#070a0e;border:1px solid rgba(255,255,255,0.05)"><div style="width:100%;aspect-ratio:960/600;background-color:#070a0e;background-size:cover;background-position:center;{{ inspectSel.detailBg }}"></div></div>
+              <div style="width:268px;flex:none;background:#090d12;border:1px solid rgba(255,255,255,0.06);border-radius:9px;padding:13px">
+                <div style="font:600 11px 'Space Grotesk';letter-spacing:0.14em;color:#7b8693;margin-bottom:11px">DEFECT LOCALIZATION</div>
+                <sc-if value="{{ inspectSel.hasLoc }}" hint-placeholder-val="{{ true }}">
+                  <div style="border-radius:7px;overflow:hidden;background:#070a0e;border:1px solid rgba(255,255,255,0.05)"><img src="../parts/generated/part_localization.png" alt="defect localization" style="width:100%;display:block"></div>
+                  <div style="display:flex;align-items:center;gap:8px;margin:12px 0 10px"><span style="width:9px;height:9px;border-radius:50%;background:#e5514e;animation:kpulse 2.4s ease-in-out infinite"></span><span style="font:400 13px 'IBM Plex Sans';color:#d2d8e0">Suspected Defect</span></div>
+                  <div style="height:1px;background:rgba(255,255,255,0.06);margin-bottom:10px"></div>
+                  <div style="display:flex;align-items:center;justify-content:space-between"><span style="font:400 13px 'IBM Plex Sans';color:#8a93a0">Region Confidence</span><span style="font:500 14px 'IBM Plex Mono';color:#eef1f5">{{ inspectSel.regionConfText }}</span></div>
+                </sc-if>
+                <sc-if value="{{ inspectSel.noLoc }}" hint-placeholder-val="{{ false }}">
+                  <div style="border-radius:7px;overflow:hidden;background:#070a0e;border:1px solid rgba(255,255,255,0.05);aspect-ratio:520/460"><img src="../parts/generated/part_clean.png" alt="clean part with no localized defect" style="width:100%;height:100%;object-fit:cover;display:block"></div>
+                  <div style="display:flex;align-items:center;gap:8px;margin:12px 0 10px"><span style="width:9px;height:9px;border-radius:50%;background:#45c46a"></span><span style="font:400 13px 'IBM Plex Sans';color:#d2d8e0">No defect localized</span></div>
+                  <div style="height:1px;background:rgba(255,255,255,0.06);margin-bottom:10px"></div>
+                  <div style="display:flex;align-items:center;justify-content:space-between"><span style="font:400 13px 'IBM Plex Sans';color:#8a93a0">Region Confidence</span><span style="font:500 14px 'IBM Plex Mono';color:#5f6975">n/a</span></div>
+                </sc-if>
+              </div>
+            </div>
+
+            <div style="height:1px;background:rgba(255,255,255,0.06);margin:18px 0 16px"></div>
+
+            <div style="display:grid;grid-template-columns:0.7fr 1.3fr;gap:28px;align-items:start">
+              <div>
+                <div style="font:600 11px 'Space Grotesk';letter-spacing:0.14em;color:#7b8693;margin-bottom:12px">INSPECTION RESULT</div>
+                <div style="display:inline-flex;align-items:center;gap:9px;background:{{ inspectSel.resultBg }};border:1px solid {{ inspectSel.resultBorder }};border-radius:8px;padding:10px 16px">
+                  <i class="ph ph-hexagon" style="font-size:17px;color:{{ inspectSel.resultColor }}"></i>
+                  <span style="font:600 16px 'Space Grotesk';letter-spacing:0.08em;color:{{ inspectSel.resultColor }}">{{ inspectSel.result }}</span>
+                </div>
+                <div style="font:400 12px 'IBM Plex Sans';color:#5f6975;margin-top:12px;line-height:1.5">Judgement only. The Inspection Engine answers <span style="color:#9aa3af">&ldquo;is this defective, and where?&rdquo;</span></div>
+              </div>
+              <div>
+                <div style="font:600 11px 'Space Grotesk';letter-spacing:0.14em;color:#7b8693;margin-bottom:12px">RAW ANOMALY SCORE</div>
+                <div style="display:flex;align-items:center;gap:18px">
+                  <span style="font:300 38px 'IBM Plex Sans';color:#f3f5f8;line-height:1">{{ inspectSel.rawText }}</span>
+                  <div style="flex:1">
+                    <div style="height:8px;border-radius:5px;background:rgba(255,255,255,0.08);overflow:hidden"><div style="{{ inspectSel.rawBarStyle }}"></div></div>
+                    <div style="display:flex;justify-content:space-between;margin-top:6px"><span style="font:400 12px 'IBM Plex Mono';color:#6b7682">0</span><span style="font:400 12px 'IBM Plex Mono';color:#6b7682">1</span></div>
+                  </div>
+                </div>
+                <div style="font:400 11px 'IBM Plex Sans';color:#5f6975;margin-top:9px;font-style:italic">A measure of how unusual the input is &mdash; <span style="color:#8a93a0;font-style:normal">not yet calibrated confidence.</span></div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+      </sc-if>
+      <sc-if value="{{ isTrust }}" hint-placeholder-val="{{ true }}">
+      <div data-screen-label="Trust" style="min-width:1180px;display:flex;flex-direction:column;gap:18px;animation:kfade .3s ease">
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.06);padding-bottom:15px">
+          <div>
+            <div style="font:600 11px 'Space Grotesk';letter-spacing:0.18em;color:#e6a23c;margin-bottom:7px">TRUST QUALIFICATION ENGINE</div>
+            <div style="font:300 26px 'Space Grotesk';color:#f3f5f8">How far to trust it</div>
+          </div>
+          <div style="font:400 13px 'IBM Plex Sans';color:#6b7682;max-width:460px;text-align:right;line-height:1.5">Maps the raw measure onto a calibrated confidence, sorts the decision into accept &middot; review &middot; reject, and abstains when evidence is insufficient.</div>
+        </div>
+
+        <!-- transformation -->
+        <section style="background:#0e141c;border:1px solid rgba(255,255,255,0.06);border-radius:11px;padding:20px 22px">
+          <div style="font:600 12px 'Space Grotesk';letter-spacing:0.15em;color:#7b8693;margin-bottom:20px">RAW ANOMALY &nbsp;&rarr;&nbsp; CALIBRATED CONFIDENCE</div>
+          <div style="display:grid;grid-template-columns:1fr 200px 1fr;gap:24px;align-items:center">
+            <!-- raw -->
+            <div style="background:#0b1017;border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:18px 20px">
+              <div style="font:600 11px 'Space Grotesk';letter-spacing:0.14em;color:#7b8693;margin-bottom:14px">RAW ANOMALY SCORE</div>
+              <div style="font:300 46px 'IBM Plex Sans';color:#f3f5f8;line-height:1;margin-bottom:14px">{{ trust.rawText }}</div>
+              <div style="height:8px;border-radius:5px;background:rgba(255,255,255,0.08);overflow:hidden"><div style="{{ trust.rawBarStyle }}"></div></div>
+              <div style="font:400 12px 'IBM Plex Sans';color:#5f6975;margin-top:12px;line-height:1.5">How unusual the input is. A standalone measure &mdash; <span style="color:#8a93a0">it is not a probability of being correct.</span></div>
+            </div>
+            <!-- transform arrow -->
+            <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
+              <div style="font:600 10px 'Space Grotesk';letter-spacing:0.16em;color:#e6a23c">CALIBRATION</div>
+              <div style="display:flex;align-items:center;width:100%"><span style="flex:1;height:1px;background:linear-gradient(90deg,rgba(230,162,60,0.1),rgba(230,162,60,0.6))"></span><i class="ph ph-caret-right" style="font-size:18px;color:#e6a23c"></i></div>
+              <div style="font:400 11px 'IBM Plex Sans';color:#5f6975;text-align:center;line-height:1.5">+ drift<br>+ calibration history</div>
+            </div>
+            <!-- calibrated -->
+            <div style="background:#0b1017;border:1px solid rgba(230,162,60,0.18);border-radius:10px;padding:18px 20px;display:flex;align-items:center;gap:20px">
+              <div style="position:relative;width:180px;height:104px;flex:none">
+                <svg width="180" height="104" viewBox="0 0 220 124" style="display:block">
+                  <defs><linearGradient id="gaugeg2" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#e5514e"></stop><stop offset="0.5" stop-color="#e6a23c"></stop><stop offset="1" stop-color="#45c46a"></stop></linearGradient></defs>
+                  <path d="M 18 108 A 92 92 0 0 1 202 108" fill="none" stroke="#161d27" stroke-width="13" stroke-linecap="round"></path>
+                  <path d="M 18 108 A 92 92 0 0 1 202 108" fill="none" stroke="url(#gaugeg2)" stroke-width="13" stroke-linecap="round"></path>
+                  <circle cx="{{ trust.gauge.mx }}" cy="{{ trust.gauge.my }}" r="7" fill="#0b1017" stroke="#f3f5f8" stroke-width="3"></circle>
+                </svg>
+                <div style="position:absolute;left:0;right:0;top:46px;text-align:center;font:400 36px 'IBM Plex Sans';color:#e6a23c;line-height:1">{{ trust.confText }}</div>
+              </div>
+              <div>
+                <div style="font:600 11px 'Space Grotesk';letter-spacing:0.14em;color:#7b8693;margin-bottom:8px">CALIBRATED CONFIDENCE</div>
+                <div style="font:400 12px 'IBM Plex Sans';color:#8a93a0;line-height:1.5">Stated certainty that corresponds to the real chance of being correct.</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div style="display:grid;grid-template-columns:1.55fr 1fr;gap:18px;align-items:start">
+          <!-- routing + bands -->
+          <section style="background:#0e141c;border:1px solid rgba(255,255,255,0.06);border-radius:11px;padding:18px 20px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+              <span style="font:600 12px 'Space Grotesk';letter-spacing:0.15em;color:#7b8693">DECISION OUTCOME</span>
+              <span style="display:inline-flex;align-items:center;gap:7px;background:{{ trust.outcomeBg }};border:1px solid {{ trust.outcomeBorder }};border-radius:6px;padding:5px 13px"><span style="width:6px;height:6px;border-radius:50%;background:{{ trust.outcomeColor }}"></span><span style="font:600 13px 'Space Grotesk';letter-spacing:0.06em;color:{{ trust.outcomeColor }}">{{ trust.outcome }}</span></span>
+            </div>
+
+            <!-- confidence axis -->
+            <div style="margin-bottom:8px;display:flex;justify-content:space-between"><span style="font:600 10px 'Space Grotesk';letter-spacing:0.12em;color:#5f6975">CALIBRATED CONFIDENCE</span></div>
+            <div style="position:relative;height:46px;border-radius:8px;overflow:hidden;display:flex;border:1px solid rgba(255,255,255,0.06)">
+              <div style="width:45%;background:repeating-linear-gradient(45deg,rgba(125,147,191,0.10),rgba(125,147,191,0.10) 7px,rgba(125,147,191,0.04) 7px,rgba(125,147,191,0.04) 14px);display:flex;align-items:center;justify-content:center"><span style="font:600 10px 'Space Grotesk';letter-spacing:0.08em;color:#7d93bf">ABSTAIN / DEFER</span></div>
+              <div style="width:40%;background:rgba(230,162,60,0.13);border-left:1px solid rgba(255,255,255,0.08);border-right:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center"><span style="font:600 10px 'Space Grotesk';letter-spacing:0.08em;color:#e6a23c">REVIEW BAND</span></div>
+              <div style="width:15%;background:rgba(69,196,106,0.12);display:flex;align-items:center;justify-content:center"><span style="font:600 10px 'Space Grotesk';letter-spacing:0.06em;color:#45c46a">AUTO</span></div>
+              <sc-if value="{{ trust.hasConf }}" hint-placeholder-val="{{ true }}">
+                <div style="position:absolute;top:-3px;bottom:-3px;left:{{ trust.markerLeft }};width:2px;background:#f3f5f8;box-shadow:0 0 8px rgba(255,255,255,0.6)"><span style="position:absolute;top:-7px;left:50%;transform:translateX(-50%);width:9px;height:9px;border-radius:50%;background:#f3f5f8"></span></div>
+              </sc-if>
+            </div>
+            <div style="display:flex;justify-content:space-between;margin-top:6px"><span style="font:400 11px 'IBM Plex Mono';color:#5f6975">0.00</span><span style="font:400 11px 'IBM Plex Mono';color:#5f6975">0.45</span><span style="font:400 11px 'IBM Plex Mono';color:#5f6975">0.85</span><span style="font:400 11px 'IBM Plex Mono';color:#5f6975">1.00</span></div>
+
+            <div style="height:1px;background:rgba(255,255,255,0.06);margin:18px 0 14px"></div>
+
+            <!-- four states -->
+            <div style="display:flex;gap:10px">
+              <sc-for list="{{ trust.states }}" as="st" hint-placeholder-count="4">
+                <div style="{{ st.cardStyle }}">
+                  <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="{{ st.dotStyle }}"></span><span style="{{ st.labelStyle }}">{{ st.label }}</span></div>
+                  <div style="font:400 11.5px 'IBM Plex Sans';color:#7a838f;line-height:1.45">{{ st.desc }}</div>
+                </div>
+              </sc-for>
+            </div>
+          </section>
+
+          <!-- drift + calibration evidence -->
+          <div style="display:flex;flex-direction:column;gap:18px">
+            <section style="background:#0e141c;border:1px solid rgba(255,255,255,0.06);border-radius:11px;padding:18px 20px">
+              <div style="font:600 12px 'Space Grotesk';letter-spacing:0.15em;color:#7b8693;margin-bottom:14px">DRIFT ASSESSMENT</div>
+              <div style="display:flex;align-items:flex-end;justify-content:space-between"><span style="font:500 19px 'IBM Plex Sans';color:{{ trust.driftColor }}">{{ trust.driftLabel }}</span><span style="font:400 12px 'IBM Plex Mono';color:#8a93a0">score {{ trust.driftText }}</span></div>
+              <svg width="100%" height="48" viewBox="0 0 320 48" preserveAspectRatio="none" style="margin:12px 0 10px"><polyline points="2,34 28,28 54,31 80,20 106,25 132,15 158,29 184,22 210,11 236,24 262,17 290,21 318,14" fill="none" stroke="#e6a23c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"></polyline></svg>
+              <div style="font:400 12px 'IBM Plex Sans';color:#6b7682;line-height:1.5">As an input moves away from familiar conditions, the system grows more cautious &mdash; widening the review band rather than answering confidently.</div>
+            </section>
+            <section style="background:#0e141c;border:1px solid rgba(255,255,255,0.06);border-radius:11px;padding:18px 20px">
+              <div style="font:600 12px 'Space Grotesk';letter-spacing:0.15em;color:#7b8693;margin-bottom:6px">CALIBRATION RELIABILITY</div>
+              <div style="font:400 11px 'IBM Plex Sans';color:#5f6975;margin-bottom:12px">Stated confidence vs. observed correctness</div>
+              <svg width="100%" height="150" viewBox="0 0 200 150">
+                <line x1="28" y1="122" x2="188" y2="122" stroke="rgba(255,255,255,0.12)" stroke-width="1"></line>
+                <line x1="28" y1="122" x2="28" y2="14" stroke="rgba(255,255,255,0.12)" stroke-width="1"></line>
+                <line x1="28" y1="122" x2="188" y2="14" stroke="rgba(255,255,255,0.18)" stroke-width="1" stroke-dasharray="4 4"></line>
+                <polyline points="28,122 60,98 92,76 124,52 156,32 188,16" fill="none" stroke="#e6a23c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline>
+                <circle cx="60" cy="98" r="2.6" fill="#e6a23c"></circle><circle cx="92" cy="76" r="2.6" fill="#e6a23c"></circle><circle cx="124" cy="52" r="2.6" fill="#e6a23c"></circle><circle cx="156" cy="32" r="2.6" fill="#e6a23c"></circle>
+                <text x="108" y="142" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" fill="#5f6975">stated confidence</text>
+              </svg>
+            </section>
+          </div>
+        </div>
+      </div>
+      </sc-if>
+      <sc-if value="{{ isReview }}" hint-placeholder-val="{{ true }}">
+      <div data-screen-label="Review" style="min-width:1180px;display:flex;flex-direction:column;gap:18px;animation:kfade .3s ease">
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.06);padding-bottom:15px">
+          <div>
+            <div style="font:600 11px 'Space Grotesk';letter-spacing:0.18em;color:#e6a23c;margin-bottom:7px">HUMAN REVIEW ENGINE</div>
+            <div style="font:300 26px 'Space Grotesk';color:#f3f5f8">Where uncertainty goes</div>
+          </div>
+          <div style="font:400 13px 'IBM Plex Sans';color:#6b7682;max-width:460px;text-align:right;line-height:1.5">Only cases qualified as review enter here, each handed off with its full evidence. The system never overrides its own expressed uncertainty.</div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:344px 1fr;gap:18px;align-items:start">
+          <!-- queue -->
+          <section style="background:#0e141c;border:1px solid rgba(255,255,255,0.06);border-radius:11px;padding:16px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:13px"><span style="font:600 12px 'Space Grotesk';letter-spacing:0.15em;color:#7b8693">REVIEW QUEUE</span><span style="display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:20px;padding:0 7px;background:rgba(230,162,60,0.14);border:1px solid rgba(230,162,60,0.35);border-radius:11px;font:600 11px 'IBM Plex Mono';color:#e6a23c">{{ queueCount }}</span></div>
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <sc-for list="{{ reviewQueue }}" as="q" hint-placeholder-count="4">
+                <button onClick="{{ q.go }}" style="{{ q.rowStyle }}">
+                  <div style="width:54px;height:34px;border-radius:5px;flex:none;background-color:#070a0e;background-size:cover;background-position:center;{{ q.bg }}"></div>
+                  <div style="min-width:0;flex:1">
+                    <div style="font:400 12px 'IBM Plex Mono';color:#d2d8e0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ q.file }}</div>
+                    <div style="display:flex;align-items:center;gap:6px;margin-top:4px"><span style="width:6px;height:6px;border-radius:50%;background:{{ q.statusColor }}"></span><span style="font:400 11px 'IBM Plex Sans';color:{{ q.statusColor }}">{{ q.statusText }}</span></div>
+                  </div>
+                  <span style="font:600 10px 'Space Grotesk';letter-spacing:0.05em;color:{{ q.outcomeColor }};flex:none">{{ q.outcome }}</span>
+                </button>
+              </sc-for>
+            </div>
+          </section>
+
+          <!-- handoff detail -->
+          <section style="background:#0e141c;border:1px solid rgba(255,255,255,0.06);border-radius:11px;padding:18px 20px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+              <div style="display:flex;align-items:center;gap:12px">
+                <span style="font:500 16px 'IBM Plex Mono';color:#eef1f5">{{ reviewSel.file }}</span>
+                <span style="display:inline-flex;align-items:center;gap:6px;background:{{ reviewSel.outcomeBg }};border:1px solid {{ reviewSel.outcomeBorder }};border-radius:6px;padding:4px 11px"><span style="width:6px;height:6px;border-radius:50%;background:{{ reviewSel.outcomeColor }}"></span><span style="font:600 12px 'Space Grotesk';letter-spacing:0.06em;color:{{ reviewSel.outcomeColor }}">{{ reviewSel.outcome }}</span></span>
+              </div>
+              <span style="font:400 13px 'IBM Plex Mono';color:#6b7682">{{ reviewSel.runId }}</span>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1.25fr 1fr;gap:20px;align-items:start">
+              <!-- evidence -->
+              <div>
+                <div style="font:600 11px 'Space Grotesk';letter-spacing:0.14em;color:#7b8693;margin-bottom:11px">EVIDENCE HANDED OFF</div>
+                <div style="border-radius:9px;overflow:hidden;background:#070a0e;border:1px solid rgba(255,255,255,0.05)"><div style="width:100%;aspect-ratio:960/600;background-color:#070a0e;background-size:cover;background-position:center;{{ reviewSel.detailBg }}"></div></div>
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:12px">
+                  <div style="background:#0b1017;border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:11px 12px"><div style="font:600 9px 'Space Grotesk';letter-spacing:0.1em;color:#5f6975;margin-bottom:6px">RAW ANOMALY</div><div style="font:400 18px 'IBM Plex Sans';color:#e7ebf0">{{ reviewSel.rawText }}</div></div>
+                  <div style="background:#0b1017;border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:11px 12px"><div style="font:600 9px 'Space Grotesk';letter-spacing:0.1em;color:#5f6975;margin-bottom:6px">CALIBRATED</div><div style="font:400 18px 'IBM Plex Sans';color:#e7ebf0">{{ reviewSel.confText }}</div></div>
+                  <div style="background:#0b1017;border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:11px 12px"><div style="font:600 9px 'Space Grotesk';letter-spacing:0.1em;color:#5f6975;margin-bottom:6px">DRIFT</div><div style="font:400 18px 'IBM Plex Sans';color:{{ reviewSel.driftColor }}">{{ reviewSel.driftText }}</div></div>
+                </div>
+              </div>
+
+              <!-- reasons + decision -->
+              <div>
+                <div style="font:600 11px 'Space Grotesk';letter-spacing:0.14em;color:#7b8693;margin-bottom:11px">WHY IT WAS DEFERRED</div>
+                <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px">
+                  <sc-for list="{{ reviewSel.reasons }}" as="r" hint-placeholder-count="2">
+                    <div style="display:flex;align-items:flex-start;gap:9px"><span style="width:5px;height:5px;border-radius:50%;background:#6b7682;margin-top:7px;flex:none"></span><span style="font:400 13px 'IBM Plex Sans';color:#c4ccd6">{{ r.text }}</span></div>
+                  </sc-for>
+                </div>
+
+                <div style="height:1px;background:rgba(255,255,255,0.06);margin-bottom:16px"></div>
+                <div style="font:600 11px 'Space Grotesk';letter-spacing:0.14em;color:#7b8693;margin-bottom:13px">REVIEWER DECISION</div>
+
+                <sc-if value="{{ reviewPending }}" hint-placeholder-val="{{ true }}">
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                    <button onClick="{{ decide.accept }}" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;background:rgba(69,196,106,0.08);border:1px solid rgba(69,196,106,0.4);border-radius:9px;cursor:pointer;font:600 13px 'Space Grotesk';color:#45c46a"><i class="ph ph-check" style="font-size:15px"></i>Accept</button>
+                    <button onClick="{{ decide.reject }}" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;background:rgba(229,81,78,0.08);border:1px solid rgba(229,81,78,0.4);border-radius:9px;cursor:pointer;font:600 13px 'Space Grotesk';color:#e5514e"><i class="ph ph-x" style="font-size:15px"></i>Reject</button>
+                    <button onClick="{{ decide.inconclusive }}" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;background:rgba(230,162,60,0.08);border:1px solid rgba(230,162,60,0.4);border-radius:9px;cursor:pointer;font:600 13px 'Space Grotesk';color:#e6a23c"><i class="ph ph-question" style="font-size:15px"></i>Inconclusive</button>
+                    <button onClick="{{ decide.cannot }}" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;background:rgba(125,147,191,0.07);border:1px solid rgba(125,147,191,0.35);border-radius:9px;cursor:pointer;font:600 13px 'Space Grotesk';color:#7d93bf"><i class="ph ph-prohibit" style="font-size:15px"></i>Could not review</button>
+                  </div>
+                  <div style="font:400 11px 'IBM Plex Sans';color:#5f6975;margin-top:12px;line-height:1.5">A reviewer acts on the full picture above &mdash; not a bare verdict. The recorded human decision is preserved as evidence.</div>
+                </sc-if>
+
+                <sc-if value="{{ reviewDecision }}" hint-placeholder-val="{{ false }}">
+                  <div style="background:{{ reviewDecision.bg }};border:1px solid {{ reviewDecision.border }};border-radius:9px;padding:16px 18px;display:flex;align-items:center;gap:13px">
+                    <div style="width:38px;height:38px;flex:none;display:grid;place-items:center;border-radius:9px;background:{{ reviewDecision.bg }};border:1px solid {{ reviewDecision.border }}"><i class="ph ph-seal-check" style="font-size:20px;color:{{ reviewDecision.color }}"></i></div>
+                    <div style="flex:1"><div style="font:600 14px 'Space Grotesk';color:{{ reviewDecision.color }}">{{ reviewDecision.label }}</div><div style="font:400 12px 'IBM Plex Sans';color:#8a93a0;margin-top:2px">Human decision recorded &middot; reviewer_03</div></div>
+                  </div>
+                  <div style="font:500 11px 'Space Grotesk';letter-spacing:0.1em;color:#5f6975;margin:14px 0 8px">CHANGE DECISION</div>
+                  <div style="display:flex;gap:8px">
+                    <button onClick="{{ decide.accept }}" style="font:500 11px 'Space Grotesk';letter-spacing:0.04em;color:#45c46a;background:none;border:1px solid rgba(69,196,106,0.25);border-radius:6px;padding:6px 11px;cursor:pointer">Accept</button>
+                    <button onClick="{{ decide.reject }}" style="font:500 11px 'Space Grotesk';letter-spacing:0.04em;color:#e5514e;background:none;border:1px solid rgba(229,81,78,0.25);border-radius:6px;padding:6px 11px;cursor:pointer">Reject</button>
+                    <button onClick="{{ decide.inconclusive }}" style="font:500 11px 'Space Grotesk';letter-spacing:0.04em;color:#e6a23c;background:none;border:1px solid rgba(230,162,60,0.25);border-radius:6px;padding:6px 11px;cursor:pointer">Inconclusive</button>
+                  </div>
+                </sc-if>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+      </sc-if>
+      <sc-if value="{{ isEvidence }}" hint-placeholder-val="{{ true }}">
+      <div data-screen-label="Evidence" style="min-width:1180px;display:flex;flex-direction:column;gap:16px;animation:kfade .3s ease">
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.06);padding-bottom:15px">
+          <div>
+            <div style="font:600 11px 'Space Grotesk';letter-spacing:0.18em;color:#e6a23c;margin-bottom:7px">EVIDENCE ENGINE</div>
+            <div style="font:300 26px 'Space Grotesk';color:#f3f5f8">The durable record</div>
+          </div>
+          <div style="font:400 13px 'IBM Plex Sans';color:#6b7682;max-width:460px;text-align:right;line-height:1.5">Every decision, its localization, confidence, outcome and routing &mdash; preserved. Where evidence is absent, the absence is recorded plainly.</div>
+        </div>
+
+        <!-- reproducibility banner -->
+        <div style="display:flex;align-items:center;gap:13px;background:#0b1017;border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:12px 16px">
+          <i class="ph ph-arrows-clockwise" style="font-size:17px;color:#45c46a"></i>
+          <span style="font:400 13px 'IBM Plex Sans';color:#c4ccd6">Regenerable from fixed inputs</span>
+          <span style="width:1px;height:15px;background:rgba(255,255,255,0.12)"></span>
+          <span style="font:400 12px 'IBM Plex Mono';color:#6b7682">run_20250521_143207</span>
+          <span style="width:1px;height:15px;background:rgba(255,255,255,0.12)"></span>
+          <span style="font:400 12px 'IBM Plex Mono';color:#6b7682">sha256:a1f3&hellip;9c7e</span>
+          <span style="margin-left:auto;font:400 12px 'IBM Plex Sans';color:#5f6975">10 of 10,000 records shown</span>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 372px;gap:16px;align-items:start">
+          <!-- ledger -->
+          <section style="background:#0e141c;border:1px solid rgba(255,255,255,0.06);border-radius:11px;padding:8px 8px 10px">
+            <div style="display:grid;grid-template-columns:1.6fr 0.7fr 0.7fr 0.9fr 0.9fr 0.8fr;gap:8px;padding:12px 14px 11px;border-bottom:1px solid rgba(255,255,255,0.06)">
+              <span style="font:600 10px 'Space Grotesk';letter-spacing:0.1em;color:#5f6975">CASE</span>
+              <span style="font:600 10px 'Space Grotesk';letter-spacing:0.1em;color:#5f6975">RESULT</span>
+              <span style="font:600 10px 'Space Grotesk';letter-spacing:0.1em;color:#5f6975">RAW</span>
+              <span style="font:600 10px 'Space Grotesk';letter-spacing:0.1em;color:#5f6975">CALIBRATED</span>
+              <span style="font:600 10px 'Space Grotesk';letter-spacing:0.1em;color:#5f6975">OUTCOME</span>
+              <span style="font:600 10px 'Space Grotesk';letter-spacing:0.1em;color:#5f6975">LOCALIZATION</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:2px;margin-top:4px">
+              <sc-for list="{{ evidenceRows }}" as="row" hint-placeholder-count="10">
+                <button onClick="{{ row.go }}" style="{{ row.rowStyle }}">
+                  <div style="min-width:0;text-align:left"><span style="font:500 12px 'IBM Plex Mono';color:#c4ccd6">{{ row.seqText }}</span> <span style="font:400 11px 'IBM Plex Mono';color:#5f6975;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ row.file }}</span></div>
+                  <div style="display:flex;align-items:center;gap:6px"><span style="width:6px;height:6px;border-radius:50%;background:{{ row.resultColor }}"></span><span style="font:600 10px 'Space Grotesk';letter-spacing:0.04em;color:{{ row.resultColor }}">{{ row.result }}</span></div>
+                  <span style="font:500 13px 'IBM Plex Mono';color:#d2d8e0;text-align:left">{{ row.rawText }}</span>
+                  <span style="{{ row.calStyle }};text-align:left">{{ row.calText }}</span>
+                  <span style="font:600 10px 'Space Grotesk';letter-spacing:0.04em;color:{{ row.outcomeColor }};text-align:left">{{ row.outcome }}</span>
+                  <span style="{{ row.locStyle }};text-align:left">{{ row.locText }}</span>
+                </button>
+              </sc-for>
+            </div>
+          </section>
+
+          <!-- record detail -->
+          <section style="background:#0e141c;border:1px solid rgba(255,255,255,0.06);border-radius:11px;padding:18px 20px">
+            <div style="font:600 12px 'Space Grotesk';letter-spacing:0.15em;color:#7b8693;margin-bottom:14px">RECORD</div>
+            <div style="font:500 15px 'IBM Plex Mono';color:#eef1f5;margin-bottom:4px">{{ esel.file }}</div>
+            <div style="display:inline-flex;align-items:center;gap:6px;background:{{ esel.outcomeBg }};border:1px solid {{ esel.outcomeBorder }};border-radius:6px;padding:4px 11px;margin-bottom:16px"><span style="width:6px;height:6px;border-radius:50%;background:{{ esel.outcomeColor }}"></span><span style="font:600 11px 'Space Grotesk';letter-spacing:0.06em;color:{{ esel.outcomeColor }}">{{ esel.outcome }}</span></div>
+
+            <div style="display:flex;flex-direction:column">
+              <div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.05)"><span style="font:400 13px 'IBM Plex Sans';color:#8a93a0">Inspection result</span><span style="font:500 13px 'Space Grotesk';color:{{ esel.resultColor }}">{{ esel.result }}</span></div>
+              <div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.05)"><span style="font:400 13px 'IBM Plex Sans';color:#8a93a0">Raw anomaly score</span><span style="font:500 13px 'IBM Plex Mono';color:#d2d8e0">{{ esel.rawText }}</span></div>
+              <div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.05)"><span style="font:400 13px 'IBM Plex Sans';color:#8a93a0">Calibrated confidence</span><span style="font:500 13px 'IBM Plex Mono';color:#d2d8e0">{{ esel.confText }}</span></div>
+              <div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.05)"><span style="font:400 13px 'IBM Plex Sans';color:#8a93a0">Region confidence</span><span style="font:500 13px 'IBM Plex Mono';color:#d2d8e0">{{ esel.regionConfText }}</span></div>
+              <div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.05)"><span style="font:400 13px 'IBM Plex Sans';color:#8a93a0">Drift score</span><span style="font:500 13px 'IBM Plex Mono';color:{{ esel.driftColor }}">{{ esel.driftText }}</span></div>
+              <div style="display:flex;justify-content:space-between;padding:9px 0"><span style="font:400 13px 'IBM Plex Sans';color:#8a93a0">Run ID</span><span style="font:500 12px 'IBM Plex Mono';color:#9aa3af">{{ esel.runId }}</span></div>
+            </div>
+
+            <sc-if value="{{ eselPartial }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:16px;background:rgba(125,147,191,0.07);border:1px solid rgba(125,147,191,0.3);border-radius:9px;padding:13px 15px">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px"><i class="ph ph-warning-octagon" style="font-size:15px;color:#7d93bf"></i><span style="font:600 11px 'Space Grotesk';letter-spacing:0.08em;color:#7d93bf">EVIDENCE ABSENCE</span></div>
+                <div style="font:400 12px 'IBM Plex Sans';color:#9aa3af;line-height:1.5">Calibration and localization were not recorded &mdash; the system abstained on insufficient evidence. The gap is recorded, not hidden.</div>
+              </div>
+            </sc-if>
+          </section>
+        </div>
+      </div>
+      </sc-if>
+      <sc-if value="{{ isEvaluation }}" hint-placeholder-val="{{ true }}">
+      <div data-screen-label="Evaluation" style="min-width:1180px;display:flex;flex-direction:column;gap:16px;animation:kfade .3s ease">
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.06);padding-bottom:15px">
+          <div>
+            <div style="font:600 11px 'Space Grotesk';letter-spacing:0.18em;color:#e6a23c;margin-bottom:7px">EVALUATION ENGINE</div>
+            <div style="font:300 26px 'Space Grotesk';color:#f3f5f8">Measured against its own claims</div>
+          </div>
+          <div style="font:400 13px 'IBM Plex Sans';color:#6b7682;max-width:470px;text-align:right;line-height:1.5">Five dimensions kept separate, so strength in one cannot disguise weakness in another. Failures are named &mdash; never collapsed into a single score.</div>
+        </div>
+
+        <!-- five dimension cards -->
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:14px">
+          <sc-for list="{{ evalDims }}" as="d" hint-placeholder-count="5">
+            <button onClick="{{ d.go }}" style="{{ d.cardStyle }};text-align:left">
+              <div style="font:600 10px 'Space Grotesk';letter-spacing:0.08em;color:#7b8693;margin-bottom:11px;height:26px;line-height:1.3">{{ d.short }}</div>
+              <div style="display:flex;align-items:baseline;gap:8px"><span style="font:300 32px 'IBM Plex Sans';color:#f3f5f8;line-height:1">{{ d.value }}</span><span style="font:400 12px 'IBM Plex Mono';color:#6b7682">{{ d.metric }}</span></div>
+              <div style="height:5px;border-radius:3px;background:rgba(255,255,255,0.07);overflow:hidden;margin:12px 0 11px"><div style="{{ d.barStyle }}"></div></div>
+              <div style="font:400 11.5px 'IBM Plex Sans';color:#6b7682;line-height:1.45">{{ d.question }}</div>
+            </button>
+          </sc-for>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start">
+          <!-- selected dimension detail -->
+          <section style="background:#0e141c;border:1px solid rgba(255,255,255,0.06);border-radius:11px;padding:20px 22px">
+            <div style="font:600 11px 'Space Grotesk';letter-spacing:0.14em;color:#e6a23c;margin-bottom:8px">{{ evalSel.short }}</div>
+            <div style="font:400 15px 'IBM Plex Sans';color:#c4ccd6;margin-bottom:18px;line-height:1.5">{{ evalSel.question }}</div>
+            <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:6px"><span style="font:300 48px 'IBM Plex Sans';color:#f3f5f8;line-height:1">{{ evalSel.value }}</span><span style="font:400 14px 'IBM Plex Mono';color:#6b7682">{{ evalSel.metric }}</span></div>
+            <div style="height:6px;border-radius:4px;background:rgba(255,255,255,0.07);overflow:hidden;margin:14px 0 22px"><div style="{{ evalSel.barStyle }}"></div></div>
+
+            <div style="font:600 11px 'Space Grotesk';letter-spacing:0.14em;color:#7b8693;margin-bottom:13px">FAILURE CATEGORIES IN THIS DIMENSION</div>
+            <div style="display:flex;flex-direction:column;gap:13px">
+              <sc-for list="{{ evalSel.failures }}" as="f" hint-placeholder-count="2">
+                <div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><span style="font:400 13px 'IBM Plex Sans';color:#d2d8e0">{{ f.name }}</span><span style="font:500 13px 'IBM Plex Mono';color:#e6a23c">{{ f.count }}</span></div>
+                  <div style="height:4px;border-radius:3px;background:rgba(255,255,255,0.06);overflow:hidden"><div style="{{ f.barStyle }}"></div></div>
+                </div>
+              </sc-for>
+            </div>
+          </section>
+
+          <!-- all named failures -->
+          <section style="background:#0e141c;border:1px solid rgba(255,255,255,0.06);border-radius:11px;padding:20px 22px">
+            <div style="font:600 12px 'Space Grotesk';letter-spacing:0.15em;color:#7b8693;margin-bottom:6px">NAMED FAILURE CATEGORIES</div>
+            <div style="font:400 12px 'IBM Plex Sans';color:#5f6975;margin-bottom:18px;line-height:1.5">Each failure mode stands on its own. No single aggregate is allowed to stand in for the rest.</div>
+            <div style="display:flex;flex-direction:column;gap:2px">
+              <sc-for list="{{ allFailures }}" as="f" hint-placeholder-count="8">
+                <div style="display:grid;grid-template-columns:1.3fr 1fr 44px;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
+                  <span style="font:400 13px 'IBM Plex Sans';color:#d2d8e0">{{ f.name }}</span>
+                  <span style="font:600 9px 'Space Grotesk';letter-spacing:0.06em;color:#6b7682">{{ f.dim }}</span>
+                  <span style="font:500 14px 'IBM Plex Mono';color:#c4ccd6;text-align:right">{{ f.count }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </section>
+        </div>
+      </div>
+      </sc-if>
+      <sc-if value="{{ isDataset }}" hint-placeholder-val="{{ true }}">
+      <div data-screen-label="Dataset" style="min-width:1180px;display:flex;flex-direction:column;gap:16px;animation:kfade .3s ease">
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.06);padding-bottom:15px">
+          <div>
+            <div style="font:600 11px 'Space Grotesk';letter-spacing:0.18em;color:#e6a23c;margin-bottom:7px">DATASET</div>
+            <div style="font:300 26px 'Space Grotesk';color:#f3f5f8">A fixed, reproducible body of evidence</div>
+          </div>
+          <div style="font:400 13px 'IBM Plex Sans';color:#6b7682;max-width:460px;text-align:right;line-height:1.5">From a fixed starting point, the same evidence can be regenerated exactly &mdash; by anyone. Depth over breadth: one problem, pursued to completion.</div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1.15fr 1fr;gap:16px;align-items:start">
+          <!-- summary -->
+          <section style="background:#0e141c;border:1px solid rgba(255,255,255,0.06);border-radius:11px;padding:20px 22px">
+            <div style="display:flex;align-items:center;gap:13px;margin-bottom:20px">
+              <div style="width:44px;height:44px;flex:none;display:grid;place-items:center;background:#121922;border:1px solid rgba(230,162,60,0.3);border-radius:10px"><i class="ph ph-stack" style="font-size:22px;color:#e6a23c"></i></div>
+              <div><div style="font:500 18px 'Space Grotesk';color:#f3f5f8">Kalibra Industrial</div><div style="font:400 13px 'IBM Plex Mono';color:#6b7682;margin-top:2px">v1.0 &middot; locally reproducible</div></div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.06);border-radius:10px;overflow:hidden">
+              <div style="background:#0e141c;padding:15px 17px"><div style="font:600 10px 'Space Grotesk';letter-spacing:0.1em;color:#5f6975;margin-bottom:7px">INPUTS</div><div style="font:300 26px 'IBM Plex Sans';color:#f3f5f8">10,000</div></div>
+              <div style="background:#0e141c;padding:15px 17px"><div style="font:600 10px 'Space Grotesk';letter-spacing:0.1em;color:#5f6975;margin-bottom:7px">PART TYPES</div><div style="font:300 26px 'IBM Plex Sans';color:#f3f5f8">1 <span style="font:400 13px 'IBM Plex Sans';color:#6b7682">&middot; Part Type A</span></div></div>
+              <div style="background:#0e141c;padding:15px 17px"><div style="font:600 10px 'Space Grotesk';letter-spacing:0.1em;color:#5f6975;margin-bottom:7px">DEFECT CATEGORIES</div><div style="font:300 26px 'IBM Plex Sans';color:#f3f5f8">1</div></div>
+              <div style="background:#0e141c;padding:15px 17px"><div style="font:600 10px 'Space Grotesk';letter-spacing:0.1em;color:#5f6975;margin-bottom:7px">MODE</div><div style="font:400 17px 'IBM Plex Sans';color:#e7ebf0;padding-top:5px">Offline (Batch)</div></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:11px;margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.06)">
+              <i class="ph ph-fingerprint" style="font-size:16px;color:#45c46a"></i>
+              <span style="font:400 12px 'IBM Plex Mono';color:#6b7682">sha256:a1f3c2&hellip;9c7e</span>
+              <span style="margin-left:auto;font:400 12px 'IBM Plex Sans';color:#5f6975">Fixed checkpoint</span>
+            </div>
+          </section>
+
+          <!-- boundaries -->
+          <section style="background:#0e141c;border:1px solid rgba(255,255,255,0.06);border-radius:11px;padding:20px 22px">
+            <div style="font:600 12px 'Space Grotesk';letter-spacing:0.15em;color:#7b8693;margin-bottom:6px">STATED BOUNDARIES</div>
+            <div style="font:400 12px 'IBM Plex Sans';color:#5f6975;margin-bottom:16px;line-height:1.5">What this system does not do is named deliberately. A clearly drawn limit is a sign of understanding.</div>
+            <div style="display:flex;flex-direction:column;gap:11px">
+              <div style="display:flex;align-items:flex-start;gap:11px"><i class="ph ph-prohibit" style="font-size:15px;color:#7d93bf;margin-top:1px"></i><div><span style="font:500 13px 'IBM Plex Sans';color:#d2d8e0">Not live, not streaming.</span> <span style="font:400 13px 'IBM Plex Sans';color:#6b7682">No real-time feed or operational alerting.</span></div></div>
+              <div style="display:flex;align-items:flex-start;gap:11px"><i class="ph ph-prohibit" style="font-size:15px;color:#7d93bf;margin-top:1px"></i><div><span style="font:500 13px 'IBM Plex Sans';color:#d2d8e0">One inspection setting.</span> <span style="font:400 13px 'IBM Plex Sans';color:#6b7682">A single problem, not many in parallel.</span></div></div>
+              <div style="display:flex;align-items:flex-start;gap:11px"><i class="ph ph-prohibit" style="font-size:15px;color:#7d93bf;margin-top:1px"></i><div><span style="font:500 13px 'IBM Plex Sans';color:#d2d8e0">Not a deployment service.</span> <span style="font:400 13px 'IBM Plex Sans';color:#6b7682">Behaviour shown as reproducible experiments.</span></div></div>
+              <div style="display:flex;align-items:flex-start;gap:11px"><i class="ph ph-handshake" style="font-size:15px;color:#e6a23c;margin-top:1px"></i><div><span style="font:500 13px 'IBM Plex Sans';color:#d2d8e0">A partner to human judgement.</span> <span style="font:400 13px 'IBM Plex Sans';color:#6b7682">Where confidence is low, a human stays in the loop.</span></div></div>
+            </div>
+          </section>
+        </div>
+
+        <!-- sample inputs -->
+        <section style="background:#0e141c;border:1px solid rgba(255,255,255,0.06);border-radius:11px;padding:18px 20px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:15px"><span style="font:600 12px 'Space Grotesk';letter-spacing:0.15em;color:#7b8693">SAMPLE INPUTS</span><span style="font:400 12px 'IBM Plex Sans';color:#5f6975">10 of 10,000</span></div>
+          <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px">
+            <sc-for list="{{ datasetThumbs }}" as="t" hint-placeholder-count="10">
+              <div style="background:#0b1017;border:1px solid rgba(255,255,255,0.06);border-radius:9px;padding:9px">
+                <div style="border-radius:6px;overflow:hidden;margin-bottom:9px;aspect-ratio:240/150;background-color:#070a0e;background-size:cover;background-position:center;{{ t.bg }}"></div>
+                <div style="display:flex;align-items:center;justify-content:space-between">
+                  <div style="display:flex;align-items:center;gap:6px"><span style="width:6px;height:6px;border-radius:50%;background:{{ t.resultColor }}"></span><span style="font:600 10px 'Space Grotesk';letter-spacing:0.04em;color:{{ t.resultColor }}">{{ t.result }}</span></div>
+                  <span style="font:400 11px 'IBM Plex Mono';color:#6b7682">{{ t.rawText }}</span>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </section>
+      </div>
+      </sc-if>
+
+    </main>
+  </div>
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer style="display:grid;grid-template-columns:repeat(4,1fr);gap:24px;padding:16px 28px;border-top:1px solid rgba(255,255,255,0.06);background:#080b10">
+    <sc-for list="{{ principles }}" as="p" hint-placeholder-count="4">
+      <div style="display:flex;align-items:flex-start;gap:12px">
+        <i class="ph {{ p.icon }}" style="font-size:20px;color:#e6a23c;margin-top:1px"></i>
+        <div><div style="font:600 11px 'Space Grotesk';letter-spacing:0.1em;color:#d2d8e0">{{ p.title }}</div><div style="font:400 12px 'IBM Plex Sans';color:#6b7682;margin-top:3px">{{ p.sub }}</div></div>
+      </div>
+    </sc-for>
+  </footer>
+</div>
+
+<template id="__bundler_thumbnail">
+  <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <rect width="100" height="100" fill="#0a0e15"></rect>
+    <polygon points="50,18 76,33 76,63 50,78 24,63 24,33" fill="none" stroke="#e6a23c" stroke-width="3.4"></polygon>
+    <polygon points="50,30 64,38 64,54 50,62 36,54 36,38" fill="none" stroke="#e6a23c" stroke-width="2" opacity="0.6"></polygon>
+    <circle cx="50" cy="46" r="4.4" fill="#e6a23c"></circle>
+  </svg>
+</template></x-dc>
+<script type="text/x-dc" data-dc-script>
+const RED='#e5514e', GREEN='#45c46a', GOLD='#e6a23c', SLATE='#7d93bf', MID='#9aa3af';
+const TH='../parts/generated/';
+
+function resultColor(r){ return r==='DEFECT'?RED : r==='OK'?GREEN : GOLD; }
+function outcomeColor(o){ return o==='ACCEPT'?GREEN : o==='REVIEW'?GOLD : o==='REJECT'?RED : SLATE; }
+function hexa(c,a){ // c hex -> rgba bg tint
+  const n=parseInt(c.slice(1),16); return `rgba(${n>>16&255},${n>>8&255},${n&255},${a})`;
+}
+function driftInfo(d){
+  if(d<0.25) return {label:'Low Drift', color:MID};
+  if(d<0.6)  return {label:'Moderate Drift', color:GOLD};
+  return {label:'High Drift', color:RED};
+}
+
+const CASES = [
+  {seq:512,file:'part_20250521_0147.png',partType:'Part Type A',batch:'batch_0519_A',runId:'run_20250521_143207',result:'DEFECT',raw:0.83,conf:0.76,outcome:'REVIEW',drift:0.42,regionConf:0.87,thumb:'thumb_02',reasons:['Confidence inside review band','Elevated drift','Localized uncertainty'],outcomeReason:'Borderline Confidence',evidence:'complete'},
+  {seq:509,file:'part_20250521_0144.png',partType:'Part Type A',batch:'batch_0519_A',runId:'run_20250521_143204',result:'OK',raw:0.12,conf:0.97,outcome:'ACCEPT',drift:0.10,regionConf:null,thumb:'thumb_01',reasons:[],outcomeReason:'High calibrated confidence',evidence:'complete'},
+  {seq:510,file:'part_20250521_0145.png',partType:'Part Type A',batch:'batch_0519_A',runId:'run_20250521_143205',result:'DEFECT',raw:0.91,conf:0.95,outcome:'REJECT',drift:0.15,regionConf:0.93,thumb:'thumb_05',reasons:[],outcomeReason:'High calibrated confidence',evidence:'complete'},
+  {seq:511,file:'part_20250521_0146.png',partType:'Part Type A',batch:'batch_0519_A',runId:'run_20250521_143206',result:'OK',raw:0.08,conf:0.98,outcome:'ACCEPT',drift:0.09,regionConf:null,thumb:'thumb_03',reasons:[],outcomeReason:'High calibrated confidence',evidence:'complete'},
+  {seq:513,file:'part_20250521_0148.png',partType:'Part Type A',batch:'batch_0519_A',runId:'run_20250521_143208',result:'UNCERTAIN',raw:0.63,conf:0.58,outcome:'REVIEW',drift:0.51,regionConf:0.71,thumb:'thumb_04',reasons:['Confidence inside review band','Localized uncertainty'],outcomeReason:'Borderline Confidence',evidence:'complete'},
+  {seq:514,file:'part_20250521_0149.png',partType:'Part Type A',batch:'batch_0519_A',runId:'run_20250521_143209',result:'DEFECT',raw:0.88,conf:0.90,outcome:'REJECT',drift:0.20,regionConf:0.86,thumb:'thumb_07',reasons:[],outcomeReason:'High calibrated confidence',evidence:'complete'},
+  {seq:515,file:'part_20250521_0150.png',partType:'Part Type A',batch:'batch_0519_A',runId:'run_20250521_143210',result:'UNCERTAIN',raw:0.55,conf:null,outcome:'ABSTAIN',drift:0.74,regionConf:null,thumb:'thumb_08',reasons:['Input outside familiar conditions','Insufficient evidence to calibrate'],outcomeReason:'Abstained \u2014 evidence insufficient',evidence:'partial'},
+  {seq:516,file:'part_20250521_0151.png',partType:'Part Type A',batch:'batch_0519_A',runId:'run_20250521_143211',result:'DEFECT',raw:0.79,conf:0.71,outcome:'REVIEW',drift:0.38,regionConf:0.80,thumb:'thumb_02',reasons:['Confidence inside review band','Localized uncertainty'],outcomeReason:'Borderline Confidence',evidence:'complete'},
+  {seq:508,file:'part_20250521_0143.png',partType:'Part Type A',batch:'batch_0519_A',runId:'run_20250521_143203',result:'OK',raw:0.18,conf:0.94,outcome:'ACCEPT',drift:0.12,regionConf:null,thumb:'thumb_06',reasons:[],outcomeReason:'High calibrated confidence',evidence:'complete'},
+  {seq:507,file:'part_20250521_0142.png',partType:'Part Type A',batch:'batch_0519_A',runId:'run_20250521_143202',result:'OK',raw:0.22,conf:0.92,outcome:'ACCEPT',drift:0.14,regionConf:null,thumb:'thumb_03',reasons:[],outcomeReason:'High calibrated confidence',evidence:'complete'}
+];
+
+const EVAL = [
+  {key:'detection', short:'DETECTION QUALITY', label:'DETECTION QUALITY', value:'0.91', metric:'AUC', question:'Does it find and locate defects?',
+   failures:[{name:'Missed defects',count:4},{name:'False alarms',count:7},{name:'Mislocalized defects',count:3}]},
+  {key:'calibration', short:'CALIBRATION', label:'CALIBRATION', value:'0.88', metric:'ECE (\u2193)', question:'Does stated confidence match real correctness?',
+   failures:[{name:'Confident errors',count:5}]},
+  {key:'uncertainty', short:'UNCERTAINTY QUALITY', label:'UNCERTAINTY QUALITY', value:'0.84', metric:'AUROC', question:'Are the cases it is unsure about the ones it gets wrong?',
+   failures:[{name:'Misplaced uncertainty',count:9}]},
+  {key:'review', short:'REVIEW QUALITY', label:'REVIEW QUALITY', value:'0.89', metric:'Accuracy', question:'Are the cases it defers the right ones to defer?',
+   failures:[{name:'Needless deferrals',count:12},{name:'Missed deferrals',count:6}]},
+  {key:'drift', short:'DRIFT RESPONSE', label:'DRIFT RESPONSE', value:'0.86', metric:'AUROC', question:'Does its caution rise as conditions degrade?',
+   failures:[{name:'Unresponsive drift',count:2}]}
+];
+
+const NAV = [
+  {key:'overview',label:'Overview',icon:'ph-house'},
+  {key:'inspection',label:'Inspection',icon:'ph-scan'},
+  {key:'trust',label:'Trust',icon:'ph-shield-check'},
+  {key:'review',label:'Review',icon:'ph-clipboard-text'},
+  {key:'evidence',label:'Evidence',icon:'ph-file-text'},
+  {key:'evaluation',label:'Evaluation',icon:'ph-chart-bar'},
+  {key:'dataset',label:'Dataset',icon:'ph-stack'}
+];
+
+const PRINCIPLES = [
+  {icon:'ph-hexagon',title:'ONE SOURCE OF TRUTH',sub:'Inspection and trust from the same evidence.'},
+  {icon:'ph-stack',title:'EVIDENCE BY CONSTRUCTION',sub:'Every decision leaves a durable record.'},
+  {icon:'ph-shield-check',title:'HONESTY OVER CAPABILITY',sub:'We abstain when we cannot be sure.'},
+  {icon:'ph-gear-six',title:'ENGINEERED FOR TRUST',sub:'Not just accurate. Trustworthy.'}
+];
+
+class Component extends DCLogic {
+  state = { screen:'overview', caseIndex:0, inspectSel:512, reviewSel:512, reviewDecisions:{}, evalDim:'detection', evidenceSel:512 };
+
+  caseView(c){
+    const dc = driftInfo(c.drift);
+    const rc = resultColor(c.result);
+    const oc = outcomeColor(c.outcome);
+    return {
+      ...c,
+      seqText:`${c.seq} / 10,000`,
+      result:c.result, resultColor:rc, resultBg:hexa(rc,0.12), resultBorder:hexa(rc,0.4),
+      rawText:c.raw.toFixed(2),
+      rawBarStyle:`width:${Math.round(c.raw*100)}%;height:100%;background:linear-gradient(90deg,${hexa(rc,0.6)},${rc});border-radius:5px`,
+      confText: c.conf==null ? '\u2014' : c.conf.toFixed(2),
+      regionConfText: c.regionConf==null ? 'n/a' : c.regionConf.toFixed(2),
+      outcomeColor:oc, outcomeBg:hexa(oc,0.12), outcomeBorder:hexa(oc,0.4),
+      driftText:c.drift.toFixed(2), driftLabel:dc.label, driftColor:dc.color,
+      reasons:(c.reasons||[]).map(t=>({text:t})),
+      thumbSrc:TH+c.thumb+'.png',
+      detailImg: c.result==='OK' ? TH+'part_clean.png' : TH+'part_main.png',
+      detailBg: `background-image:url(${c.result==='OK' ? TH+'part_clean.png' : TH+'part_main.png'})`,
+      hasLoc: c.result!=='OK',
+      noLoc: c.result==='OK',
+      outcomeReasonsText:(c.reasons||[]).join(' \u00b7 ')
+    };
+  }
+
+  go(screen){ this.setState({screen}); }
+  byseq(q){ return CASES.find(c=>c.seq===q) || CASES[0]; }
+  gaugeXY(conf){ const cx=110,cy=108,r=92,v=(conf==null?0:conf); return {mx:(cx-r*Math.cos(v*Math.PI)).toFixed(1), my:(cy-r*Math.sin(v*Math.PI)).toFixed(1)}; }
+  decisionMeta(k){ return ({accept:{label:'Accepted',color:GREEN}, reject:{label:'Rejected',color:RED}, inconclusive:{label:'Inconclusive',color:GOLD}, cannot:{label:'Could not review',color:SLATE}})[k] || null; }
+  recordReview(seq,k){ this.setState(st=>({reviewDecisions:{...st.reviewDecisions,[seq]:k}})); }
+
+  rowStyle(active){ return `display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:8px;cursor:pointer;width:100%;text-align:left;border:1px solid ${active?'rgba(255,255,255,0.1)':'transparent'};background:${active?'#151c26':'transparent'};transition:background .12s`; }
+
+  renderVals(){
+    const s=this.state;
+    const featured=this.caseView(CASES[s.caseIndex]);
+    const gauge=this.gaugeXY(CASES[s.caseIndex].conf);
+
+    const nav=NAV.map(n=>{
+      const active=n.key===s.screen;
+      const style=`display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:8px;cursor:pointer;width:100%;text-align:left;font:500 14px 'IBM Plex Sans';transition:background .15s;`+
+        (active?`background:#151c26;border:1px solid rgba(255,255,255,0.08);color:#f3f5f8;`:`background:transparent;border:1px solid transparent;color:#98a2ae;`);
+      return {label:n.label, icon:n.icon, style, go:()=>this.go(n.key)};
+    });
+
+    const recentIds=[509,510,511,513,514];
+    const recentCases=recentIds.map(id=>{
+      const c=CASES.find(x=>x.seq===id);
+      return {result:c.result, resultColor:resultColor(c.result), rawText:c.raw.toFixed(2), thumb:TH+c.thumb+'.png', bg:`background-image:url(${TH+c.thumb+'.png'})`,
+        go:()=>{ const i=CASES.findIndex(x=>x.seq===id); this.setState({caseIndex:i}); }};
+    });
+    const evalCells=EVAL.map(e=>({label:e.short, value:e.value, metric:e.metric, go:()=>this.go('evaluation')}));
+
+    // ---- INSPECTION ----
+    const inspectList=CASES.map(c=>({
+      seqText:'#'+c.seq, file:c.file, result:c.result, resultColor:resultColor(c.result),
+      rawText:c.raw.toFixed(2), thumb:TH+c.thumb+'.png', bg:`background-image:url(${TH+c.thumb+'.png'})`, rowStyle:this.rowStyle(c.seq===s.inspectSel),
+      go:()=>this.setState({inspectSel:c.seq})
+    }));
+    const inspectSel=this.caseView(this.byseq(s.inspectSel));
+
+    // ---- TRUST ----
+    const tc=this.byseq(s.caseIndex!=null?CASES[s.caseIndex].seq:512);
+    const tv=this.caseView(tc);
+    const isAbstain=tc.outcome==='ABSTAIN';
+    const toc=outcomeColor(tc.outcome);
+    const statesDef=[
+      {key:'ACCEPT',label:'Accept',color:GREEN,desc:'Sound part \u2014 auto-finalized.'},
+      {key:'REVIEW',label:'Review',color:GOLD,desc:'Borderline confidence \u2014 deferred to a human.'},
+      {key:'REJECT',label:'Reject',color:RED,desc:'Defective part \u2014 auto-finalized.'},
+      {key:'ABSTAIN',label:'Abstain',color:SLATE,desc:'Evidence insufficient \u2014 declined automatically.'}
+    ];
+    const trust={
+      rawText:tc.raw.toFixed(2), confText:(tc.conf==null?'\u2014':tc.conf.toFixed(2)),
+      isAbstain, hasConf:tc.conf!=null, markerLeft:(tc.conf==null?0:tc.conf*100).toFixed(1)+'%',
+      gauge:this.gaugeXY(tc.conf), driftText:tc.drift.toFixed(2),
+      driftLabel:driftInfo(tc.drift).label, driftColor:driftInfo(tc.drift).color,
+      rawBarStyle:`width:${Math.round(tc.raw*100)}%;height:100%;background:linear-gradient(90deg,${hexa(resultColor(tc.result),0.6)},${resultColor(tc.result)});border-radius:5px`,
+      outcome:tc.outcome, outcomeColor:toc, outcomeBg:hexa(toc,0.12), outcomeBorder:hexa(toc,0.4), outcomeReason:tc.outcomeReason,
+      reasons:tv.reasons,
+      states:statesDef.map(d=>{
+        const active=d.key===tc.outcome;
+        return {label:d.label, desc:d.desc, color:d.color,
+          cardStyle:`flex:1;background:${active?hexa(d.color,0.1):'#0b1017'};border:1px solid ${active?hexa(d.color,0.5):'rgba(255,255,255,0.06)'};border-radius:9px;padding:12px 13px`,
+          dotStyle:`width:7px;height:7px;border-radius:50%;background:${d.color};${active?'box-shadow:0 0 7px '+d.color:''}`,
+          labelStyle:`font:600 13px 'Space Grotesk';letter-spacing:0.04em;color:${active?d.color:'#c4ccd6'}`};
+      })
+    };
+
+    // ---- REVIEW ----
+    const queue=CASES.filter(c=>c.outcome==='REVIEW'||c.outcome==='ABSTAIN');
+    const reviewQueue=queue.map(c=>{
+      const dk=s.reviewDecisions[c.seq]; const dm=this.decisionMeta(dk);
+      return { seqText:'#'+c.seq, file:c.file, outcome:c.outcome, outcomeColor:outcomeColor(c.outcome),
+        thumb:TH+c.thumb+'.png', bg:`background-image:url(${TH+c.thumb+'.png'})`, statusText:dm?dm.label:'Pending review', statusColor:dm?dm.color:'#8a93a0',
+        rowStyle:this.rowStyle(c.seq===s.reviewSel), go:()=>this.setState({reviewSel:c.seq}) };
+    });
+    const rsel=this.byseq(s.reviewSel);
+    const reviewSel=this.caseView(rsel);
+    const rdk=s.reviewDecisions[rsel.seq]; const rdm=this.decisionMeta(rdk);
+    const reviewDecision = rdm ? {label:rdm.label, color:rdm.color, bg:hexa(rdm.color,0.12), border:hexa(rdm.color,0.4)} : null;
+    const decide={
+      accept:()=>this.recordReview(rsel.seq,'accept'), reject:()=>this.recordReview(rsel.seq,'reject'),
+      inconclusive:()=>this.recordReview(rsel.seq,'inconclusive'), cannot:()=>this.recordReview(rsel.seq,'cannot')
+    };
+
+    // ---- EVIDENCE ----
+    const evidenceRows=CASES.map(c=>{
+      const loc = c.result==='OK' ? {text:'n/a',muted:true} : (c.regionConf==null ? {text:'absent',flag:true} : {text:'present',ok:true});
+      const cal = c.conf==null ? {text:'not recorded',flag:true} : {text:c.conf.toFixed(2)};
+      return { seq:c.seq, seqText:'#'+c.seq, file:c.file, result:c.result, resultColor:resultColor(c.result),
+        rawText:c.raw.toFixed(2), calText:cal.text, calStyle:`font:500 13px 'IBM Plex Mono';color:${cal.flag?'#7d93bf':'#d2d8e0'}`,
+        outcome:c.outcome, outcomeColor:outcomeColor(c.outcome),
+        locText:loc.text, locStyle:`font:400 12px 'IBM Plex Sans';color:${loc.flag?'#e6a23c':loc.muted?'#5f6975':'#9aa3af'}`,
+        rowStyle:`display:grid;grid-template-columns:1.6fr 0.7fr 0.7fr 0.9fr 0.9fr 0.8fr;gap:8px;align-items:center;padding:11px 14px;cursor:pointer;border-radius:8px;border:1px solid ${c.seq===s.evidenceSel?'rgba(255,255,255,0.1)':'transparent'};background:${c.seq===s.evidenceSel?'#151c26':'transparent'}`,
+        go:()=>this.setState({evidenceSel:c.seq}) };
+    });
+    const esel=this.caseView(this.byseq(s.evidenceSel));
+    const eselPartial = this.byseq(s.evidenceSel).evidence==='partial';
+
+    // ---- EVALUATION ----
+    const evalDims=EVAL.map(e=>{
+      const sel=e.key===s.evalDim; const val=parseFloat(e.value);
+      return {...e, sel, valuePct:Math.round(val*100)+'%',
+        cardStyle:`background:${sel?'#151c26':'#0e141c'};border:1px solid ${sel?'rgba(230,162,60,0.4)':'rgba(255,255,255,0.06)'};border-radius:11px;padding:16px 17px;cursor:pointer;transition:border .15s`,
+        barStyle:`width:${Math.round(val*100)}%;height:100%;background:linear-gradient(90deg,${hexa(GOLD,0.5)},${GOLD});border-radius:4px`,
+        go:()=>this.setState({evalDim:e.key})};
+    });
+    const evalSel=EVAL.find(e=>e.key===s.evalDim);
+    const MAXF=12;
+    const evalSelView={...evalSel,
+      failures:evalSel.failures.map(f=>({name:f.name, count:f.count, barStyle:`width:${Math.round(f.count/MAXF*100)}%;height:100%;background:${hexa(GOLD,0.55)};border-radius:3px`})),
+      barStyle:`width:${Math.round(parseFloat(evalSel.value)*100)}%;height:100%;background:linear-gradient(90deg,${hexa(GOLD,0.5)},${GOLD});border-radius:4px`};
+    const allFailures=[];
+    EVAL.forEach(e=>e.failures.forEach(f=>allFailures.push({name:f.name, count:f.count, dim:e.short, barStyle:`width:${Math.round(f.count/MAXF*100)}%;height:100%;background:${hexa(GOLD,0.45)};border-radius:3px`})));
+
+    // ---- DATASET ----
+    const datasetThumbs=CASES.map(c=>({seqText:'#'+c.seq, thumb:TH+c.thumb+'.png', bg:`background-image:url(${TH+c.thumb+'.png'})`, result:c.result, resultColor:resultColor(c.result), rawText:c.raw.toFixed(2)}));
+
+    return {
+      isOverview:s.screen==='overview', isInspection:s.screen==='inspection', isTrust:s.screen==='trust',
+      isReview:s.screen==='review', isEvidence:s.screen==='evidence', isEvaluation:s.screen==='evaluation', isDataset:s.screen==='dataset',
+      nav, principles:PRINCIPLES,
+      featured, gauge, recentCases, evalCells,
+      inspectList, inspectSel,
+      trust, trustCase:tv,
+      reviewQueue, reviewSel, reviewDecision, reviewPending:!rdm, decide, queueCount:queue.length,
+      evidenceRows, esel, eselPartial,
+      evalDims, evalSel:evalSelView, allFailures,
+      datasetThumbs,
+      prevCase:()=>this.setState(st=>({caseIndex:(st.caseIndex-1+CASES.length)%CASES.length})),
+      nextCase:()=>this.setState(st=>({caseIndex:(st.caseIndex+1)%CASES.length})),
+      goEvidence:()=>this.go('evidence'), goEval:()=>this.go('evaluation'),
+      noop:()=>{}
+    };
+  }
+}
+</script>
+</body>
+</html>

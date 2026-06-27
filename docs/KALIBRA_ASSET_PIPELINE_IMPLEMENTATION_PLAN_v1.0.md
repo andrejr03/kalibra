@@ -28,7 +28,7 @@ This phase must not:
 - generate thumbnails;
 - modify `master_clean.png`;
 - modify prototype files or prototype archives;
-- write into `assets/calibra-prototype/`, `assets/prototypes/`, or the root
+- write into `assets/kalibra-prototype/`, `assets/prototypes/`, or the root
   prototype image;
 - implement inspection, anomaly detection, calibration, trust qualification,
   human review, evidence recording, or evaluation logic;
