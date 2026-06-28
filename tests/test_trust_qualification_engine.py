@@ -28,15 +28,32 @@ from src.trust import (
     InvalidTrustQualificationResult,
     MalformedRawInspectionResult,
     NonReproducibleTrustQualification,
+    PLACEHOLDER_CALIBRATION_KIND,
     QualifiedOutcome,
     QualificationOutcome,
     RawInspectionMutationError,
     TrustEvidenceEmissionFailure,
+    DeterministicPlaceholderCalibrator,
+    DeterministicTrustBaselineCalibrator,
     TrustQualificationEngine,
     TrustQualificationEngineOutput,
     TrustQualificationEvidenceRecord,
     TrustQualificationResult,
     TrustQualifiedResult,
+)
+
+
+EXPECTED_BASELINE_CALIBRATION_KIND = "deterministic_rule_based_trust_baseline_v1"
+LOW_BASELINE_UNCERTAINTY_RATIONALE = (
+    "Deterministic trust baseline confidence is far from the raw decision "
+    "boundary."
+)
+ELEVATED_BASELINE_UNCERTAINTY_RATIONALE = (
+    "Deterministic trust baseline confidence is near the raw decision boundary."
+)
+HIGH_BASELINE_UNCERTAINTY_RATIONALE = (
+    "Deterministic trust baseline confidence is too close to the raw decision "
+    "boundary."
 )
 
 
@@ -178,8 +195,203 @@ def test_calibrated_confidence_is_explicitly_marked_calibrated():
         "calibrated_confidence"
     )
     assert qualification.calibrated_confidence.calibration_kind == (
-        "deterministic_placeholder_calibration"
+        EXPECTED_BASELINE_CALIBRATION_KIND
     )
+
+
+def test_deterministic_trust_baseline_confidence_is_distinct_from_raw_anomaly():
+    raw_result = make_raw_result(raw_measure=5.0)
+
+    qualification = TrustQualificationEngine().qualify(
+        raw_result
+    ).trust_qualification_result
+
+    assert raw_result.raw_anomaly_measure == 5.0
+    assert qualification.calibrated_confidence.value == 0.9
+    assert not hasattr(qualification, "raw_anomaly_measure")
+    assert (
+        qualification.calibrated_confidence.calibration_kind
+        == EXPECTED_BASELINE_CALIBRATION_KIND
+    )
+
+
+def test_deterministic_trust_baseline_calibrator_is_default():
+    engine = TrustQualificationEngine()
+
+    assert isinstance(engine.calibrator, DeterministicTrustBaselineCalibrator)
+
+
+def test_deterministic_trust_baseline_calibrator_examples():
+    calibrator = DeterministicTrustBaselineCalibrator()
+
+    examples = (
+        (5.0, 0.9),
+        (35.0, 0.3),
+        (49.0, 0.02),
+        (95.0, 0.9),
+    )
+    for raw_measure, expected_confidence in examples:
+        confidence = calibrator.calibrate(
+            make_raw_result(raw_measure=raw_measure)
+        )
+        assert confidence.value == expected_confidence
+        assert confidence.calibration_kind == EXPECTED_BASELINE_CALIBRATION_KIND
+
+
+def test_placeholder_calibrator_remains_available_as_compatibility_surface():
+    confidence = DeterministicPlaceholderCalibrator().calibrate(
+        make_raw_result(raw_measure=5.0)
+    )
+
+    assert confidence.value == 0.9
+    assert confidence.calibration_kind == PLACEHOLDER_CALIBRATION_KIND
+
+
+def test_deterministic_trust_baseline_same_raw_result_is_reproducible():
+    engine = TrustQualificationEngine()
+    raw_result = make_raw_result(raw_measure=5.0)
+
+    first = engine.qualify(raw_result)
+    second = engine.qualify(raw_result)
+
+    assert first == second
+    assert first.trust_qualification_result == second.trust_qualification_result
+    assert (
+        first.trust_qualification_evidence_record
+        == second.trust_qualification_evidence_record
+    )
+
+
+def test_deterministic_trust_baseline_drift_changes_caution_not_raw_result():
+    raw_result = make_raw_result(
+        raw_measure=5.0,
+        judgement=InspectionJudgement.OK,
+    )
+    raw_before = deepcopy(raw_result)
+
+    without_drift = TrustQualificationEngine().qualify(
+        raw_result
+    ).trust_qualification_result
+    with_drift = TrustQualificationEngine().qualify(
+        raw_result,
+        drift_reference=DriftReference(
+            reference_id="baseline-drift-reference-1",
+            available=True,
+            drift_score=0.9,
+        ),
+    ).trust_qualification_result
+
+    assert without_drift.qualified_outcome is QualifiedOutcome.ACCEPT
+    assert with_drift.calibrated_confidence == without_drift.calibrated_confidence
+    assert with_drift.qualified_outcome is QualifiedOutcome.REVIEW
+    assert with_drift.drift_caution.status is DriftCautionStatus.DRIFTED
+    assert with_drift.drift_caution.caution_applied is True
+    assert raw_result == raw_before
+
+
+def test_deterministic_trust_baseline_review_and_abstain_are_outcomes():
+    review = TrustQualificationEngine().qualify(
+        make_raw_result(raw_measure=35.0)
+    ).trust_qualification_result
+    abstain = TrustQualificationEngine().qualify(
+        make_raw_result(raw_measure=49.0)
+    ).trust_qualification_result
+
+    assert review.qualified_outcome is QualifiedOutcome.REVIEW
+    assert abstain.qualified_outcome is QualifiedOutcome.ABSTAIN
+
+
+def test_deterministic_trust_baseline_uncertainty_rationales():
+    low = TrustQualificationEngine().qualify(
+        make_raw_result(raw_measure=5.0)
+    ).trust_qualification_result
+    elevated = TrustQualificationEngine().qualify(
+        make_raw_result(raw_measure=35.0)
+    ).trust_qualification_result
+    high = TrustQualificationEngine().qualify(
+        make_raw_result(raw_measure=49.0)
+    ).trust_qualification_result
+
+    assert (
+        low.uncertainty_characterization.rationale
+        == LOW_BASELINE_UNCERTAINTY_RATIONALE
+    )
+    assert (
+        elevated.uncertainty_characterization.rationale
+        == ELEVATED_BASELINE_UNCERTAINTY_RATIONALE
+    )
+    assert (
+        high.uncertainty_characterization.rationale
+        == HIGH_BASELINE_UNCERTAINTY_RATIONALE
+    )
+
+
+def test_deterministic_trust_baseline_malformed_input_fails_explicitly():
+    with pytest.raises(MalformedRawInspectionResult):
+        TrustQualificationEngine().qualify(object())  # type: ignore[arg-type]
+
+
+def test_deterministic_trust_baseline_calibration_failure_emits_no_abstain():
+    class FailingCalibrator:
+        def calibrate(self, raw_result: RawInspectionResult) -> object:
+            raise CalibrationFailure("baseline calibration unavailable")
+
+    class RecordingEvidenceEmitter:
+        def __init__(self) -> None:
+            self.emitted: list[TrustQualificationResult] = []
+
+        def emit(
+            self,
+            raw_result: RawInspectionResult,
+            qualification: TrustQualificationResult,
+        ) -> object:
+            self.emitted.append(qualification)
+            return object()
+
+    evidence_emitter = RecordingEvidenceEmitter()
+
+    with pytest.raises(CalibrationFailure):
+        TrustQualificationEngine(
+            calibrator=FailingCalibrator(),
+            evidence_emitter=evidence_emitter,
+        ).qualify(make_raw_result(raw_measure=49.0))
+
+    assert evidence_emitter.emitted == []
+
+
+def test_deterministic_trust_baseline_evidence_preserves_raw_and_qualification():
+    raw_result = make_raw_result(raw_measure=5.0)
+
+    output = TrustQualificationEngine().qualify(raw_result)
+
+    assert output.trust_qualification_evidence_record.raw_inspection_result == (
+        raw_result
+    )
+    assert (
+        output.trust_qualification_evidence_record.trust_qualification_result
+        == output.trust_qualification_result
+    )
+
+
+def test_deterministic_trust_baseline_exposes_no_out_of_scope_behavior():
+    engine = TrustQualificationEngine()
+
+    assert not hasattr(engine, "inspect")
+    assert not hasattr(engine, "inspect_image")
+    assert not hasattr(engine, "inspect_path")
+    assert not hasattr(engine, "review")
+    assert not hasattr(engine, "route_for_review")
+    assert not hasattr(engine, "present_evidence")
+    assert not hasattr(engine, "evaluate")
+    assert not hasattr(engine, "train")
+    assert not hasattr(engine, "update")
+    assert not hasattr(engine, "update_model")
+    assert not hasattr(engine, "persist")
+    assert not hasattr(engine, "save")
+    assert not hasattr(engine, "store")
+    assert not hasattr(engine, "render")
+    assert not hasattr(engine, "ui")
+    assert not hasattr(engine, "prototype_asset")
 
 
 def test_raw_qualified_outcomes_are_explicit_and_complete():
@@ -224,6 +436,51 @@ def test_missing_drift_reference_is_absence_not_failure():
     assert qualification.drift_caution.absence_reason == (
         "drift_reference_unavailable"
     )
+
+
+def test_deterministic_trust_baseline_drift_status_rules():
+    engine = TrustQualificationEngine()
+    raw_result = make_raw_result(raw_measure=5.0, judgement=InspectionJudgement.OK)
+
+    none_reference = engine.qualify(raw_result).trust_qualification_result
+    unavailable = engine.qualify(
+        raw_result,
+        drift_reference=DriftReference(
+            reference_id="drift-reference-unavailable",
+            available=False,
+        ),
+    ).trust_qualification_result
+    in_distribution = engine.qualify(
+        raw_result,
+        drift_reference=DriftReference(
+            reference_id="drift-reference-in-distribution",
+            available=True,
+            drift_score=0.59,
+        ),
+    ).trust_qualification_result
+    drifted = engine.qualify(
+        raw_result,
+        drift_reference=DriftReference(
+            reference_id="drift-reference-drifted",
+            available=True,
+            drift_score=0.6,
+        ),
+    ).trust_qualification_result
+
+    assert none_reference.drift_caution.status is DriftCautionStatus.UNAVAILABLE
+    assert none_reference.drift_caution.caution_applied is False
+    assert unavailable.drift_caution.status is DriftCautionStatus.UNAVAILABLE
+    assert unavailable.drift_caution.caution_applied is False
+    assert (
+        in_distribution.drift_caution.status
+        is DriftCautionStatus.IN_DISTRIBUTION
+    )
+    assert in_distribution.drift_caution.caution_applied is False
+    assert in_distribution.qualified_outcome is QualifiedOutcome.ACCEPT
+    assert drifted.drift_caution.status is DriftCautionStatus.DRIFTED
+    assert drifted.drift_caution.caution_applied is True
+    assert drifted.qualified_outcome is QualifiedOutcome.REVIEW
+    assert drifted.calibrated_confidence == none_reference.calibrated_confidence
 
 
 def test_drift_caution_can_increase_caution_without_mutating_raw_result():

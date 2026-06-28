@@ -11,9 +11,11 @@ from src.inspection import InspectionResult, InspectionJudgement, RawInspectionR
 
 from .domain import (
     CalibratedTrustConfidence,
+    DETERMINISTIC_TRUST_BASELINE_CALIBRATION_KIND,
     DriftCaution,
     DriftCautionStatus,
     DriftReference,
+    PLACEHOLDER_CALIBRATION_KIND,
     QualifiedOutcome,
     TrustQualificationEngineOutput,
     TrustQualificationEvidenceRecord,
@@ -37,6 +39,37 @@ from .interfaces import (
 from .types import TrustQualifiedResult
 
 
+ABSTAIN_CONFIDENCE_THRESHOLD = 0.15
+REVIEW_CONFIDENCE_THRESHOLD = 0.40
+DRIFT_REVIEW_THRESHOLD = 0.60
+
+
+@dataclass(frozen=True)
+class DeterministicTrustBaselineCalibrator:
+    calibrator_id: str = "trust-deterministic-baseline-v1"
+    decision_boundary: float = 50.0
+    raw_measure_span: float = 50.0
+
+    def calibrate(
+        self, raw_result: RawInspectionResult
+    ) -> CalibratedTrustConfidence:
+        raw_measure = raw_result.raw_anomaly_measure
+        if not isfinite(raw_measure):
+            raise CalibrationFailure("raw anomaly measure must be finite")
+        normalized_margin = min(
+            1.0,
+            max(
+                0.0,
+                abs(raw_measure - self.decision_boundary)
+                / self.raw_measure_span,
+            ),
+        )
+        return CalibratedTrustConfidence(
+            value=round(normalized_margin, 6),
+            calibration_kind=DETERMINISTIC_TRUST_BASELINE_CALIBRATION_KIND,
+        )
+
+
 @dataclass(frozen=True)
 class DeterministicPlaceholderCalibrator:
     calibrator_id: str = "trust-placeholder-calibrator-v1"
@@ -52,7 +85,8 @@ class DeterministicPlaceholderCalibrator:
             max(0.0, abs(raw_measure - 50.0) / 50.0),
         )
         return CalibratedTrustConfidence(
-            value=round(normalized_distance_from_boundary, 6)
+            value=round(normalized_distance_from_boundary, 6),
+            calibration_kind=PLACEHOLDER_CALIBRATION_KIND,
         )
 
 
@@ -86,7 +120,7 @@ class TrustQualificationEvidenceEmitter:
 class TrustQualificationEngine:
     method: TrustQualificationMethod | None = None
     calibrator: TrustCalibrationMethod = field(
-        default_factory=DeterministicPlaceholderCalibrator
+        default_factory=DeterministicTrustBaselineCalibrator
     )
     evidence_emitter: TrustQualificationEvidenceEmitterProtocol = field(
         default_factory=TrustQualificationEvidenceEmitter
@@ -185,7 +219,7 @@ class TrustQualificationEngine:
             raise
         except Exception as exc:
             raise CalibrationFailure(
-                "placeholder trust calibration failed"
+                "trust calibration failed"
             ) from exc
         if not isinstance(confidence, CalibratedTrustConfidence):
             raise CalibrationFailure(
@@ -203,7 +237,7 @@ class TrustQualificationEngine:
             return DriftCaution(status=DriftCautionStatus.UNAVAILABLE)
         status = (
             DriftCautionStatus.DRIFTED
-            if score >= 0.6
+            if score >= DRIFT_REVIEW_THRESHOLD
             else DriftCautionStatus.IN_DISTRIBUTION
         )
         return DriftCaution(
@@ -288,16 +322,25 @@ def _uncertainty_for_confidence(
     if confidence.value >= 0.75:
         return UncertaintyCharacterization(
             status=UncertaintyStatus.LOW,
-            rationale="Placeholder confidence is far from the decision boundary.",
+            rationale=(
+                "Deterministic trust baseline confidence is far from the raw "
+                "decision boundary."
+            ),
         )
     if confidence.value >= 0.15:
         return UncertaintyCharacterization(
             status=UncertaintyStatus.ELEVATED,
-            rationale="Placeholder confidence is near the decision boundary.",
+            rationale=(
+                "Deterministic trust baseline confidence is near the raw "
+                "decision boundary."
+            ),
         )
     return UncertaintyCharacterization(
         status=UncertaintyStatus.HIGH,
-        rationale="Placeholder confidence is too close to the decision boundary.",
+        rationale=(
+            "Deterministic trust baseline confidence is too close to the raw "
+            "decision boundary."
+        ),
     )
 
 
@@ -306,9 +349,9 @@ def _qualified_outcome(
     confidence: CalibratedTrustConfidence,
     drift_caution: DriftCaution,
 ) -> QualifiedOutcome:
-    if confidence.value < 0.15:
+    if confidence.value < ABSTAIN_CONFIDENCE_THRESHOLD:
         return QualifiedOutcome.ABSTAIN
-    if confidence.value < 0.4:
+    if confidence.value < REVIEW_CONFIDENCE_THRESHOLD:
         return QualifiedOutcome.REVIEW
 
     base_outcome = (

@@ -1,5 +1,6 @@
 from .domain import (
     CONFIDENCE_KIND,
+    DETERMINISTIC_TRUST_BASELINE_CALIBRATION_KIND,
     DRIFT_UNAVAILABLE,
     PLACEHOLDER_CALIBRATION_KIND,
     TRUST_EVIDENCE_KIND,
@@ -16,6 +17,7 @@ from .domain import (
 )
 from .engine import (
     DeterministicPlaceholderCalibrator,
+    DeterministicTrustBaselineCalibrator,
     TrustQualificationEngine,
     TrustQualificationEvidenceEmitter,
 )
@@ -50,7 +52,9 @@ __all__ = [
     "CalibratedTrustConfidence",
     "CalibrationFailure",
     "DRIFT_UNAVAILABLE",
+    "DETERMINISTIC_TRUST_BASELINE_CALIBRATION_KIND",
     "DeterministicPlaceholderCalibrator",
+    "DeterministicTrustBaselineCalibrator",
     "DriftAssessment",
     "DriftAssessmentStatus",
     "DriftCaution",

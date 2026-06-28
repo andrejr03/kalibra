@@ -12,7 +12,16 @@ from .errors import InvalidTrustQualificationResult, MalformedRawInspectionResul
 
 
 CONFIDENCE_KIND = "calibrated_confidence"
+DETERMINISTIC_TRUST_BASELINE_CALIBRATION_KIND = (
+    "deterministic_rule_based_trust_baseline_v1"
+)
 PLACEHOLDER_CALIBRATION_KIND = "deterministic_placeholder_calibration"
+VALID_CALIBRATION_KINDS = frozenset(
+    {
+        DETERMINISTIC_TRUST_BASELINE_CALIBRATION_KIND,
+        PLACEHOLDER_CALIBRATION_KIND,
+    }
+)
 DRIFT_UNAVAILABLE = "drift_reference_unavailable"
 TRUST_EVIDENCE_KIND = "trust_qualification_result"
 
@@ -40,7 +49,7 @@ class DriftCautionStatus(str, Enum):
 class CalibratedTrustConfidence:
     value: float
     confidence_kind: str = CONFIDENCE_KIND
-    calibration_kind: str = PLACEHOLDER_CALIBRATION_KIND
+    calibration_kind: str = DETERMINISTIC_TRUST_BASELINE_CALIBRATION_KIND
     source_raw_measure_kind: str = RAW_MEASURE_KIND
 
     def __post_init__(self) -> None:
@@ -56,9 +65,9 @@ class CalibratedTrustConfidence:
             raise InvalidTrustQualificationResult(
                 "confidence must be explicitly marked as calibrated"
             )
-        if self.calibration_kind != PLACEHOLDER_CALIBRATION_KIND:
+        if self.calibration_kind not in VALID_CALIBRATION_KINDS:
             raise InvalidTrustQualificationResult(
-                "placeholder calibration kind must be explicit"
+                "calibration kind must be explicit"
             )
         if self.source_raw_measure_kind != RAW_MEASURE_KIND:
             raise InvalidTrustQualificationResult(
