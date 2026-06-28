@@ -1,4 +1,6 @@
 from .domain import (
+    IMAGE_BASELINE_EXAMINATION_KIND,
+    IMAGE_BASELINE_RAW_SCALE,
     INSPECTION_EVIDENCE_KIND,
     PLACEHOLDER_EXAMINATION_KIND,
     RAW_MEASURE_KIND,
@@ -17,6 +19,7 @@ from .domain import (
     StabilizedInspectionInput,
 )
 from .engine import (
+    DeterministicImageBaselineExaminer,
     DeterministicPlaceholderExaminer,
     InspectionEngine,
     InspectionEvidenceEmitter,
@@ -39,8 +42,11 @@ from .interfaces import InspectionEvidenceEmitterProtocol, InspectionExaminer
 __all__ = [
     "DefectJudgment",
     "DefectLocalization",
+    "DeterministicImageBaselineExaminer",
     "DeterministicPlaceholderExaminer",
     "EvidenceEmissionFailure",
+    "IMAGE_BASELINE_EXAMINATION_KIND",
+    "IMAGE_BASELINE_RAW_SCALE",
     "INSPECTION_EVIDENCE_KIND",
     "InspectionEngine",
     "InspectionEngineOutput",

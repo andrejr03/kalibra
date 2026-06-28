@@ -6,11 +6,15 @@ from pathlib import Path
 import pytest
 
 import src.inspection as inspection_api
+from src.inspection.engine import _read_pgm_p2, _resolve_local_artifact_path
 from src.inspection import (
+    IMAGE_BASELINE_EXAMINATION_KIND,
+    IMAGE_BASELINE_RAW_SCALE,
     INSPECTION_EVIDENCE_KIND,
     RAW_MEASURE_KIND,
     DefectJudgment,
     DefectLocalization,
+    DeterministicImageBaselineExaminer,
     EvidenceEmissionFailure,
     InspectionEngine,
     InspectionEngineOutput,
@@ -49,6 +53,8 @@ DOWNSTREAM_FIELD_NAMES = {
     "trust_qualification",
 }
 
+FIXTURES = Path(__file__).resolve().parent / "fixtures" / "inspection"
+
 
 def make_input(
     content_hash: str = "stable-content-hash-001",
@@ -59,6 +65,18 @@ def make_input(
         artifact_uri=f"artifact://kalibra/parts/{input_id}.png",
         content_hash=content_hash,
         metadata={"fixture": "fixed"},
+    )
+
+
+def _baseline_engine() -> InspectionEngine:
+    return InspectionEngine(examiner=DeterministicImageBaselineExaminer())
+
+
+def _baseline_input(filename: str) -> StabilizedInspectionInput:
+    return StabilizedInspectionInput(
+        input_id=f"baseline-{filename}",
+        artifact_uri=str(FIXTURES / filename),
+        content_hash=f"content-hash-{filename}",
     )
 
 
@@ -142,6 +160,136 @@ def test_raw_measure_is_explicitly_raw_and_not_confidence():
     assert "raw" in result.raw_measure_scale
     assert not hasattr(result, "confidence")
     assert not hasattr(result, "calibrated_confidence")
+
+
+def test_image_baseline_labels_are_accepted_by_contracts():
+    examination = PlaceholderExamination(
+        input_id="input-baseline",
+        examination_id="exam-baseline",
+        judgement=InspectionJudgement.OK,
+        raw_anomaly_measure=12.5,
+        localization=None,
+        examination_kind=IMAGE_BASELINE_EXAMINATION_KIND,
+        raw_measure_scale=IMAGE_BASELINE_RAW_SCALE,
+    )
+    assert examination.raw_measure_scale == "local_contrast_raw_0_100"
+
+    result = RawInspectionResult(
+        inspection_result_id="result-baseline",
+        input_id="input-baseline",
+        judgement=InspectionJudgement.OK,
+        localization=None,
+        raw_anomaly_measure=12.5,
+        examination_id="exam-baseline",
+        examination_kind=IMAGE_BASELINE_EXAMINATION_KIND,
+        raw_measure_scale=IMAGE_BASELINE_RAW_SCALE,
+    )
+    assert result.examination_kind == "deterministic_local_image_baseline_v1"
+    assert result.raw_measure_kind == "raw_anomaly_measure"
+
+
+def test_pgm_reader_parses_grid_and_maxval():
+    pixels, maxval = _read_pgm_p2(FIXTURES / "blob_defect.pgm")
+
+    assert maxval == 255
+    assert pixels == [
+        [0, 0, 0, 0],
+        [0, 255, 255, 0],
+        [0, 255, 255, 0],
+        [0, 0, 0, 0],
+    ]
+
+
+def test_pgm_reader_rejects_non_p2_and_truncated():
+    with pytest.raises(InspectionExaminationFailure):
+        _read_pgm_p2(FIXTURES / "bad_magic.pgm")
+    with pytest.raises(InspectionExaminationFailure):
+        _read_pgm_p2(FIXTURES / "truncated.pgm")
+
+
+def test_pgm_reader_rejects_malformed_missing_and_out_of_range_files(tmp_path):
+    malformed_header = tmp_path / "malformed_header.pgm"
+    malformed_header.write_text("P2\nx 1\n255\n0\n", encoding="ascii")
+    non_numeric_pixel = tmp_path / "non_numeric_pixel.pgm"
+    non_numeric_pixel.write_text("P2\n1 1\n255\nx\n", encoding="ascii")
+    out_of_range_pixel = tmp_path / "out_of_range_pixel.pgm"
+    out_of_range_pixel.write_text("P2\n1 1\n255\n256\n", encoding="ascii")
+
+    with pytest.raises(InspectionExaminationFailure):
+        _read_pgm_p2(malformed_header)
+    with pytest.raises(InspectionExaminationFailure):
+        _read_pgm_p2(non_numeric_pixel)
+    with pytest.raises(InspectionExaminationFailure):
+        _read_pgm_p2(out_of_range_pixel)
+    with pytest.raises(InspectionExaminationFailure):
+        _read_pgm_p2(FIXTURES / "missing.pgm")
+
+
+def test_resolver_rejects_non_local_scheme():
+    assert _resolve_local_artifact_path("part.pgm") == Path("part.pgm")
+    assert _resolve_local_artifact_path("file:///tmp/x.pgm") == Path("/tmp/x.pgm")
+    with pytest.raises(InspectionExaminationFailure):
+        _resolve_local_artifact_path("artifact://kalibra/x.png")
+    with pytest.raises(InspectionExaminationFailure):
+        _resolve_local_artifact_path("http://example.test/x.pgm")
+    with pytest.raises(InspectionExaminationFailure):
+        _resolve_local_artifact_path("https://example.test/x.pgm")
+
+
+def test_baseline_defect_image_produces_localized_raw_result():
+    output = _baseline_engine().inspect(_baseline_input("blob_defect.pgm"))
+    result = output.raw_inspection_result
+
+    assert result.judgement is InspectionJudgement.DEFECT
+    assert result.raw_measure_kind == "raw_anomaly_measure"
+    assert result.raw_measure_kind == RAW_MEASURE_KIND
+    assert result.raw_measure_scale == "local_contrast_raw_0_100"
+    assert result.raw_measure_scale == IMAGE_BASELINE_RAW_SCALE
+    assert 0.0 <= result.raw_anomaly_measure <= 100.0
+    assert result.localization is not None
+    assert result.localization.region == NormalizedBoundingBox(
+        x_min=0.25, y_min=0.25, x_max=0.75, y_max=0.75
+    )
+    assert not hasattr(result, "confidence")
+    assert not hasattr(result, "calibrated_confidence")
+
+
+def test_baseline_uniform_image_is_ok_without_localization():
+    output = _baseline_engine().inspect(_baseline_input("uniform_ok.pgm"))
+    result = output.raw_inspection_result
+
+    assert result.judgement is InspectionJudgement.OK
+    assert result.localization is None
+    assert result.raw_anomaly_measure == 0.0
+
+
+def test_baseline_same_image_is_reproducible():
+    engine = _baseline_engine()
+    inspection_input = _baseline_input("blob_defect.pgm")
+
+    first = engine.inspect(inspection_input)
+    second = engine.inspect(inspection_input)
+
+    assert first.raw_inspection_result == second.raw_inspection_result
+    assert first.inspection_evidence_record == second.inspection_evidence_record
+
+
+def test_baseline_missing_or_non_local_artifact_fails_explicitly():
+    missing = StabilizedInspectionInput(
+        input_id="baseline-missing",
+        artifact_uri=str(FIXTURES / "does_not_exist.pgm"),
+        content_hash="content-hash-missing",
+    )
+    with pytest.raises(InspectionExaminationFailure):
+        _baseline_engine().inspect(missing)
+
+    non_local = StabilizedInspectionInput(
+        input_id="baseline-non-local",
+        artifact_uri="artifact://kalibra/integration/input-000.png",
+        content_hash="content-hash-non-local",
+    )
+    with pytest.raises(InspectionExaminationFailure):
+        _baseline_engine().inspect(non_local)
 
 
 def test_raw_result_contains_no_downstream_domain_fields():

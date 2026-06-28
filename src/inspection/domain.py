@@ -24,6 +24,14 @@ RAW_MEASURE_KIND = "raw_anomaly_measure"
 RAW_MEASURE_SCALE = "placeholder_hash_raw_0_100"
 PLACEHOLDER_EXAMINATION_KIND = "deterministic_placeholder_examination"
 INSPECTION_EVIDENCE_KIND = "inspection_raw_result"
+IMAGE_BASELINE_EXAMINATION_KIND = "deterministic_local_image_baseline_v1"
+IMAGE_BASELINE_RAW_SCALE = "local_contrast_raw_0_100"
+VALID_EXAMINATION_KINDS = frozenset(
+    {PLACEHOLDER_EXAMINATION_KIND, IMAGE_BASELINE_EXAMINATION_KIND}
+)
+VALID_RAW_MEASURE_SCALES = frozenset(
+    {RAW_MEASURE_SCALE, IMAGE_BASELINE_RAW_SCALE}
+)
 
 _FORBIDDEN_METADATA_KEYS = frozenset(
     {
@@ -212,6 +220,7 @@ class PlaceholderExamination:
     raw_anomaly_measure: float
     localization: DefectLocalization | None
     examination_kind: str = PLACEHOLDER_EXAMINATION_KIND
+    raw_measure_scale: str = RAW_MEASURE_SCALE
 
     def __post_init__(self) -> None:
         if not self.input_id.strip():
@@ -220,10 +229,12 @@ class PlaceholderExamination:
             raise InvalidInspectionResult("examination requires examination_id")
         if not isfinite(self.raw_anomaly_measure):
             raise InvalidInspectionResult("raw anomaly measure must be finite")
-        if self.examination_kind != PLACEHOLDER_EXAMINATION_KIND:
+        if self.examination_kind not in VALID_EXAMINATION_KINDS:
             raise InvalidInspectionResult(
                 "inspection examination kind must remain explicit"
             )
+        if self.raw_measure_scale not in VALID_RAW_MEASURE_SCALES:
+            raise InvalidInspectionResult("raw anomaly measure scale is required")
         if self.judgement is InspectionJudgement.DEFECT and self.localization is None:
             raise PartialInspectionResult(
                 "defect examinations require localization"
@@ -261,9 +272,9 @@ class RawInspectionResult:
             raise InvalidInspectionResult(
                 "raw anomaly measure must be explicitly marked raw"
             )
-        if self.raw_measure_scale != RAW_MEASURE_SCALE:
+        if self.raw_measure_scale not in VALID_RAW_MEASURE_SCALES:
             raise InvalidInspectionResult("raw anomaly measure scale is required")
-        if self.examination_kind != PLACEHOLDER_EXAMINATION_KIND:
+        if self.examination_kind not in VALID_EXAMINATION_KINDS:
             raise InvalidInspectionResult(
                 "placeholder examination kind must be explicit"
             )
