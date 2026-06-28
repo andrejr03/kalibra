@@ -229,6 +229,22 @@ implemented. No model, technique, or framework is chosen here.
    the engine's single examination of the single input; its product is reused by
    later stages and must not be reconstructed.
 
+   The current implementation provides two interchangeable
+   `InspectionExaminer` implementations:
+
+   - `DeterministicPlaceholderExaminer` — the default examiner used by
+     `InspectionEngine()` and by substrate integration.
+   - `DeterministicImageBaselineExaminer` — an opt-in deterministic local image
+     baseline selected only by constructing
+     `InspectionEngine(examiner=DeterministicImageBaselineExaminer())`.
+
+   The image baseline reads local grayscale PGM P2 artifacts, computes a
+   deterministic raw local-contrast measure, and returns the same downstream
+   examination contract as the placeholder examiner. It exists to exercise the
+   Inspection boundary with real image artifacts. It does not implement ML,
+   production computer vision, calibration, trust qualification, review routing,
+   evaluation, benchmark measurement, or performance claims.
+
 3. **Judgement formation.** Derive, from the examination, an overall judgement of
    whether the input is defective.
 
@@ -298,6 +314,11 @@ Contract invariants:
   downstream, but the contract must not enable its violation here).
 - **Traceability.** Every produced and emitted artifact must be tied back to the
   exact input that produced it.
+- **Descriptive labels may differ by examiner.** The current implementation
+  accepts distinct `examination_kind` and `raw_measure_scale` labels for the
+  placeholder and local image baseline examiners, while preserving
+  `raw_measure_kind = "raw_anomaly_measure"` as the downstream-compatible raw
+  measure kind.
 
 ---
 
@@ -359,6 +380,9 @@ The Inspection Engine must be validated against:
   absence of these responsibilities is itself validated, not assumed.
 - **Single-source conformance.** Judgement, localization, and raw measure for one
   input demonstrably originate from one examination of that input.
+- **Examiner interchangeability.** Both current examiners exercise the
+  `InspectionExaminer` protocol and preserve the same downstream raw inspection
+  contract.
 - **Reproducibility.** The same fixed input yields the same result and the same
   emitted record on re-run (C2, P2).
 - **Traceability.** Every result and record is tied back to the exact originating
@@ -432,9 +456,11 @@ engine, and naming them grants no licence to anticipate them.
   detection quality and other dimensions from the emitted records — never from
   inside this engine, and never by adding evaluation logic here.
 - **Examination internals are replaceable.** Because this plan fixes the engine's
-  contracts and seams but not its examination technique, the chosen method (when
-  a later phase selects one) can be implemented and later replaced without
-  changing the engine's boundary, as long as the contracts in §8 are honoured.
+  contracts and seams but not its examination technique, the implementation now
+  supports both the default deterministic placeholder examiner and the opt-in
+  deterministic local image baseline examiner without changing the engine's
+  boundary. The `InspectionExaminer` protocol has therefore been exercised by two
+  interchangeable implementations while preserving the same downstream contract.
 - **The input contract can carry richer stabilized inputs.** Additional
   stabilized-input characteristics may be added at intake without changing the
   engine's responsibility, provided Contract A's obligations continue to hold.
