@@ -103,6 +103,10 @@ class ReviewerDecision:
             raise MalformedReviewerDecision("review_case_id is required")
         if not self.reviewer_ref.strip():
             raise MalformedReviewerDecision("reviewer_ref is required")
+        if not isinstance(self.decision, ReviewerDecisionValue):
+            raise MalformedReviewerDecision(
+                "reviewer decision must use ReviewerDecisionValue"
+            )
         if not self.rationale.strip():
             raise MalformedReviewerDecision("reviewer rationale is required")
 
@@ -123,9 +127,28 @@ class ReviewHandoff:
             raise InvalidHumanReviewResult("handoff source_input_ref is required")
         if not self.deferral_reason.strip():
             raise InvalidHumanReviewResult("handoff deferral reason is required")
+        if not isinstance(self.raw_inspection_result, RawInspectionResult):
+            raise InvalidHumanReviewResult(
+                "handoff raw_inspection_result is required"
+            )
+        if not isinstance(
+            self.trust_qualification_result,
+            TrustQualificationResult,
+        ):
+            raise InvalidHumanReviewResult(
+                "handoff trust_qualification_result is required"
+            )
+        if not self.trust_qualification_result.qualification_result_id.strip():
+            raise InvalidHumanReviewResult(
+                "handoff trust qualification result id is required"
+            )
         if self.raw_inspection_result.input_id != self.source_input_ref:
             raise InvalidHumanReviewResult(
                 "handoff source input must match raw inspection result"
+            )
+        if self.trust_qualification_result.input_id != self.source_input_ref:
+            raise InvalidHumanReviewResult(
+                "handoff source input must match trust qualification result"
             )
         if (
             self.trust_qualification_result.inspection_result_id

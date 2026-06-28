@@ -103,7 +103,10 @@ class HumanReviewEngine:
             localization_ref=raw_inspection_result.localization,
         )
 
-    def prepare_handoff(self, review_case: ReviewQualifiedCase) -> ReviewHandoff:
+    def prepare_review_package(
+        self,
+        review_case: ReviewQualifiedCase,
+    ) -> ReviewHandoff:
         self._validate_case_chain(review_case)
         return ReviewHandoff(
             review_case_id=review_case.review_case_id,
@@ -113,6 +116,9 @@ class HumanReviewEngine:
             trust_qualification_result=review_case.trust_qualification_result,
             deferral_reason=review_case.deferral_reason,
         )
+
+    def prepare_handoff(self, review_case: ReviewQualifiedCase) -> ReviewHandoff:
+        return self.prepare_review_package(review_case)
 
     def record_decision(
         self,
@@ -193,7 +199,7 @@ class HumanReviewEngine:
         review_case: ReviewQualifiedCase,
         reviewer_decision: ReviewerDecision,
     ) -> HumanReviewEngineOutput:
-        handoff = self.prepare_handoff(review_case)
+        handoff = self.prepare_review_package(review_case)
         record = self._emit_evidence(handoff, reviewer_decision)
         return HumanReviewEngineOutput(
             review_handoff=handoff,
@@ -239,11 +245,32 @@ class HumanReviewEngine:
                 "review case raw result must reference the source input"
             )
         if (
+            review_case.raw_inspection_result.inspection_result_id
+            != review_case.inspection_result_id
+        ):
+            raise IncompleteReviewChain(
+                "review case raw result must match the review case"
+            )
+        if (
+            review_case.trust_qualification_result.input_id
+            != review_case.input_id
+        ):
+            raise IncompleteReviewChain(
+                "review case trust qualification must reference the source input"
+            )
+        if (
             review_case.trust_qualification_result.inspection_result_id
             != review_case.raw_inspection_result.inspection_result_id
         ):
             raise IncompleteReviewChain(
                 "review case trust qualification must reference raw result"
+            )
+        if (
+            review_case.trust_qualification_result.qualification_result_id
+            != review_case.qualification_result_id
+        ):
+            raise IncompleteReviewChain(
+                "review case trust qualification must match the review case"
             )
 
     def _guard_upstream_unchanged(
