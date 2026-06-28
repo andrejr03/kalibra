@@ -10,7 +10,14 @@ and manages the human-review boundary.
 
 It is an architecture-first plan: it fixes the permanent engineering boundary of
 the Human Review Engine — what it owns, what it refuses, what crosses its seams,
-and how it is validated — without choosing how any of it is built.
+and how it is validated — and records the implemented deterministic baseline
+where that boundary is now concrete.
+
+The current repository implements the deterministic Human Review baseline as the
+canonical Human Review path. The baseline prepares deterministic review packages,
+validates reviewer decisions, preserves complete upstream lineage, and emits
+deterministic review evidence while preserving the same downstream canonical
+contracts.
 
 The plan deliberately does **not** select UI frameworks, storage frameworks,
 model-training workflows, or evaluation metrics. Those belong to later phases and
@@ -99,6 +106,11 @@ a named domain or to a deferred architecture, and the boundary is load-bearing:
 - **Update the inspection system from reviewer decisions.** It must not retrain,
   recalibrate, or otherwise update the model from human decisions; no feedback
   loop exists (Exclusion X5, AGENTS.md Scope Protection).
+- **Perform operational routing.** It must not decide workflow routing, queueing,
+  escalation, or case dispatch; it consumes cases already qualified for review or
+  drifted by the Trust Qualification Engine.
+- **Persist data or expose UI behaviour.** It must not own storage, database
+  writes, workflow screens, or review presentation surfaces.
 - **Evaluate performance.** It must not measure review quality or any other
   dimension; it records reviews, it does not judge them. *(Evaluation Engine.)*
 - **Own the Evidence presentation layer.** It emits records and assembles the
@@ -141,9 +153,10 @@ What the engine **must not** require or assume:
 - Any live or streaming source; cases are drawn from a fixed body (C1, C4, X8).
 
 It also accepts, from the reviewer, the **reviewer decision** for a routed case —
-the human judgement to be recorded. The concrete form of that decision, and the
-surface through which a reviewer supplies it, are left to implementation; this
-plan fixes only that the decision is captured and recorded as evidence.
+the human judgement to be recorded. The implemented canonical decision record is
+`ReviewerDecision`: it is externally supplied, validated, bound to exactly one
+review case, and preserved as evidence only. The engine does not choose, infer,
+normalize, or generate the reviewer decision.
 
 ---
 
@@ -154,14 +167,20 @@ For each routed case, the engine produces and emits:
 - **A review case (the prepared hand-off).** The assembled evidence a reviewer
   needs — source input reference, localization, raw inspection result, and trust
   qualification — together with the preserved reason for deferral. This is what is
-  presented for human judgement (H2).
+  presented for human judgement (H2). The implemented canonical review package is
+  `ReviewHandoff`, prepared by `prepare_review_package(...)`; `prepare_handoff(...)`
+  remains a compatibility alias to the same logic.
 - **A recorded reviewer decision.** The human's judgement for the case, captured as
-  a durable artifact and bound to the review case.
+  a durable artifact and bound to the review case. The implemented canonical
+  decision record is `ReviewerDecision`.
 - **A preserved upstream-chain link.** The binding from the reviewer action through
   trust qualification, raw inspection result, and source input, so the decision is
-  traceable end to end.
+  traceable end to end. The implemented chain record is `ReviewUpstreamChain`.
 - **A review evidence record.** A durable record of the routing and the reviewer
-  decision emitted into the Evidence Engine (E1).
+  decision emitted into the Evidence Engine (E1). The implemented
+  `ReviewEvidenceRecord` deterministically preserves the `ReviewHandoff`,
+  `ReviewerDecision`, and `ReviewUpstreamChain`; the preserved hand-off carries the
+  original `RawInspectionResult` and `TrustQualificationResult`.
 
 Properties the plan fixes:
 
@@ -250,7 +269,9 @@ implemented. No UI, storage, or training mechanism is chosen here.
    result, and the trust qualification — **from the Review-Qualified Case the
    engine received**, which already carries this full chain. The assembly reads the
    upstream artifacts carried in the case; it must not modify them, and it must not
-   depend on the Evidence Engine to perform this assembly.
+   depend on the Evidence Engine to perform this assembly. The current canonical
+   method for this stage is `prepare_review_package(...)`, which returns
+   `ReviewHandoff`; `prepare_handoff(...)` remains compatibility-only.
 
 4. **Reviewer decision capture.** Receive the human's judgement for the case and
    capture it as a durable artifact bound to the review case. The engine collects
@@ -285,9 +306,9 @@ Ordering and boundary obligations:
 ## 8. Data Contracts
 
 This section fixes the **shape and obligations** of what the engine consumes and
-produces, expressed as abstract contracts. Concrete types, encodings, field
-names, surfaces, and storage formats are deliberately left to implementation; only
-the obligations below are binding.
+produces. The current repository implements the canonical contracts with the
+types named below; encodings, external reviewer surfaces, and storage formats
+remain outside this engine.
 
 **Contract A — Review-Qualified Case (consumed).**
 - Carries the trust qualification result (with its *review*/drifted qualified
@@ -303,6 +324,8 @@ the obligations below are binding.
 - Is bound to exactly one review case.
 - Is recorded as evidence; it must not be transformed into a model update,
   retraining signal, or recalibration input (Exclusion X5).
+- Is implemented as `ReviewerDecision`, whose identifiers, reviewer reference,
+  rationale, and `ReviewerDecisionValue` are validated before recording.
 
 **Contract C — Review Case / Hand-off (produced).**
 - Carries the assembled evidence for the reviewer: source-input reference,
@@ -310,6 +333,8 @@ the obligations below are binding.
 - Carries the preserved deferral reason.
 - Must not contain a mutated copy of any upstream artifact; it references and
   presents them, never replaces them.
+- Is implemented as `ReviewHandoff`, the canonical deterministic review package
+  produced from `ReviewQualifiedCase`.
 
 **Contract D — Review Evidence Record (emitted).**
 - Durably preserves the review case, the preserved deferral reason, the recorded
@@ -320,6 +345,9 @@ the obligations below are binding.
   decision (P2).
 - Faithfully represents the recorded decision and the upstream artifacts; it must
   not present a result as stronger than its evidence allows (E2, R7).
+- Is implemented as `ReviewEvidenceRecord`, which embeds `ReviewHandoff`,
+  `ReviewerDecision`, and `ReviewUpstreamChain`; the embedded hand-off preserves
+  the original `RawInspectionResult` and `TrustQualificationResult`.
 
 Contract invariants:
 
@@ -331,6 +359,9 @@ Contract invariants:
   through trust qualification, raw inspection result, and source input.
 - **Review as outcome.** A routed case is a normal qualified destination, never an
   error artifact.
+- **Boundary preservation.** The deterministic baseline performs no image
+  inspection, trust qualification, routing, evaluation, persistence, UI behaviour,
+  model update, training, or feedback loop.
 
 ---
 
@@ -380,7 +411,7 @@ General obligations for all failure modes:
   for example, recalibrate or re-inspect — it only surfaces the failure).
 
 This plan fixes *which* failures must be handled and *how they must be treated*;
-the concrete error mechanisms are implementation choices.
+the current repository surfaces them through explicit Human Review errors.
 
 ---
 
@@ -468,8 +499,8 @@ Testing principles:
 - Tests should be small and focused, each covering one obligation, consistent with
   Kalibra's coding rules (small, testable modules).
 
-The concrete test code, fixtures, and runner are produced during implementation,
-not in this plan.
+The concrete baseline tests live in `tests/test_human_review_engine.py` and
+validate the implemented canonical contracts and boundary absences.
 
 ---
 
@@ -516,6 +547,11 @@ evidence, and binds that decision back through trust qualification, raw inspecti
 result, and source input. It mutates nothing upstream, trains nothing, updates no
 model from what reviewers decide, evaluates nothing, and presents no surface of its
 own.
+
+The implemented deterministic baseline now makes that boundary concrete through
+`ReviewQualifiedCase`, `ReviewHandoff`, `ReviewerDecision`, `ReviewUpstreamChain`,
+`ReviewEvidenceRecord`, and `HumanReviewEngineOutput`. It strengthens validation
+and lineage guarantees without changing downstream canonical contracts.
 
 Engineered to this boundary, the Human Review Engine is what makes Kalibra a
 partner to human judgement rather than a replacement for it: uncertainty always has
