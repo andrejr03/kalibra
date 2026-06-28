@@ -250,6 +250,19 @@ here.
    stated certainty corresponds to observed correctness. Mark the result
    explicitly as calibrated. The raw measure is read, never altered.
 
+   The current implementation provides two interchangeable calibration
+   implementations:
+
+   - `DeterministicTrustBaselineCalibrator` — the canonical default used by
+     `TrustQualificationEngine()`.
+   - `DeterministicPlaceholderCalibrator` — retained as a compatibility-only
+     calibration surface.
+
+   The deterministic Trust baseline maps the raw anomaly measure into calibrated
+   confidence with a fixed rule based on distance from the raw decision boundary.
+   It is rule-based and locally deterministic. It is not calibration science,
+   probabilistic calibration, ML, benchmark evaluation, or a performance claim.
+
 3. **Drift-aware caution (where available).** If a drift reference is available,
    assess how far the input has drifted and determine the additional caution that
    drift induces. This adjustment influences qualification only; it must not
@@ -336,8 +349,15 @@ Contract invariants:
 - **Calibration is explicit.** Confidence must be self-describing as calibrated,
   and the raw measure must remain self-describing as raw, so neither can be
   mistaken for the other (R3).
+- **Calibration labels are explicit.** The current default calibration kind is
+  `deterministic_rule_based_trust_baseline_v1`. The placeholder calibration kind
+  remains available only for compatibility.
 - **Non-destruction.** The raw inspection result remains intact and recoverable
   alongside its qualification (core boundary).
+- **Derived trust only.** `RawInspectionResult` remains unchanged. Only
+  calibrated confidence and the qualified outcome are derived from it; the raw
+  anomaly measure is never overwritten. Drift may increase caution, but it never
+  changes the raw anomaly measure or the calibrated confidence.
 - **Traceability.** Every produced and emitted artifact is tied back to the exact
   raw inspection result and originating input.
 
@@ -405,6 +425,9 @@ The engine must be validated against:
   image, and no reconstruction of the inspection result (R2, core boundary).
 - **Calibration-before-confidence.** No output presents the raw measure or any
   uncalibrated value as confidence; confidence is always marked calibrated (R3).
+- **Calibrator interchangeability.** The default deterministic Trust baseline
+  and the compatibility placeholder calibrator both preserve the same downstream
+  canonical `TrustQualificationResult` contract.
 - **Outcome conformance.** Every qualified outcome is one of {accept, reject,
   review, abstain}; *review* and *abstain* are emitted as valid outcomes, never as
   errors.
@@ -487,11 +510,12 @@ These are points where later phases and other domains attach to the Trust
 Qualification Engine. Naming them fixes the boundary now; none grants licence to
 absorb another domain's responsibility.
 
-- **Calibration method is replaceable.** Because this plan fixes the engine's
-  contracts and seams but not its calibration technique, the method chosen in a
-  later phase can be implemented and later replaced without changing the engine's
-  boundary, provided calibrated confidence remains marked calibrated and the raw
-  measure remains untouched (Contracts A, C).
+- **Calibration method is replaceable.** The current implementation demonstrates
+  this with `DeterministicTrustBaselineCalibrator` as the default and
+  `DeterministicPlaceholderCalibrator` as a compatibility-only surface. Both
+  preserve the same downstream `TrustQualificationResult` contract, keep
+  calibrated confidence marked as calibrated, and leave the raw measure
+  untouched (Contracts A, C).
 - **Drift assessment attaches via the drift reference.** Drift-aware caution is
   applied *where available*; richer drift references or assessments can be
   introduced via Contract B without changing the engine's responsibility, and must
