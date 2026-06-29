@@ -1,25 +1,28 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from dataclasses import FrozenInstanceError, replace
+from dataclasses import FrozenInstanceError, fields, replace
 from pathlib import Path
 
 import pytest
 
 from src.evidence import (
     PERFORMANCE_EVIDENCE_KIND,
+    EvidenceAbsenceFailure,
     EvidenceAbsenceMarker,
     EvidenceArtifact,
     EvidenceBundle,
     EvidenceChainLink,
     EvidenceDomain,
     EvidenceEngine,
+    EvidenceLinkingFailure,
     EvidenceRecordLink,
     EvidenceReference,
     EvidenceResult,
     EvidenceSourceDomain,
     EvidenceStatus,
     EvidenceView,
+    EvidenceViewFailure,
     FabricatedEvidenceRecord,
     InboundEvidenceRecord,
     InvalidEvidenceBundle,
@@ -269,6 +272,96 @@ class RecordingEvidenceMethod:
         )
 
 
+def make_inbound_inspection_evidence(
+    record_id: str,
+    input_id: str,
+    inspection_result_id: str,
+    relation: str = "source_input_to_raw_inspection",
+    payload_extra: dict | None = None,
+    links: tuple[EvidenceRecordLink, ...] | None = None,
+) -> InboundEvidenceRecord:
+    payload = {
+        "input_id": input_id,
+        "inspection_result_id": inspection_result_id,
+    }
+    if payload_extra:
+        payload.update(payload_extra)
+    return InboundEvidenceRecord(
+        record_id=record_id,
+        evidence_kind="inspection_raw_result",
+        source_domain=EvidenceSourceDomain.INSPECTION,
+        payload=payload,
+        links=links
+        if links is not None
+        else (
+            EvidenceRecordLink(
+                from_record_id=input_id,
+                to_record_id=inspection_result_id,
+                relation=relation,
+            ),
+        ),
+    )
+
+
+def make_inbound_trust_evidence(
+    record_id: str,
+    inspection_result_id: str,
+    qualification_result_id: str,
+) -> InboundEvidenceRecord:
+    return InboundEvidenceRecord(
+        record_id=record_id,
+        evidence_kind="trust_qualification_result",
+        source_domain=EvidenceSourceDomain.TRUST,
+        payload={
+            "inspection_result_id": inspection_result_id,
+            "qualification_result_id": qualification_result_id,
+        },
+        links=(
+            EvidenceRecordLink(
+                from_record_id=inspection_result_id,
+                to_record_id=qualification_result_id,
+                relation="raw_inspection_result_to_trust_qualification",
+            ),
+        ),
+    )
+
+
+def make_inbound_review_evidence(
+    record_id: str,
+    qualification_result_id: str,
+    review_case_id: str,
+    decision_id: str,
+) -> InboundEvidenceRecord:
+    return InboundEvidenceRecord(
+        record_id=record_id,
+        evidence_kind="human_review_result",
+        source_domain=EvidenceSourceDomain.HUMAN_REVIEW,
+        payload={
+            "review_case_id": review_case_id,
+            "reviewer_decision": {
+                "decision_id": decision_id,
+                "decision": "inconclusive",
+            },
+            "upstream_chain": {
+                "qualification_result_id": qualification_result_id,
+                "review_case_id": review_case_id,
+            },
+        },
+        links=(
+            EvidenceRecordLink(
+                from_record_id=qualification_result_id,
+                to_record_id=review_case_id,
+                relation="trust_qualification_to_human_review",
+            ),
+            EvidenceRecordLink(
+                from_record_id=review_case_id,
+                to_record_id=decision_id,
+                relation="review_case_to_reviewer_decision",
+            ),
+        ),
+    )
+
+
 def test_evidence_can_be_collected_for_accept_without_human_review_result():
     bundle = make_bundle(
         outcome=QualificationOutcome.ACCEPT,
@@ -504,6 +597,607 @@ def test_preserved_records_are_immutable_and_read_only():
         preserved_record.payload["record_id"] = "changed"
 
 
+def test_same_fixed_evidence_produces_identical_preserved_records_and_view():
+    records = make_upstream_evidence_records()
+    engine = EvidenceEngine()
+
+    first = engine.preserve(records)
+    second = engine.preserve(records)
+
+    assert first == second
+    assert first.records == second.records
+    assert tuple(record.content_hash for record in first.records) == tuple(
+        record.content_hash for record in second.records
+    )
+    assert tuple(record.preserved_record_id for record in first.records) == tuple(
+        record.preserved_record_id for record in second.records
+    )
+    assert first.view_id == second.view_id
+
+
+def test_equivalent_canonical_payloads_produce_identical_content_hashes():
+    first_record = InboundEvidenceRecord(
+        record_id="canonical-evidence-record-1",
+        evidence_kind="inspection_raw_result",
+        source_domain=EvidenceSourceDomain.INSPECTION,
+        payload={
+            "inspection_result_id": "raw-1",
+            "input_id": "input-1",
+            "measure": {
+                "kind": "raw_anomaly_measure",
+                "value": 42.0,
+            },
+        },
+        links=(
+            EvidenceRecordLink(
+                from_record_id="input-1",
+                to_record_id="raw-1",
+                relation="source_input_to_raw_inspection",
+            ),
+        ),
+    )
+    second_record = InboundEvidenceRecord(
+        record_id="canonical-evidence-record-1",
+        evidence_kind="inspection_raw_result",
+        source_domain=EvidenceSourceDomain.INSPECTION,
+        payload={
+            "measure": {
+                "value": 42.0,
+                "kind": "raw_anomaly_measure",
+            },
+            "input_id": "input-1",
+            "inspection_result_id": "raw-1",
+        },
+        links=(
+            EvidenceRecordLink(
+                from_record_id="input-1",
+                to_record_id="raw-1",
+                relation="source_input_to_raw_inspection",
+            ),
+        ),
+    )
+
+    first_view = EvidenceEngine().preserve((first_record,))
+    second_view = EvidenceEngine().preserve((second_record,))
+
+    assert first_view.records[0].content_hash == (
+        second_view.records[0].content_hash
+    )
+    assert first_view.records[0].preserved_record_id == (
+        second_view.records[0].preserved_record_id
+    )
+    assert first_view.view_id == second_view.view_id
+
+
+def test_content_hash_depends_only_on_canonical_payload_content():
+    payload = {
+        "inspection_result_id": "raw-1",
+        "input_id": "input-1",
+        "measure": {
+            "kind": "raw_anomaly_measure",
+            "value": 42.0,
+        },
+    }
+    first_record = InboundEvidenceRecord(
+        record_id="canonical-evidence-record-1",
+        evidence_kind="inspection_raw_result",
+        source_domain=EvidenceSourceDomain.INSPECTION,
+        payload=payload,
+        links=(
+            EvidenceRecordLink(
+                from_record_id="input-1",
+                to_record_id="raw-1",
+                relation="source_input_to_raw_inspection",
+            ),
+        ),
+    )
+    second_record = InboundEvidenceRecord(
+        record_id="canonical-evidence-record-2",
+        evidence_kind="inspection_raw_result",
+        source_domain=EvidenceSourceDomain.INSPECTION,
+        payload=payload,
+        links=(
+            EvidenceRecordLink(
+                from_record_id="input-1",
+                to_record_id="raw-1",
+                relation="source_input_to_raw_inspection",
+            ),
+        ),
+    )
+
+    first_preserved = EvidenceEngine().preserve((first_record,)).records[0]
+    second_preserved = EvidenceEngine().preserve((second_record,)).records[0]
+
+    assert first_preserved.content_hash == second_preserved.content_hash
+    assert first_preserved.preserved_record_id != (
+        second_preserved.preserved_record_id
+    )
+
+
+def test_preserved_record_id_uses_inbound_id_source_domain_and_content_hash():
+    payload = {
+        "inspection_result_id": "raw-1",
+        "input_id": "input-1",
+    }
+    first_record = InboundEvidenceRecord(
+        record_id="canonical-evidence-record-1",
+        evidence_kind="inspection_raw_result",
+        source_domain=EvidenceSourceDomain.INSPECTION,
+        payload=payload,
+        links=(
+            EvidenceRecordLink(
+                from_record_id="input-1",
+                to_record_id="raw-1",
+                relation="source_input_to_raw_inspection",
+            ),
+        ),
+    )
+    second_record = InboundEvidenceRecord(
+        record_id="canonical-evidence-record-1",
+        evidence_kind="trust_qualification_result",
+        source_domain=EvidenceSourceDomain.TRUST,
+        payload={
+            "inspection_result_id": "raw-1",
+            "qualification_result_id": "qualification-1",
+        },
+        links=(
+            EvidenceRecordLink(
+                from_record_id="raw-1",
+                to_record_id="qualification-1",
+                relation="raw_inspection_result_to_trust_qualification",
+            ),
+        ),
+    )
+
+    first_preserved = EvidenceEngine().preserve((first_record,)).records[0]
+    second_preserved = EvidenceEngine().preserve((second_record,)).records[0]
+
+    assert first_preserved.inbound_record_id == second_preserved.inbound_record_id
+    assert first_preserved.source_domain is not second_preserved.source_domain
+    assert first_preserved.preserved_record_id != (
+        second_preserved.preserved_record_id
+    )
+
+
+def test_preserved_payload_sequences_are_immutable():
+    record = InboundEvidenceRecord(
+        record_id="sequence-evidence-record-1",
+        evidence_kind="inspection_raw_result",
+        source_domain=EvidenceSourceDomain.INSPECTION,
+        payload={
+            "inspection_result_id": "raw-1",
+            "input_id": "input-1",
+            "measurements": ["raw", "localized"],
+            "nested": {
+                "labels": ["alpha", "beta"],
+            },
+        },
+        links=(
+            EvidenceRecordLink(
+                from_record_id="input-1",
+                to_record_id="raw-1",
+                relation="source_input_to_raw_inspection",
+            ),
+        ),
+    )
+
+    preserved = EvidenceEngine().preserve((record,)).records[0]
+
+    assert preserved.payload["measurements"] == ("raw", "localized")
+    assert preserved.payload["nested"]["labels"] == ("alpha", "beta")
+    with pytest.raises(TypeError):
+        preserved.payload["measurements"][0] = "changed"
+    with pytest.raises(TypeError):
+        preserved.payload["nested"]["labels"][0] = "changed"
+
+
+def test_set_payloads_are_canonicalized_deterministically():
+    first_record = InboundEvidenceRecord(
+        record_id="set-evidence-record-1",
+        evidence_kind="inspection_raw_result",
+        source_domain=EvidenceSourceDomain.INSPECTION,
+        payload={
+            "inspection_result_id": "raw-1",
+            "input_id": "input-1",
+            "tags": {"gamma", "alpha", "beta"},
+        },
+        links=(
+            EvidenceRecordLink(
+                from_record_id="input-1",
+                to_record_id="raw-1",
+                relation="source_input_to_raw_inspection",
+            ),
+        ),
+    )
+    second_record = InboundEvidenceRecord(
+        record_id="set-evidence-record-1",
+        evidence_kind="inspection_raw_result",
+        source_domain=EvidenceSourceDomain.INSPECTION,
+        payload={
+            "inspection_result_id": "raw-1",
+            "input_id": "input-1",
+            "tags": {"beta", "gamma", "alpha"},
+        },
+        links=(
+            EvidenceRecordLink(
+                from_record_id="input-1",
+                to_record_id="raw-1",
+                relation="source_input_to_raw_inspection",
+            ),
+        ),
+    )
+
+    first_preserved = EvidenceEngine().preserve((first_record,)).records[0]
+    second_preserved = EvidenceEngine().preserve((second_record,)).records[0]
+
+    assert first_preserved.payload["tags"] == ("alpha", "beta", "gamma")
+    assert first_preserved.content_hash == second_preserved.content_hash
+
+
+def test_path_payloads_are_canonicalized_deterministically():
+    first_record = InboundEvidenceRecord(
+        record_id="path-evidence-record-1",
+        evidence_kind="inspection_raw_result",
+        source_domain=EvidenceSourceDomain.INSPECTION,
+        payload={
+            "inspection_result_id": "raw-1",
+            "input_id": "input-1",
+            "artifact_path": Path("fixtures/part.pgm"),
+        },
+        links=(
+            EvidenceRecordLink(
+                from_record_id="input-1",
+                to_record_id="raw-1",
+                relation="source_input_to_raw_inspection",
+            ),
+        ),
+    )
+    second_record = InboundEvidenceRecord(
+        record_id="path-evidence-record-1",
+        evidence_kind="inspection_raw_result",
+        source_domain=EvidenceSourceDomain.INSPECTION,
+        payload={
+            "artifact_path": Path("fixtures") / "part.pgm",
+            "input_id": "input-1",
+            "inspection_result_id": "raw-1",
+        },
+        links=(
+            EvidenceRecordLink(
+                from_record_id="input-1",
+                to_record_id="raw-1",
+                relation="source_input_to_raw_inspection",
+            ),
+        ),
+    )
+
+    first_preserved = EvidenceEngine().preserve((first_record,)).records[0]
+    second_preserved = EvidenceEngine().preserve((second_record,)).records[0]
+
+    assert first_preserved.payload["artifact_path"] == "fixtures/part.pgm"
+    assert first_preserved.content_hash == second_preserved.content_hash
+
+
+def test_shuffled_inbound_evidence_produces_same_preserved_ordering():
+    inspection_record, trust_record, review_record = make_upstream_evidence_records()
+    expected_order = tuple(
+        record.preserved_record_id
+        for record in EvidenceEngine().preserve(
+            (inspection_record, trust_record, review_record)
+        ).records
+    )
+
+    shuffled_order = tuple(
+        record.preserved_record_id
+        for record in EvidenceEngine().preserve(
+            (review_record, trust_record, inspection_record)
+        ).records
+    )
+
+    assert shuffled_order == expected_order
+
+
+def test_shuffled_inbound_records_produce_identical_evidence_view():
+    inspection_record, trust_record, review_record = make_upstream_evidence_records()
+
+    first = EvidenceEngine().preserve(
+        (inspection_record, trust_record, review_record)
+    )
+    second = EvidenceEngine().preserve(
+        (review_record, inspection_record, trust_record)
+    )
+
+    assert second == first
+
+
+def test_preserved_record_ordering_follows_source_domain_then_inbound_id():
+    inspection_b = make_inbound_inspection_evidence(
+        record_id="inspection-record-b",
+        input_id="input-b",
+        inspection_result_id="raw-b",
+    )
+    inspection_a = make_inbound_inspection_evidence(
+        record_id="inspection-record-a",
+        input_id="input-a",
+        inspection_result_id="raw-a",
+    )
+    trust_record = make_inbound_trust_evidence(
+        record_id="trust-record-a",
+        inspection_result_id="raw-a",
+        qualification_result_id="qualification-a",
+    )
+    review_record = make_inbound_review_evidence(
+        record_id="review-record-a",
+        qualification_result_id="qualification-a",
+        review_case_id="review-case-a",
+        decision_id="decision-a",
+    )
+
+    view = EvidenceEngine().preserve(
+        (review_record, inspection_b, trust_record, inspection_a)
+    )
+
+    assert tuple(
+        (record.source_domain, record.inbound_record_id)
+        for record in view.records
+    ) == (
+        (EvidenceSourceDomain.INSPECTION, "inspection-record-a"),
+        (EvidenceSourceDomain.INSPECTION, "inspection-record-b"),
+        (EvidenceSourceDomain.TRUST, "trust-record-a"),
+        (EvidenceSourceDomain.HUMAN_REVIEW, "review-record-a"),
+    )
+
+
+def test_preserved_record_ordering_uses_preserved_id_as_final_tie_breaker():
+    first = make_inbound_inspection_evidence(
+        record_id="inspection-record-duplicate",
+        input_id="input-a",
+        inspection_result_id="raw-a",
+        payload_extra={"measure": 1},
+    )
+    second = make_inbound_inspection_evidence(
+        record_id="inspection-record-duplicate",
+        input_id="input-b",
+        inspection_result_id="raw-b",
+        payload_extra={"measure": 2},
+    )
+
+    forward_view = EvidenceEngine().preserve((first, second))
+    reversed_view = EvidenceEngine().preserve((second, first))
+    forward_ids = tuple(
+        record.preserved_record_id for record in forward_view.records
+    )
+    reversed_ids = tuple(
+        record.preserved_record_id for record in reversed_view.records
+    )
+
+    assert forward_ids == reversed_ids
+    assert forward_ids == tuple(sorted(forward_ids))
+
+
+def test_chain_link_ordering_is_deterministic():
+    records = make_upstream_evidence_records()
+    first = EvidenceEngine().preserve(records)
+    second = EvidenceEngine().preserve(tuple(reversed(records)))
+
+    first_link_ids = tuple(link.link_id for link in first.links)
+    second_link_ids = tuple(link.link_id for link in second.links)
+
+    assert first_link_ids == second_link_ids
+    assert first_link_ids == tuple(sorted(first_link_ids))
+
+
+def test_chain_links_are_deterministic_and_deduplicated():
+    duplicate_link = EvidenceRecordLink(
+        from_record_id="input-duplicate",
+        to_record_id="raw-duplicate",
+        relation="source_input_to_raw_inspection",
+    )
+    record = make_inbound_inspection_evidence(
+        record_id="inspection-record-duplicate-links",
+        input_id="input-duplicate",
+        inspection_result_id="raw-duplicate",
+        links=(duplicate_link, duplicate_link),
+    )
+
+    first = EvidenceEngine().preserve((record,))
+    second = EvidenceEngine().preserve((record,))
+    link_identities = tuple(
+        (link.from_record_id, link.to_record_id, link.relation)
+        for link in first.links
+    )
+
+    assert first.links == second.links
+    assert len(link_identities) == len(set(link_identities))
+    assert tuple(link.link_id for link in first.links) == tuple(
+        sorted(link.link_id for link in first.links)
+    )
+
+
+def test_chain_links_are_created_only_when_both_cross_record_endpoints_exist():
+    inspection_record, trust_record, review_record = make_upstream_evidence_records()
+
+    only_trust = EvidenceEngine().preserve((trust_record,))
+    trust_and_review = EvidenceEngine().preserve((trust_record, review_record))
+    inspection_and_trust = EvidenceEngine().preserve(
+        (inspection_record, trust_record)
+    )
+    only_review = EvidenceEngine().preserve((review_record,))
+
+    assert "inspection_evidence_to_trust_evidence" not in {
+        link.relation for link in only_trust.links
+    }
+    assert "trust_evidence_to_human_review_evidence" not in {
+        link.relation for link in only_review.links
+    }
+    assert "trust_evidence_to_human_review_evidence" in {
+        link.relation for link in trust_and_review.links
+    }
+    assert "inspection_evidence_to_trust_evidence" not in {
+        link.relation for link in trust_and_review.links
+    }
+    assert "inspection_evidence_to_trust_evidence" in {
+        link.relation for link in inspection_and_trust.links
+    }
+    assert "trust_evidence_to_human_review_evidence" not in {
+        link.relation for link in inspection_and_trust.links
+    }
+
+
+def test_missing_cross_record_links_are_not_fabricated():
+    inspection_record, _, review_record = make_upstream_evidence_records()
+
+    view = EvidenceEngine().preserve((inspection_record, review_record))
+
+    assert "inspection_evidence_to_trust_evidence" not in {
+        link.relation for link in view.links
+    }
+    assert "trust_evidence_to_human_review_evidence" not in {
+        link.relation for link in view.links
+    }
+
+
+def test_absence_marker_ordering_is_deterministic():
+    first = EvidenceEngine().preserve(
+        (),
+        expected_stages=(
+            EvidenceSourceDomain.HUMAN_REVIEW,
+            EvidenceSourceDomain.TRUST,
+        ),
+    )
+    second = EvidenceEngine().preserve(
+        (),
+        expected_stages=(
+            EvidenceSourceDomain.TRUST,
+            EvidenceSourceDomain.HUMAN_REVIEW,
+        ),
+    )
+
+    first_absence_ids = tuple(absence.absence_id for absence in first.absences)
+    second_absence_ids = tuple(absence.absence_id for absence in second.absences)
+
+    assert first_absence_ids == second_absence_ids
+    assert first_absence_ids == tuple(sorted(first_absence_ids))
+
+
+def test_evidence_view_id_changes_when_record_link_or_absence_identity_changes():
+    first_record = make_inbound_inspection_evidence(
+        record_id="view-id-record-a",
+        input_id="input-view-id",
+        inspection_result_id="raw-view-id",
+    )
+    second_record = make_inbound_inspection_evidence(
+        record_id="view-id-record-b",
+        input_id="input-view-id",
+        inspection_result_id="raw-view-id",
+    )
+    link_variant_record = make_inbound_inspection_evidence(
+        record_id="view-id-record-a",
+        input_id="input-view-id",
+        inspection_result_id="raw-view-id",
+        relation="source_input_to_raw_inspection_variant",
+    )
+
+    first_view = EvidenceEngine().preserve((first_record,))
+    record_variant_view = EvidenceEngine().preserve((second_record,))
+    link_variant_view = EvidenceEngine().preserve((link_variant_record,))
+    absence_view = EvidenceEngine().preserve(
+        (),
+        expected_stages=(EvidenceSourceDomain.TRUST,),
+    )
+
+    assert record_variant_view.view_id != first_view.view_id
+    assert link_variant_view.view_id != first_view.view_id
+    assert absence_view.view_id != first_view.view_id
+
+
+def test_evidence_view_id_remains_stable_when_semantic_input_is_unchanged():
+    first_record = InboundEvidenceRecord(
+        record_id="stable-view-record",
+        evidence_kind="inspection_raw_result",
+        source_domain=EvidenceSourceDomain.INSPECTION,
+        payload={
+            "inspection_result_id": "raw-stable",
+            "input_id": "input-stable",
+            "measure": {
+                "kind": "raw_anomaly_measure",
+                "value": 42.0,
+            },
+        },
+        links=(
+            EvidenceRecordLink(
+                from_record_id="input-stable",
+                to_record_id="raw-stable",
+                relation="source_input_to_raw_inspection",
+            ),
+        ),
+    )
+    second_record = InboundEvidenceRecord(
+        record_id="stable-view-record",
+        evidence_kind="inspection_raw_result",
+        source_domain=EvidenceSourceDomain.INSPECTION,
+        payload={
+            "measure": {
+                "value": 42.0,
+                "kind": "raw_anomaly_measure",
+            },
+            "input_id": "input-stable",
+            "inspection_result_id": "raw-stable",
+        },
+        links=(
+            EvidenceRecordLink(
+                from_record_id="input-stable",
+                to_record_id="raw-stable",
+                relation="source_input_to_raw_inspection",
+            ),
+        ),
+    )
+
+    first_view = EvidenceEngine().preserve((first_record,))
+    second_view = EvidenceEngine().preserve((second_record,))
+
+    assert second_view.view_id == first_view.view_id
+
+
+def test_evidence_view_is_deterministic_and_read_only():
+    records = make_upstream_evidence_records()
+    first = EvidenceEngine().preserve(records)
+    second = EvidenceEngine().preserve(records)
+
+    assert first == second
+    assert first.view_id == second.view_id
+    assert first.read_only is True
+    with pytest.raises(FrozenInstanceError):
+        first.read_only = False
+    with pytest.raises(FrozenInstanceError):
+        first.absences = ()
+
+
+def test_preserved_records_remain_immutable_after_preservation():
+    preserved_record = EvidenceEngine().preserve(
+        make_upstream_evidence_records()
+    ).records[0]
+
+    with pytest.raises(FrozenInstanceError):
+        preserved_record.preserved_record_id = "changed"
+    with pytest.raises(FrozenInstanceError):
+        preserved_record.inbound_record_id = "changed"
+    with pytest.raises(FrozenInstanceError):
+        preserved_record.evidence_kind = "changed"
+    with pytest.raises(TypeError):
+        preserved_record.payload["evidence_kind"] = "changed"
+
+
+def test_each_upstream_evidence_record_remains_unchanged_after_preservation():
+    records = make_upstream_evidence_records()
+    inspection_before, trust_before, review_before = deepcopy(records)
+
+    EvidenceEngine().preserve(tuple(reversed(records)))
+
+    assert records[0] == inspection_before
+    assert records[1] == trust_before
+    assert records[2] == review_before
+
+
 def test_upstream_records_are_not_mutated_by_preservation():
     records = make_upstream_evidence_records()
     before = deepcopy(records)
@@ -588,6 +1282,123 @@ def test_prototype_visuals_cannot_be_accepted_as_performance_evidence():
         )
 
 
+def test_blank_inbound_record_id_raises_malformed_inbound_record():
+    with pytest.raises(MalformedInboundEvidenceRecord):
+        InboundEvidenceRecord(
+            record_id=" ",
+            evidence_kind="inspection_raw_result",
+            source_domain=EvidenceSourceDomain.INSPECTION,
+            payload={
+                "input_id": "input-malformed",
+                "inspection_result_id": "raw-malformed",
+            },
+        )
+
+
+def test_blank_evidence_kind_raises_malformed_inbound_record():
+    with pytest.raises(MalformedInboundEvidenceRecord):
+        InboundEvidenceRecord(
+            record_id="malformed-evidence-record",
+            evidence_kind=" ",
+            source_domain=EvidenceSourceDomain.INSPECTION,
+            payload={
+                "input_id": "input-malformed",
+                "inspection_result_id": "raw-malformed",
+            },
+        )
+
+
+def test_non_mapping_payload_raises_malformed_inbound_record():
+    with pytest.raises(MalformedInboundEvidenceRecord):
+        InboundEvidenceRecord(
+            record_id="malformed-evidence-record",
+            evidence_kind="inspection_raw_result",
+            source_domain=EvidenceSourceDomain.INSPECTION,
+            payload=("not", "a", "mapping"),  # type: ignore[arg-type]
+        )
+
+
+def test_invalid_source_domain_raises_malformed_inbound_record():
+    with pytest.raises(MalformedInboundEvidenceRecord):
+        InboundEvidenceRecord(
+            record_id="malformed-evidence-record",
+            evidence_kind="inspection_raw_result",
+            source_domain="outside-domain",  # type: ignore[arg-type]
+            payload={
+                "input_id": "input-malformed",
+                "inspection_result_id": "raw-malformed",
+            },
+        )
+
+
+@pytest.mark.parametrize(
+    "link",
+    (
+        {"from_record_id": " ", "to_record_id": "raw-1", "relation": "rel"},
+        {"from_record_id": "input-1", "to_record_id": " ", "relation": "rel"},
+        {"from_record_id": "input-1", "to_record_id": "raw-1", "relation": " "},
+    ),
+)
+def test_blank_chain_link_fields_raise_evidence_domain_error(link):
+    with pytest.raises(EvidenceLinkingFailure):
+        EvidenceRecordLink(**link)
+
+
+@pytest.mark.parametrize(
+    "absence",
+    (
+        {
+            "absence_id": "absence-1",
+            "expected_stage": " ",
+            "reason": "missing",
+            "upstream_ref": "upstream-1",
+        },
+        {
+            "absence_id": "absence-1",
+            "expected_stage": "human_review",
+            "reason": " ",
+            "upstream_ref": "upstream-1",
+        },
+        {
+            "absence_id": "absence-1",
+            "expected_stage": "human_review",
+            "reason": "missing",
+            "upstream_ref": " ",
+        },
+    ),
+)
+def test_blank_absence_fields_raise_evidence_absence_failure(absence):
+    with pytest.raises(EvidenceAbsenceFailure):
+        EvidenceAbsenceMarker(**absence)
+
+
+def test_blank_expected_absence_stage_raises_evidence_absence_failure():
+    with pytest.raises(EvidenceAbsenceFailure):
+        EvidenceEngine().preserve((), expected_stages=(" ",))
+
+
+def test_non_read_only_evidence_view_raises_evidence_view_failure():
+    with pytest.raises(EvidenceViewFailure):
+        EvidenceView(view_id="view-1", records=(), read_only=False)
+
+
+def test_empty_preserve_without_records_or_expected_absences_is_rejected():
+    with pytest.raises(MalformedInboundEvidenceRecord):
+        EvidenceEngine().preserve(())
+
+
+def test_well_formed_expected_absence_is_preserved_in_evidence_view():
+    view = EvidenceEngine().preserve(
+        (),
+        expected_stages=(EvidenceSourceDomain.HUMAN_REVIEW,),
+    )
+
+    assert len(view.absences) == 1
+    assert view.absences[0].expected_stage == "human_review"
+    assert view.absences[0].reason == "human_review_evidence_absent"
+    assert view.absences[0].upstream_ref == "no-upstream-record"
+
+
 def test_reviewer_decisions_remain_evidence_only_not_feedback():
     _, _, review_record = make_upstream_evidence_records()
 
@@ -600,6 +1411,110 @@ def test_reviewer_decisions_remain_evidence_only_not_feedback():
     assert not hasattr(EvidenceEngine(), "update_model")
     assert not hasattr(EvidenceEngine(), "train")
     assert not hasattr(EvidenceEngine(), "recalibrate")
+
+
+def test_evidence_engine_exposes_no_forbidden_boundary_surface():
+    engine = EvidenceEngine()
+    forbidden_surface = (
+        "inspect",
+        "inspect_image",
+        "image_inspection",
+        "create_raw_inspection_judgement",
+        "create_raw_inspection_judgment",
+        "raw_inspection_judgement",
+        "raw_inspection_judgment",
+        "judge_raw_inspection",
+        "create_inspection_result",
+        "qualify",
+        "qualify_trust",
+        "trust_qualification",
+        "qualify_trust_result",
+        "review",
+        "human_review",
+        "perform_review",
+        "record_review",
+        "route",
+        "route_for_review",
+        "operational_routing",
+        "evaluate",
+        "evaluation",
+        "measure_performance",
+        "score_performance",
+        "performance_score",
+        "quality_score",
+        "persist",
+        "save",
+        "store",
+        "database",
+        "database_storage",
+        "db",
+        "filesystem_storage",
+        "write_filesystem",
+        "render",
+        "render_ui",
+        "ui",
+        "present",
+        "train",
+        "model_train",
+        "update_model",
+        "model_update",
+        "recalibrate",
+        "calibrate",
+        "feedback",
+        "feedback_loop",
+        "stream",
+        "streaming",
+        "subscribe",
+        "live",
+        "run_live",
+        "monitor",
+        "monitoring",
+    )
+
+    for surface in forbidden_surface:
+        assert not hasattr(engine, surface)
+        assert not hasattr(EvidenceEngine, surface)
+
+
+def test_canonical_evidence_outputs_expose_no_forbidden_boundary_fields():
+    view = EvidenceEngine().preserve(make_upstream_evidence_records())
+    absence_view = EvidenceEngine().preserve(
+        (),
+        expected_stages=(EvidenceSourceDomain.HUMAN_REVIEW,),
+    )
+    canonical_outputs = (
+        view.records[0],
+        view.links[0],
+        absence_view.absences[0],
+        view,
+    )
+    forbidden_fields = {
+        "inspection_result",
+        "trust_qualification_result",
+        "review_result",
+        "evaluation_report",
+        "benchmark_result",
+        "performance_score",
+        "quality_score",
+        "routing_command",
+        "persistence_handle",
+        "database_handle",
+        "filesystem_path",
+        "ui_payload",
+        "rendering_payload",
+        "model_update_payload",
+        "training_payload",
+        "calibration_payload",
+        "feedback_payload",
+        "live_subscription",
+        "monitoring_payload",
+    }
+
+    for output in canonical_outputs:
+        field_names = {field.name for field in fields(output)}
+        assert field_names.isdisjoint(forbidden_fields)
+        for field_name in forbidden_fields:
+            assert not hasattr(output, field_name)
 
 
 def test_no_model_update_training_recalibration_or_feedback_behaviour_exists():
@@ -639,13 +1554,14 @@ def test_malformed_inbound_records_are_refused():
         EvidenceEngine().preserve((object(),))  # type: ignore[arg-type]
 
 
-def test_fabricated_records_are_refused_explicitly():
+@pytest.mark.parametrize("marker", ("fabricated", "inferred", "synthetic_claim"))
+def test_fabricated_records_are_refused_explicitly(marker):
     with pytest.raises(FabricatedEvidenceRecord):
         InboundEvidenceRecord(
             record_id="fabricated-record",
             evidence_kind="inspection_raw_result",
-            source_domain="outside-domain",  # type: ignore[arg-type]
-            payload={"fabricated": True},
+            source_domain=EvidenceSourceDomain.INSPECTION,
+            payload={marker: True},
         )
 
 

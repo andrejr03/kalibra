@@ -71,9 +71,9 @@ class InboundEvidenceRecord:
             )
         try:
             source_domain = EvidenceSourceDomain(self.source_domain)
-        except ValueError as exc:
-            raise FabricatedEvidenceRecord(
-                "evidence records must come from an upstream Kalibra domain"
+        except (TypeError, ValueError) as exc:
+            raise MalformedInboundEvidenceRecord(
+                "inbound evidence source_domain must name an upstream Kalibra domain"
             ) from exc
         canonical_payload = _canonicalize(self.payload)
         if not isinstance(canonical_payload, dict):

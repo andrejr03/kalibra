@@ -18,6 +18,7 @@ from .domain import (
     view_from_parts,
 )
 from .errors import (
+    EvidenceAbsenceFailure,
     EvidencePreservationFailure,
     InvalidEvidenceResult,
     MalformedInboundEvidenceRecord,
@@ -140,9 +141,15 @@ class EvidenceEngine:
                 "evidence preservation requires records or explicit absences"
             )
 
+        inbound_records = tuple(sorted(inbound_records, key=_inbound_sort_key))
         preserved_records = tuple(
-            preserved_record_from_inbound(record)
-            for record in sorted(inbound_records, key=_inbound_sort_key)
+            sorted(
+                (
+                    preserved_record_from_inbound(record)
+                    for record in inbound_records
+                ),
+                key=_preserved_sort_key,
+            )
         )
         preserved_by_inbound_id = {
             preserved.inbound_record_id: preserved
@@ -231,13 +238,25 @@ def _review_inbound_record(record: ReviewEvidenceRecord) -> InboundEvidenceRecor
     )
 
 
-def _inbound_sort_key(record: InboundEvidenceRecord) -> tuple[int, str]:
+def _source_domain_order(source_domain: EvidenceSourceDomain) -> int:
     domain_order = {
         EvidenceSourceDomain.INSPECTION: 0,
         EvidenceSourceDomain.TRUST: 1,
         EvidenceSourceDomain.HUMAN_REVIEW: 2,
     }
-    return (domain_order[record.source_domain], record.record_id)
+    return domain_order[source_domain]
+
+
+def _inbound_sort_key(record: InboundEvidenceRecord) -> tuple[int, str]:
+    return (_source_domain_order(record.source_domain), record.record_id)
+
+
+def _preserved_sort_key(record) -> tuple[int, str, str]:
+    return (
+        _source_domain_order(record.source_domain),
+        record.inbound_record_id,
+        record.preserved_record_id,
+    )
 
 
 def _build_chain_links(
@@ -327,7 +346,12 @@ def _build_absence_markers(
     present_domains = {record.source_domain for record in preserved_records}
     absences = []
     for stage in expected_stages:
-        source_domain = EvidenceSourceDomain(stage)
+        try:
+            source_domain = EvidenceSourceDomain(stage)
+        except ValueError as exc:
+            raise EvidenceAbsenceFailure(
+                "expected absence stage must name an upstream evidence stage"
+            ) from exc
         if source_domain in present_domains:
             continue
         absences.append(
