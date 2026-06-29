@@ -36,6 +36,20 @@ VALID_EXAMINATION_KINDS = frozenset(
 VALID_RAW_MEASURE_SCALES = frozenset(
     {RAW_MEASURE_SCALE, IMAGE_BASELINE_RAW_SCALE}
 )
+_VALID_RAW_RESULT_EXAMINATION_KINDS = frozenset(
+    {
+        PLACEHOLDER_EXAMINATION_KIND,
+        IMAGE_BASELINE_EXAMINATION_KIND,
+        INSPECTION_PREDICTION_KIND,
+    }
+)
+_VALID_RAW_RESULT_RAW_MEASURE_SCALES = frozenset(
+    {
+        RAW_MEASURE_SCALE,
+        IMAGE_BASELINE_RAW_SCALE,
+        PREDICTION_RAW_MEASURE_SCALE,
+    }
+)
 
 _FORBIDDEN_METADATA_KEYS = frozenset(
     {
@@ -328,11 +342,11 @@ class RawInspectionResult:
             raise InvalidInspectionResult(
                 "raw anomaly measure must be explicitly marked raw"
             )
-        if self.raw_measure_scale not in VALID_RAW_MEASURE_SCALES:
+        if self.raw_measure_scale not in _VALID_RAW_RESULT_RAW_MEASURE_SCALES:
             raise InvalidInspectionResult("raw anomaly measure scale is required")
-        if self.examination_kind not in VALID_EXAMINATION_KINDS:
+        if self.examination_kind not in _VALID_RAW_RESULT_EXAMINATION_KINDS:
             raise InvalidInspectionResult(
-                "placeholder examination kind must be explicit"
+                "raw inspection result provenance kind must be explicit"
             )
         if self.judgement is InspectionJudgement.DEFECT and self.localization is None:
             raise PartialInspectionResult("defect results require localization")

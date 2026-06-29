@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from hashlib import sha256
 import json
+from math import isfinite
 from pathlib import Path
 from typing import Any
 from urllib.parse import unquote, urlparse
@@ -11,11 +12,14 @@ from .domain import (
     DefectLocalization,
     IMAGE_BASELINE_EXAMINATION_KIND,
     IMAGE_BASELINE_RAW_SCALE,
+    INSPECTION_PREDICTION_KIND,
     InspectionEngineOutput,
     InspectionEvidenceRecord,
     InspectionJudgement,
+    InspectionPrediction,
     NormalizedBoundingBox,
     PlaceholderExamination,
+    RAW_MEASURE_KIND,
     RawInspectionResult,
     StabilizedInspectionInput,
 )
@@ -24,8 +28,10 @@ from .errors import (
     InspectionError,
     InspectionExaminationFailure,
     InvalidInspectionResult,
+    InvalidInspectionPrediction,
     MalformedInspectionInput,
     NonReproducibleInspection,
+    PartialInspectionPrediction,
 )
 from .interfaces import InspectionEvidenceEmitterProtocol, InspectionExaminer
 
@@ -180,12 +186,100 @@ class InspectionEngine:
             )
         return first_output
 
+    def transform_prediction(
+        self,
+        inspection_input: StabilizedInspectionInput,
+        prediction: InspectionPrediction,
+    ) -> InspectionEngineOutput:
+        self._validate_stabilized_input(inspection_input)
+        self._validate_prediction_for_input(inspection_input, prediction)
+
+        raw_result = self._assemble_result_from_prediction(
+            inspection_input,
+            prediction,
+        )
+        evidence_record = self._emit_evidence(raw_result)
+        return InspectionEngineOutput(
+            raw_inspection_result=raw_result,
+            inspection_evidence_record=evidence_record,
+        )
+
     def _validate_stabilized_input(
         self, inspection_input: StabilizedInspectionInput
     ) -> None:
         if not isinstance(inspection_input, StabilizedInspectionInput):
             raise MalformedInspectionInput(
                 "inspection engine only accepts StabilizedInspectionInput"
+            )
+
+    def _validate_prediction_for_input(
+        self,
+        inspection_input: StabilizedInspectionInput,
+        prediction: InspectionPrediction,
+    ) -> None:
+        if not isinstance(prediction, InspectionPrediction):
+            raise InvalidInspectionPrediction(
+                "inspection prediction transformation requires InspectionPrediction"
+            )
+        if not isinstance(prediction.input_id, str) or not prediction.input_id.strip():
+            raise InvalidInspectionPrediction("prediction requires input_id")
+        if (
+            not isinstance(prediction.prediction_id, str)
+            or not prediction.prediction_id.strip()
+        ):
+            raise InvalidInspectionPrediction("prediction requires prediction_id")
+        if prediction.input_id != inspection_input.input_id:
+            raise InvalidInspectionPrediction(
+                "inspection prediction must reference the inspected input"
+            )
+        if prediction.prediction_kind != INSPECTION_PREDICTION_KIND:
+            raise InvalidInspectionPrediction(
+                "inspection prediction kind is not supported"
+            )
+        if prediction.raw_measure_kind != RAW_MEASURE_KIND:
+            raise InvalidInspectionPrediction(
+                "prediction measure must be explicitly marked raw"
+            )
+        if not isinstance(
+            prediction.predicted_raw_anomaly_measure,
+            (float, int),
+        ) or not isfinite(prediction.predicted_raw_anomaly_measure):
+            raise InvalidInspectionPrediction(
+                "prediction raw anomaly measure must be finite"
+            )
+        if (
+            not isinstance(prediction.raw_measure_scale, str)
+            or not prediction.raw_measure_scale.strip()
+        ):
+            raise InvalidInspectionPrediction(
+                "prediction raw anomaly measure scale is required"
+            )
+        if not isinstance(prediction.prediction_kind, str):
+            raise InvalidInspectionPrediction("prediction kind is required")
+        if not isinstance(prediction.predicted_judgement, InspectionJudgement):
+            raise InvalidInspectionPrediction(
+                "prediction judgement must use InspectionJudgement"
+            )
+        if (
+            prediction.predicted_localization is not None
+            and not isinstance(prediction.predicted_localization, DefectLocalization)
+        ):
+            raise InvalidInspectionPrediction(
+                "prediction localization must use DefectLocalization"
+            )
+        if (
+            prediction.predicted_judgement is InspectionJudgement.DEFECT
+            and prediction.predicted_localization is None
+        ):
+            raise PartialInspectionPrediction(
+                "defect predictions require localization"
+            )
+        if (
+            prediction.predicted_judgement is InspectionJudgement.OK
+            and prediction.predicted_localization is not None
+        ):
+            raise PartialInspectionPrediction(
+                "ok predictions must not include localization"
             )
 
     def _inspect_once(
@@ -244,6 +338,42 @@ class InspectionEngine:
                 examination_id=examination.examination_id,
                 raw_measure_scale=examination.raw_measure_scale,
                 examination_kind=examination.examination_kind,
+            )
+        except InspectionError:
+            raise
+        except Exception as exc:
+            raise InvalidInspectionResult("raw inspection result failed") from exc
+
+    def _assemble_result_from_prediction(
+        self,
+        inspection_input: StabilizedInspectionInput,
+        prediction: InspectionPrediction,
+    ) -> RawInspectionResult:
+        result_id = _stable_id(
+            "raw-inspection-result",
+            {
+                "input_id": inspection_input.input_id,
+                "prediction_id": prediction.prediction_id,
+                "prediction_kind": prediction.prediction_kind,
+                "predicted_judgement": prediction.predicted_judgement.value,
+                "predicted_raw_anomaly_measure": (
+                    prediction.predicted_raw_anomaly_measure
+                ),
+                "raw_measure_kind": prediction.raw_measure_kind,
+                "raw_measure_scale": prediction.raw_measure_scale,
+            },
+        )
+        try:
+            return RawInspectionResult(
+                inspection_result_id=result_id,
+                input_id=inspection_input.input_id,
+                judgement=prediction.predicted_judgement,
+                localization=prediction.predicted_localization,
+                raw_anomaly_measure=prediction.predicted_raw_anomaly_measure,
+                examination_id=prediction.prediction_id,
+                raw_measure_kind=prediction.raw_measure_kind,
+                raw_measure_scale=prediction.raw_measure_scale,
+                examination_kind=prediction.prediction_kind,
             )
         except InspectionError:
             raise

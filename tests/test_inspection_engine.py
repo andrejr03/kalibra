@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pytest
 
+import src.inspection.engine as inspection_engine_module
 import src.inspection as inspection_api
 from src.inspection.engine import _read_pgm_p2, _resolve_local_artifact_path
 from src.inspection import (
@@ -118,6 +119,32 @@ def _prediction_localization() -> DefectLocalization:
             x_max=0.6,
             y_max=0.7,
         )
+    )
+
+
+def _ok_prediction_for(
+    inspection_input: StabilizedInspectionInput,
+    prediction_id: str = "prediction-ok",
+) -> InspectionPrediction:
+    return InspectionPrediction(
+        input_id=inspection_input.input_id,
+        prediction_id=prediction_id,
+        predicted_judgement=InspectionJudgement.OK,
+        predicted_raw_anomaly_measure=7.5,
+        predicted_localization=None,
+    )
+
+
+def _defect_prediction_for(
+    inspection_input: StabilizedInspectionInput,
+    prediction_id: str = "prediction-defect",
+) -> InspectionPrediction:
+    return InspectionPrediction(
+        input_id=inspection_input.input_id,
+        prediction_id=prediction_id,
+        predicted_judgement=InspectionJudgement.DEFECT,
+        predicted_raw_anomaly_measure=42.0,
+        predicted_localization=_prediction_localization(),
     )
 
 
@@ -315,6 +342,310 @@ def test_raw_result_contains_no_downstream_domain_fields():
     assert_no_downstream_fields(RawInspectionResult)
     assert_no_downstream_fields(InspectionEvidenceRecord)
     assert_no_downstream_fields(InspectionEngineOutput)
+
+
+def test_prediction_transformation_raw_result_accepts_prediction_provenance():
+    result = RawInspectionResult(
+        inspection_result_id="result-from-prediction",
+        input_id="input-from-prediction",
+        judgement=InspectionJudgement.OK,
+        localization=None,
+        raw_anomaly_measure=7.5,
+        examination_id="prediction-001",
+        raw_measure_scale=PREDICTION_RAW_MEASURE_SCALE,
+        examination_kind=INSPECTION_PREDICTION_KIND,
+    )
+
+    assert result.examination_kind == INSPECTION_PREDICTION_KIND
+    assert result.raw_measure_scale == PREDICTION_RAW_MEASURE_SCALE
+    assert result.raw_measure_kind == RAW_MEASURE_KIND
+
+
+def test_prediction_transformation_raw_result_exposes_no_downstream_fields():
+    assert_no_downstream_fields(RawInspectionResult)
+
+
+def test_prediction_transformation_raw_result_has_no_prediction_id_field():
+    result = RawInspectionResult(
+        inspection_result_id="result-no-prediction-field",
+        input_id="input-no-prediction-field",
+        judgement=InspectionJudgement.OK,
+        localization=None,
+        raw_anomaly_measure=7.5,
+        examination_id="prediction-001",
+        raw_measure_scale=PREDICTION_RAW_MEASURE_SCALE,
+        examination_kind=INSPECTION_PREDICTION_KIND,
+    )
+
+    assert "prediction_id" not in field_names(RawInspectionResult)
+    assert not hasattr(result, "prediction_id")
+
+
+def test_prediction_transformation_preserves_existing_raw_result_provenance():
+    placeholder_result = RawInspectionResult(
+        inspection_result_id="result-placeholder",
+        input_id="input-placeholder",
+        judgement=InspectionJudgement.OK,
+        localization=None,
+        raw_anomaly_measure=7.5,
+        examination_id="examination-placeholder",
+    )
+    baseline_result = RawInspectionResult(
+        inspection_result_id="result-baseline",
+        input_id="input-baseline",
+        judgement=InspectionJudgement.OK,
+        localization=None,
+        raw_anomaly_measure=12.5,
+        examination_id="examination-baseline",
+        raw_measure_scale=IMAGE_BASELINE_RAW_SCALE,
+        examination_kind=IMAGE_BASELINE_EXAMINATION_KIND,
+    )
+
+    assert placeholder_result.raw_measure_kind == RAW_MEASURE_KIND
+    assert baseline_result.raw_measure_kind == RAW_MEASURE_KIND
+    assert placeholder_result.raw_measure_scale == "placeholder_hash_raw_0_100"
+    assert baseline_result.raw_measure_scale == "local_contrast_raw_0_100"
+    assert placeholder_result.examination_kind == "deterministic_placeholder_examination"
+    assert baseline_result.examination_kind == "deterministic_local_image_baseline_v1"
+
+
+def test_prediction_transformation_valid_ok_prediction_returns_engine_output():
+    inspection_input = make_input(input_id="input-transform-ok")
+    prediction = _ok_prediction_for(
+        inspection_input,
+        prediction_id="prediction-transform-ok",
+    )
+
+    output = InspectionEngine().transform_prediction(inspection_input, prediction)
+
+    assert isinstance(output, InspectionEngineOutput)
+    assert isinstance(output.raw_inspection_result, RawInspectionResult)
+    assert isinstance(output.inspection_evidence_record, InspectionEvidenceRecord)
+    assert output.raw_inspection_result.judgement is InspectionJudgement.OK
+    assert output.raw_inspection_result.localization is None
+
+
+def test_prediction_transformation_valid_defect_prediction_returns_localized_result():
+    inspection_input = make_input(input_id="input-transform-defect")
+    prediction = _defect_prediction_for(
+        inspection_input,
+        prediction_id="prediction-transform-defect",
+    )
+
+    output = InspectionEngine().transform_prediction(inspection_input, prediction)
+    result = output.raw_inspection_result
+
+    assert result.judgement is InspectionJudgement.DEFECT
+    assert result.localization == prediction.predicted_localization
+    assert result.localization is not None
+    assert result.localization.region == _prediction_localization().region
+
+
+def test_prediction_transformation_preserves_prediction_provenance_labels():
+    inspection_input = make_input(input_id="input-transform-provenance")
+    prediction = _ok_prediction_for(
+        inspection_input,
+        prediction_id="prediction-transform-provenance",
+    )
+
+    result = InspectionEngine().transform_prediction(
+        inspection_input,
+        prediction,
+    ).raw_inspection_result
+
+    assert result.raw_measure_kind == RAW_MEASURE_KIND
+    assert result.raw_measure_scale == PREDICTION_RAW_MEASURE_SCALE
+    assert result.examination_kind == INSPECTION_PREDICTION_KIND
+
+
+def test_prediction_transformation_preserves_single_source_prediction_mapping():
+    inspection_input = make_input(input_id="input-transform-single-source")
+    prediction = _defect_prediction_for(
+        inspection_input,
+        prediction_id="prediction-transform-single-source",
+    )
+
+    result = InspectionEngine().transform_prediction(
+        inspection_input,
+        prediction,
+    ).raw_inspection_result
+
+    assert result.judgement is prediction.predicted_judgement
+    assert result.localization == prediction.predicted_localization
+    assert result.raw_anomaly_measure == prediction.predicted_raw_anomaly_measure
+    assert result.examination_id == prediction.prediction_id
+
+
+def test_prediction_transformation_emits_evidence_for_transformed_raw_result():
+    inspection_input = make_input(input_id="input-transform-evidence")
+    prediction = _ok_prediction_for(
+        inspection_input,
+        prediction_id="prediction-transform-evidence",
+    )
+
+    output = InspectionEngine().transform_prediction(inspection_input, prediction)
+    result = output.raw_inspection_result
+    record = output.inspection_evidence_record
+
+    assert record.evidence_kind == INSPECTION_EVIDENCE_KIND
+    assert record.input_id == result.input_id
+    assert record.inspection_result_id == result.inspection_result_id
+    assert record.raw_inspection_result == result
+
+
+def test_prediction_transformation_does_not_expose_prediction_downstream():
+    inspection_input = make_input(input_id="input-transform-isolation")
+    prediction = _ok_prediction_for(
+        inspection_input,
+        prediction_id="prediction-transform-isolation",
+    )
+
+    output = InspectionEngine().transform_prediction(inspection_input, prediction)
+
+    assert not hasattr(output, "prediction")
+    assert not hasattr(output, "inspection_prediction")
+    assert not hasattr(output.raw_inspection_result, "prediction")
+    assert not hasattr(output.raw_inspection_result, "prediction_id")
+    assert output.inspection_evidence_record.raw_inspection_result is not prediction
+    assert output.inspection_evidence_record.raw_inspection_result == (
+        output.raw_inspection_result
+    )
+
+
+def test_prediction_transformation_rejects_non_prediction_object():
+    inspection_input = make_input(input_id="input-transform-non-prediction")
+
+    with pytest.raises(InvalidInspectionPrediction):
+        InspectionEngine().transform_prediction(inspection_input, object())
+
+
+def test_prediction_transformation_rejects_input_mismatch():
+    inspection_input = make_input(input_id="input-transform-mismatch")
+    prediction = InspectionPrediction(
+        input_id="different-input",
+        prediction_id="prediction-transform-mismatch",
+        predicted_judgement=InspectionJudgement.OK,
+        predicted_raw_anomaly_measure=7.5,
+        predicted_localization=None,
+    )
+
+    with pytest.raises(InvalidInspectionPrediction):
+        InspectionEngine().transform_prediction(inspection_input, prediction)
+
+
+def test_prediction_transformation_rejects_unsupported_prediction_kind():
+    inspection_input = make_input(input_id="input-transform-unsupported-kind")
+    prediction = InspectionPrediction(
+        input_id=inspection_input.input_id,
+        prediction_id="prediction-transform-unsupported-kind",
+        predicted_judgement=InspectionJudgement.OK,
+        predicted_raw_anomaly_measure=7.5,
+        predicted_localization=None,
+        prediction_kind="unsupported_prediction_kind",
+    )
+
+    with pytest.raises(InvalidInspectionPrediction):
+        InspectionEngine().transform_prediction(inspection_input, prediction)
+
+
+@pytest.mark.parametrize(
+    "prediction_kind",
+    [
+        "inspection_prediction_v2",
+        "inspection_prediction_future",
+    ],
+)
+def test_prediction_transformation_rejects_version_like_prediction_kind(
+    prediction_kind,
+):
+    inspection_input = make_input(input_id=f"input-transform-{prediction_kind}")
+    prediction = InspectionPrediction(
+        input_id=inspection_input.input_id,
+        prediction_id=f"prediction-transform-{prediction_kind}",
+        predicted_judgement=InspectionJudgement.OK,
+        predicted_raw_anomaly_measure=7.5,
+        predicted_localization=None,
+        prediction_kind=prediction_kind,
+    )
+
+    with pytest.raises(InvalidInspectionPrediction):
+        InspectionEngine().transform_prediction(inspection_input, prediction)
+
+
+def test_prediction_transformation_rejects_bypassed_prediction_validation():
+    inspection_input = make_input(input_id="input-transform-bypassed-validation")
+    prediction = _ok_prediction_for(
+        inspection_input,
+        prediction_id="prediction-transform-bypassed-validation",
+    )
+    object.__setattr__(prediction, "raw_measure_kind", "confidence")
+
+    with pytest.raises(InvalidInspectionPrediction):
+        InspectionEngine().transform_prediction(inspection_input, prediction)
+
+
+def test_prediction_transformation_rejected_prediction_emits_no_evidence():
+    class RecordingEvidenceEmitter:
+        def __init__(self) -> None:
+            self.raw_results: list[RawInspectionResult] = []
+
+        def emit(self, raw_result: RawInspectionResult) -> InspectionEvidenceRecord:
+            self.raw_results.append(raw_result)
+            return InspectionEvidenceRecord(
+                record_id="should-not-be-emitted",
+                input_id=raw_result.input_id,
+                inspection_result_id=raw_result.inspection_result_id,
+                raw_inspection_result=raw_result,
+            )
+
+    inspection_input = make_input(input_id="input-transform-no-evidence")
+    prediction = InspectionPrediction(
+        input_id=inspection_input.input_id,
+        prediction_id="prediction-transform-no-evidence",
+        predicted_judgement=InspectionJudgement.OK,
+        predicted_raw_anomaly_measure=7.5,
+        predicted_localization=None,
+        prediction_kind="inspection_prediction_future",
+    )
+    evidence_emitter = RecordingEvidenceEmitter()
+
+    with pytest.raises(InvalidInspectionPrediction):
+        InspectionEngine(evidence_emitter=evidence_emitter).transform_prediction(
+            inspection_input,
+            prediction,
+        )
+
+    assert evidence_emitter.raw_results == []
+
+
+def test_prediction_transformation_rejected_prediction_produces_no_raw_result(
+    monkeypatch,
+):
+    inspection_input = make_input(input_id="input-transform-no-raw-result")
+    prediction = InspectionPrediction(
+        input_id=inspection_input.input_id,
+        prediction_id="prediction-transform-no-raw-result",
+        predicted_judgement=InspectionJudgement.OK,
+        predicted_raw_anomaly_measure=7.5,
+        predicted_localization=None,
+        prediction_kind="inspection_prediction_v2",
+    )
+    raw_result_calls = []
+
+    def fail_if_raw_result_is_constructed(*args, **kwargs):
+        raw_result_calls.append((args, kwargs))
+        raise AssertionError("rejected predictions must not produce raw results")
+
+    monkeypatch.setattr(
+        inspection_engine_module,
+        "RawInspectionResult",
+        fail_if_raw_result_is_constructed,
+    )
+
+    with pytest.raises(InvalidInspectionPrediction):
+        InspectionEngine().transform_prediction(inspection_input, prediction)
+
+    assert raw_result_calls == []
 
 
 def test_defect_results_include_localization():
