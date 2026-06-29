@@ -10,9 +10,11 @@ from typing import Mapping
 
 from .errors import (
     InvalidInspectionInput,
+    InvalidInspectionPrediction,
     InvalidInspectionResult,
     MissingContentHash,
     MissingInputIdentity,
+    PartialInspectionPrediction,
     PartialInspectionResult,
     UnstabilizedInspectionInput,
 )
@@ -24,6 +26,8 @@ RAW_MEASURE_KIND = "raw_anomaly_measure"
 RAW_MEASURE_SCALE = "placeholder_hash_raw_0_100"
 PLACEHOLDER_EXAMINATION_KIND = "deterministic_placeholder_examination"
 INSPECTION_EVIDENCE_KIND = "inspection_raw_result"
+INSPECTION_PREDICTION_KIND = "inspection_prediction"
+PREDICTION_RAW_MEASURE_SCALE = "model_raw_anomaly_measure"
 IMAGE_BASELINE_EXAMINATION_KIND = "deterministic_local_image_baseline_v1"
 IMAGE_BASELINE_RAW_SCALE = "local_contrast_raw_0_100"
 VALID_EXAMINATION_KINDS = frozenset(
@@ -243,6 +247,58 @@ class PlaceholderExamination:
             raise PartialInspectionResult(
                 "ok examinations must not include localization"
             )
+
+
+@dataclass(frozen=True)
+class InspectionPrediction:
+    input_id: str
+    prediction_id: str
+    predicted_judgement: InspectionJudgement
+    predicted_raw_anomaly_measure: float
+    predicted_localization: DefectLocalization | None
+    raw_measure_kind: str = RAW_MEASURE_KIND
+    raw_measure_scale: str = PREDICTION_RAW_MEASURE_SCALE
+    prediction_kind: str = INSPECTION_PREDICTION_KIND
+    model_metadata: Mapping[str, str] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        if not self.input_id.strip():
+            raise InvalidInspectionPrediction("prediction requires input_id")
+        if not self.prediction_id.strip():
+            raise InvalidInspectionPrediction("prediction requires prediction_id")
+        if not isfinite(self.predicted_raw_anomaly_measure):
+            raise InvalidInspectionPrediction(
+                "prediction raw anomaly measure must be finite"
+            )
+        if self.raw_measure_kind != RAW_MEASURE_KIND:
+            raise InvalidInspectionPrediction(
+                "prediction measure must be explicitly marked raw"
+            )
+        if not self.raw_measure_scale.strip():
+            raise InvalidInspectionPrediction(
+                "prediction raw anomaly measure scale is required"
+            )
+        if not self.prediction_kind.strip():
+            raise InvalidInspectionPrediction("prediction kind is required")
+        if (
+            self.predicted_judgement is InspectionJudgement.DEFECT
+            and self.predicted_localization is None
+        ):
+            raise PartialInspectionPrediction(
+                "defect predictions require localization"
+            )
+        if (
+            self.predicted_judgement is InspectionJudgement.OK
+            and self.predicted_localization is not None
+        ):
+            raise PartialInspectionPrediction(
+                "ok predictions must not include localization"
+            )
+        object.__setattr__(
+            self,
+            "model_metadata",
+            _freeze_metadata(self.model_metadata),
+        )
 
 
 @dataclass(frozen=True)

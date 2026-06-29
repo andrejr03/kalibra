@@ -11,6 +11,8 @@ from src.inspection import (
     IMAGE_BASELINE_EXAMINATION_KIND,
     IMAGE_BASELINE_RAW_SCALE,
     INSPECTION_EVIDENCE_KIND,
+    INSPECTION_PREDICTION_KIND,
+    PREDICTION_RAW_MEASURE_SCALE,
     RAW_MEASURE_KIND,
     DefectJudgment,
     DefectLocalization,
@@ -18,17 +20,23 @@ from src.inspection import (
     EvidenceEmissionFailure,
     InspectionEngine,
     InspectionEngineOutput,
+    InspectionError,
     InspectionEvidenceRecord,
     InspectionExaminationFailure,
+    InspectionInferenceProvider,
     InspectionInput,
     InspectionJudgement,
+    InspectionPrediction,
     InspectionResult,
     InvalidInspectionInput,
+    InvalidInspectionPrediction,
+    InvalidInspectionResult,
     MalformedInspectionInput,
     MissingContentHash,
     MissingInputIdentity,
     NonReproducibleInspection,
     NormalizedBoundingBox,
+    PartialInspectionPrediction,
     PartialInspectionResult,
     PlaceholderExamination,
     RawAnomalyScore,
@@ -100,6 +108,17 @@ def field_names(contract_type: type[object]) -> set[str]:
 def assert_no_downstream_fields(contract_type: type[object]) -> None:
     names = field_names(contract_type)
     assert names.isdisjoint(DOWNSTREAM_FIELD_NAMES)
+
+
+def _prediction_localization() -> DefectLocalization:
+    return DefectLocalization(
+        region=NormalizedBoundingBox(
+            x_min=0.2,
+            y_min=0.3,
+            x_max=0.6,
+            y_max=0.7,
+        )
+    )
 
 
 def test_well_formed_stabilized_input_produces_one_raw_result():
@@ -313,6 +332,248 @@ def test_ok_results_do_not_include_localization():
 
     assert result.judgement is InspectionJudgement.OK
     assert result.localization is None
+
+
+def test_prediction_error_hierarchy_extends_inspection_errors():
+    assert issubclass(InvalidInspectionPrediction, InspectionError)
+    assert issubclass(PartialInspectionPrediction, InvalidInspectionPrediction)
+
+
+def test_valid_ok_inspection_prediction_constructs_with_raw_defaults():
+    prediction = InspectionPrediction(
+        input_id="input-ok-prediction",
+        prediction_id="prediction-ok",
+        predicted_judgement=InspectionJudgement.OK,
+        predicted_raw_anomaly_measure=0.25,
+        predicted_localization=None,
+    )
+
+    assert prediction.input_id == "input-ok-prediction"
+    assert prediction.prediction_id == "prediction-ok"
+    assert prediction.predicted_judgement is InspectionJudgement.OK
+    assert prediction.predicted_raw_anomaly_measure == 0.25
+    assert prediction.predicted_localization is None
+    assert prediction.raw_measure_kind == RAW_MEASURE_KIND
+    assert prediction.raw_measure_scale == PREDICTION_RAW_MEASURE_SCALE
+    assert prediction.prediction_kind == INSPECTION_PREDICTION_KIND
+
+
+def test_valid_defect_inspection_prediction_constructs_with_localization():
+    localization = _prediction_localization()
+
+    prediction = InspectionPrediction(
+        input_id="input-defect-prediction",
+        prediction_id="prediction-defect",
+        predicted_judgement=InspectionJudgement.DEFECT,
+        predicted_raw_anomaly_measure=42.0,
+        predicted_localization=localization,
+        model_metadata={"method": "abstract-v1", "version": "1"},
+    )
+
+    assert prediction.predicted_judgement is InspectionJudgement.DEFECT
+    assert prediction.predicted_localization == localization
+    assert prediction.model_metadata["method"] == "abstract-v1"
+    assert prediction.model_metadata["version"] == "1"
+
+
+def test_inspection_prediction_defect_without_localization_is_partial():
+    with pytest.raises(PartialInspectionPrediction):
+        InspectionPrediction(
+            input_id="input-defect-without-localization",
+            prediction_id="prediction-defect-without-localization",
+            predicted_judgement=InspectionJudgement.DEFECT,
+            predicted_raw_anomaly_measure=51.0,
+            predicted_localization=None,
+        )
+
+
+def test_inspection_prediction_ok_with_localization_is_partial():
+    with pytest.raises(PartialInspectionPrediction):
+        InspectionPrediction(
+            input_id="input-ok-with-localization",
+            prediction_id="prediction-ok-with-localization",
+            predicted_judgement=InspectionJudgement.OK,
+            predicted_raw_anomaly_measure=5.0,
+            predicted_localization=_prediction_localization(),
+        )
+
+
+def test_inspection_prediction_invalid_localization_uses_existing_validation():
+    with pytest.raises(InvalidInspectionResult):
+        InspectionPrediction(
+            input_id="input-invalid-localization",
+            prediction_id="prediction-invalid-localization",
+            predicted_judgement=InspectionJudgement.DEFECT,
+            predicted_raw_anomaly_measure=77.0,
+            predicted_localization=DefectLocalization(
+                region=NormalizedBoundingBox(
+                    x_min=0.9,
+                    y_min=0.2,
+                    x_max=0.1,
+                    y_max=0.8,
+                )
+            ),
+        )
+
+
+@pytest.mark.parametrize(
+    "raw_measure",
+    [float("nan"), float("inf"), float("-inf")],
+)
+def test_inspection_prediction_rejects_non_finite_raw_measure(raw_measure):
+    with pytest.raises(InvalidInspectionPrediction):
+        InspectionPrediction(
+            input_id="input-non-finite-measure",
+            prediction_id="prediction-non-finite-measure",
+            predicted_judgement=InspectionJudgement.OK,
+            predicted_raw_anomaly_measure=raw_measure,
+            predicted_localization=None,
+        )
+
+
+def test_inspection_prediction_rejects_wrong_raw_measure_kind():
+    with pytest.raises(InvalidInspectionPrediction):
+        InspectionPrediction(
+            input_id="input-wrong-kind",
+            prediction_id="prediction-wrong-kind",
+            predicted_judgement=InspectionJudgement.OK,
+            predicted_raw_anomaly_measure=3.0,
+            predicted_localization=None,
+            raw_measure_kind="confidence",
+        )
+
+
+@pytest.mark.parametrize(
+    "override",
+    [
+        {"input_id": " "},
+        {"prediction_id": " "},
+        {"raw_measure_scale": " "},
+        {"prediction_kind": " "},
+    ],
+)
+def test_inspection_prediction_rejects_blank_required_labels(override):
+    kwargs = {
+        "input_id": "input-required-labels",
+        "prediction_id": "prediction-required-labels",
+        "predicted_judgement": InspectionJudgement.OK,
+        "predicted_raw_anomaly_measure": 3.0,
+        "predicted_localization": None,
+    }
+    kwargs.update(override)
+
+    with pytest.raises(InvalidInspectionPrediction):
+        InspectionPrediction(**kwargs)
+
+
+def test_inspection_prediction_exposes_no_downstream_fields():
+    assert_no_downstream_fields(InspectionPrediction)
+
+
+@pytest.mark.parametrize(
+    "metadata",
+    [
+        {"calibrated_confidence": "0.9"},
+        {"trust_qualification": "accept"},
+    ],
+)
+def test_inspection_prediction_model_metadata_rejects_downstream_keys(metadata):
+    with pytest.raises(InvalidInspectionInput):
+        InspectionPrediction(
+            input_id="input-forbidden-metadata",
+            prediction_id="prediction-forbidden-metadata",
+            predicted_judgement=InspectionJudgement.OK,
+            predicted_raw_anomaly_measure=1.0,
+            predicted_localization=None,
+            model_metadata=metadata,
+        )
+
+
+def test_inspection_prediction_model_metadata_accepts_descriptive_keys():
+    prediction = InspectionPrediction(
+        input_id="input-descriptive-metadata",
+        prediction_id="prediction-descriptive-metadata",
+        predicted_judgement=InspectionJudgement.OK,
+        predicted_raw_anomaly_measure=1.0,
+        predicted_localization=None,
+        model_metadata={"method": "abstract-v1", "version": "1"},
+    )
+
+    assert prediction.model_metadata["method"] == "abstract-v1"
+    assert prediction.model_metadata["version"] == "1"
+
+
+def test_inspection_prediction_model_metadata_is_immutable():
+    metadata = {"method": "abstract-v1", "version": "1"}
+    prediction = InspectionPrediction(
+        input_id="input-immutable-metadata",
+        prediction_id="prediction-immutable-metadata",
+        predicted_judgement=InspectionJudgement.OK,
+        predicted_raw_anomaly_measure=1.0,
+        predicted_localization=None,
+        model_metadata=metadata,
+    )
+
+    metadata["version"] = "2"
+    assert prediction.model_metadata["version"] == "1"
+    with pytest.raises(TypeError):
+        prediction.model_metadata["version"] = "3"
+
+
+class StubInspectionInferenceProvider:
+    def predict(
+        self,
+        inspection_input: StabilizedInspectionInput,
+    ) -> InspectionPrediction:
+        return InspectionPrediction(
+            input_id=inspection_input.input_id,
+            prediction_id=f"prediction-{inspection_input.input_id}",
+            predicted_judgement=InspectionJudgement.OK,
+            predicted_raw_anomaly_measure=0.0,
+            predicted_localization=None,
+            model_metadata={"method": "structural-stub"},
+        )
+
+
+def test_inference_provider_structural_stub_returns_prediction():
+    provider: InspectionInferenceProvider = StubInspectionInferenceProvider()
+
+    prediction = provider.predict(make_input(input_id="input-provider"))
+
+    assert isinstance(prediction, InspectionPrediction)
+    assert prediction.input_id == "input-provider"
+
+
+def test_inference_provider_protocol_defines_only_predict():
+    protocol_methods = {
+        name
+        for name, value in InspectionInferenceProvider.__dict__.items()
+        if callable(value) and not name.startswith("_")
+    }
+
+    assert protocol_methods == {"predict"}
+
+
+def test_inference_provider_exposes_no_downstream_or_runtime_behavior():
+    provider = StubInspectionInferenceProvider()
+
+    assert not hasattr(provider, "qualify")
+    assert not hasattr(provider, "route_for_review")
+    assert not hasattr(provider, "evaluate")
+    assert not hasattr(provider, "emit")
+    assert not hasattr(provider, "persist")
+    assert not hasattr(provider, "train")
+    assert not hasattr(provider, "update_model")
+    assert not hasattr(provider, "calibrate")
+
+
+def test_inspection_engine_remains_unwired_from_inference_provider():
+    engine = InspectionEngine()
+
+    assert not hasattr(engine, "predict")
+    assert not hasattr(engine, "inference_provider")
+    assert not hasattr(engine, "provider")
+    assert not hasattr(engine, "model")
 
 
 def test_same_input_produces_identical_result_and_evidence_record():

@@ -34,6 +34,14 @@ class PartialInspectionResult(InvalidInspectionResult):
     """Raised when a raw result is incomplete or internally inconsistent."""
 
 
+class InvalidInspectionPrediction(InspectionError):
+    """Raised when an inference prediction violates the prediction contract."""
+
+
+class PartialInspectionPrediction(InvalidInspectionPrediction):
+    """Raised when a prediction is incomplete or internally inconsistent."""
+
+
 class EvidenceEmissionFailure(InspectionError):
     """Raised when the inspection evidence record cannot be emitted."""
 
