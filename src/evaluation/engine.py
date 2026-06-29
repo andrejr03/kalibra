@@ -303,7 +303,7 @@ def _dimension_evidence_refs(
             drift = qualification.get("drift_caution", {})
             if drift.get("status") != "unavailable":
                 trust_refs.append(record.preserved_record_id)
-        return tuple(trust_refs)
+        return _sorted_refs(trust_refs)
     return ()
 
 
@@ -318,19 +318,19 @@ def _absence_refs_for_dimension(
             if absence.expected_stage == EvidenceSourceDomain.HUMAN_REVIEW.value
         )
         if refs:
-            return refs
+            return _sorted_refs(refs)
     if dimension is EvaluationDimension.DRIFT:
         trust_refs = _record_refs(evidence_view, EvidenceSourceDomain.TRUST)
         if trust_refs:
             return trust_refs
-    return tuple(absence.absence_id for absence in evidence_view.absences)
+    return _sorted_refs(absence.absence_id for absence in evidence_view.absences)
 
 
 def _record_refs(
     evidence_view: EvidenceView,
     source_domain: EvidenceSourceDomain,
 ) -> tuple[str, ...]:
-    return tuple(
+    return _sorted_refs(
         record.preserved_record_id
         for record in evidence_view.records
         if record.source_domain is source_domain
@@ -366,8 +366,8 @@ def _weak_performance_refs(
                 [],
             ).append(record.preserved_record_id)
     return (
-        {dimension: tuple(refs) for dimension, refs in by_dimension.items()},
-        {category: tuple(refs) for category, refs in by_category.items()},
+        {dimension: _sorted_refs(refs) for dimension, refs in by_dimension.items()},
+        {category: _sorted_refs(refs) for category, refs in by_category.items()},
     )
 
 
@@ -376,6 +376,10 @@ def _report_evidence_refs(evidence_view: EvidenceView) -> tuple[str, ...]:
         record.preserved_record_id for record in evidence_view.records
     ]
     refs.extend(absence.absence_id for absence in evidence_view.absences)
+    return _sorted_refs(refs)
+
+
+def _sorted_refs(refs) -> tuple[str, ...]:
     return tuple(sorted(refs))
 
 

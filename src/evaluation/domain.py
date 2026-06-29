@@ -215,18 +215,19 @@ def dimension_finding(
     summary: str,
     limitation: str | None = None,
 ) -> DimensionFinding:
+    canonical_evidence_refs = _sorted_refs(evidence_refs)
     return DimensionFinding(
         finding_id=_stable_id(
             "dimension-finding",
             {
                 "dimension": EvaluationDimension(dimension).value,
-                "evidence_refs": evidence_refs,
+                "evidence_refs": canonical_evidence_refs,
                 "status": EvaluationFindingStatus(status).value,
             },
         ),
         dimension=dimension,
         status=status,
-        evidence_refs=evidence_refs,
+        evidence_refs=canonical_evidence_refs,
         summary=summary,
         limitation=limitation,
     )
@@ -238,18 +239,19 @@ def failure_category_finding(
     evidence_refs: tuple[str, ...],
     summary: str,
 ) -> FailureCategoryFinding:
+    canonical_evidence_refs = _sorted_refs(evidence_refs)
     return FailureCategoryFinding(
         finding_id=_stable_id(
             "failure-category-finding",
             {
                 "category": FailureCategory(category).value,
-                "evidence_refs": evidence_refs,
+                "evidence_refs": canonical_evidence_refs,
                 "status": EvaluationFindingStatus(status).value,
             },
         ),
         category=category,
         status=status,
-        evidence_refs=evidence_refs,
+        evidence_refs=canonical_evidence_refs,
         summary=summary,
     )
 
@@ -260,18 +262,19 @@ def absence_disclosure(
     evidence_refs: tuple[str, ...],
 ) -> AbsenceDisclosure:
     target = _target_value(dimension_or_category)
+    canonical_evidence_refs = _sorted_refs(evidence_refs)
     return AbsenceDisclosure(
         disclosure_id=_stable_id(
             "absence-disclosure",
             {
                 "dimension_or_category": target,
-                "evidence_refs": evidence_refs,
+                "evidence_refs": canonical_evidence_refs,
                 "reason": reason,
             },
         ),
         dimension_or_category=target,
         reason=reason,
-        evidence_refs=evidence_refs,
+        evidence_refs=canonical_evidence_refs,
     )
 
 
@@ -339,3 +342,7 @@ def _flatten_payload_tokens(value: Any):
 def _stable_id(prefix: str, payload: Mapping[str, Any]) -> str:
     canonical = json.dumps(payload, sort_keys=True, separators=(",", ":"))
     return f"{prefix}:{sha256(canonical.encode('utf-8')).hexdigest()[:32]}"
+
+
+def _sorted_refs(evidence_refs: tuple[str, ...]) -> tuple[str, ...]:
+    return tuple(sorted(evidence_refs))
