@@ -12,7 +12,13 @@ from .domain import (
     NormalizedBoundingBox,
     StabilizedInspectionInput,
 )
-from .errors import MalformedInspectionInput
+from .errors import InspectionExaminationFailure, MalformedInspectionInput
+from .local_artifacts import (
+    local_contrast_analysis,
+    localization_from_deviations,
+    read_pgm_p2,
+    resolve_local_artifact_path,
+)
 
 
 @dataclass(frozen=True)
@@ -95,6 +101,72 @@ class DeterministicMockInferenceProvider:
                 y_max=round(y_min + self.localization_height, 6),
             ),
             localization_kind="deterministic_mock_suspected_region",
+        )
+
+
+@dataclass(frozen=True)
+class LocalArtifactInferenceProvider:
+    provider_id: str = "local-artifact-inference-provider-v1"
+    defect_threshold: float = 50.0
+    anomaly_fraction: float = 0.5
+
+    def predict(
+        self,
+        inspection_input: StabilizedInspectionInput,
+    ) -> InspectionPrediction:
+        if not isinstance(inspection_input, StabilizedInspectionInput):
+            raise MalformedInspectionInput(
+                "local artifact provider requires StabilizedInspectionInput"
+            )
+
+        path = resolve_local_artifact_path(inspection_input.artifact_uri)
+        if not path.exists() or not path.is_file():
+            raise InspectionExaminationFailure(
+                f"inspection artifact is missing or unreadable: {path}"
+            )
+
+        pixels, maxval = read_pgm_p2(path)
+        deviations, max_deviation, width, height = local_contrast_analysis(
+            pixels, maxval
+        )
+        raw_measure = round(max_deviation * 100.0, 6)
+        judgement = (
+            InspectionJudgement.DEFECT
+            if raw_measure >= self.defect_threshold
+            else InspectionJudgement.OK
+        )
+        localization = (
+            localization_from_deviations(
+                deviations,
+                max_deviation,
+                self.anomaly_fraction,
+                width,
+                height,
+                localization_kind="local_artifact_suspected_region",
+            )
+            if judgement is InspectionJudgement.DEFECT
+            else None
+        )
+        digest = _digest(
+            {
+                "input_id": inspection_input.input_id,
+                "maxval": maxval,
+                "pixels": pixels,
+                "provider_id": self.provider_id,
+            }
+        )
+
+        return InspectionPrediction(
+            input_id=inspection_input.input_id,
+            prediction_id=f"local-artifact-prediction:{digest[:32]}",
+            predicted_judgement=judgement,
+            predicted_raw_anomaly_measure=raw_measure,
+            predicted_localization=localization,
+            model_metadata={
+                "method": self.provider_id,
+                "version": "1",
+                "artifact_format": "pgm_p2",
+            },
         )
 
 

@@ -935,6 +935,190 @@ def test_inference_provider_exposes_no_downstream_or_runtime_behavior():
     assert not hasattr(provider, "calibrate")
 
 
+def _local_artifact_provider_type():
+    from src.inspection import LocalArtifactInferenceProvider
+
+    return LocalArtifactInferenceProvider
+
+
+def test_local_artifact_inference_provider_imports_from_public_api():
+    provider_type = _local_artifact_provider_type()
+
+    assert provider_type is inspection_api.LocalArtifactInferenceProvider
+
+
+def test_local_artifact_inference_provider_satisfies_provider_protocol():
+    provider: InspectionInferenceProvider = _local_artifact_provider_type()()
+
+    assert callable(provider.predict)
+
+
+def test_local_artifact_inference_provider_reads_fixture_content():
+    provider = _local_artifact_provider_type()()
+    inspection_input = _local_artifact_fixture_input(
+        "blob_defect.pgm",
+        input_id_prefix="local-provider",
+    )
+
+    prediction = provider.predict(inspection_input)
+
+    assert isinstance(prediction, InspectionPrediction)
+    assert not isinstance(prediction, RawInspectionResult)
+    assert prediction.input_id == inspection_input.input_id
+    assert prediction.prediction_id.startswith("local-artifact-prediction:")
+    assert prediction.predicted_judgement is InspectionJudgement.DEFECT
+    assert prediction.predicted_raw_anomaly_measure == 75.0
+    assert prediction.predicted_localization is not None
+    assert prediction.predicted_localization.region == NormalizedBoundingBox(
+        x_min=0.25,
+        y_min=0.25,
+        x_max=0.75,
+        y_max=0.75,
+    )
+    assert (
+        prediction.predicted_localization.localization_kind
+        == "local_artifact_suspected_region"
+    )
+    assert prediction.model_metadata["method"] == (
+        "local-artifact-inference-provider-v1"
+    )
+    assert prediction.model_metadata["artifact_format"] == "pgm_p2"
+
+
+def test_local_artifact_inference_provider_changed_content_changes_prediction():
+    provider = _local_artifact_provider_type()()
+    original_input = StabilizedInspectionInput(
+        input_id="local-provider-same-input",
+        artifact_uri=str(_inspection_fixture_path("blob_defect.pgm")),
+        content_hash="content-hash-same-input",
+    )
+    changed_input = StabilizedInspectionInput(
+        input_id="local-provider-same-input",
+        artifact_uri=str(_inspection_fixture_path("blob_defect_shifted.pgm")),
+        content_hash="content-hash-same-input",
+    )
+
+    original_prediction = provider.predict(original_input)
+    changed_prediction = provider.predict(changed_input)
+
+    assert isinstance(original_prediction, InspectionPrediction)
+    assert isinstance(changed_prediction, InspectionPrediction)
+    assert changed_prediction != original_prediction
+    assert changed_prediction.predicted_judgement is InspectionJudgement.DEFECT
+    assert changed_prediction.predicted_raw_anomaly_measure == 75.0
+    assert changed_prediction.predicted_localization is not None
+    assert changed_prediction.predicted_localization.region == NormalizedBoundingBox(
+        x_min=0.0,
+        y_min=0.0,
+        x_max=0.5,
+        y_max=0.5,
+    )
+
+
+def test_local_artifact_inference_provider_is_deterministic():
+    provider = _local_artifact_provider_type()()
+    inspection_input = _local_artifact_fixture_input(
+        "blob_defect.pgm",
+        input_id_prefix="local-provider-deterministic",
+    )
+
+    first = provider.predict(inspection_input)
+    second = provider.predict(inspection_input)
+    from_separate_provider = _local_artifact_provider_type()().predict(
+        inspection_input
+    )
+
+    assert first == second
+    assert first == from_separate_provider
+
+
+def test_local_artifact_inference_provider_localization_matches_judgement():
+    provider = _local_artifact_provider_type()()
+
+    defect_prediction = provider.predict(
+        _local_artifact_fixture_input(
+            "blob_defect.pgm",
+            input_id_prefix="local-provider-defect",
+        )
+    )
+    ok_prediction = provider.predict(
+        _local_artifact_fixture_input(
+            "uniform_ok.pgm",
+            input_id_prefix="local-provider-ok",
+        )
+    )
+
+    assert defect_prediction.predicted_judgement is InspectionJudgement.DEFECT
+    assert defect_prediction.predicted_localization is not None
+    assert ok_prediction.predicted_judgement is InspectionJudgement.OK
+    assert ok_prediction.predicted_raw_anomaly_measure == 0.0
+    assert ok_prediction.predicted_localization is None
+
+
+def test_local_artifact_inference_provider_rejects_invalid_inputs():
+    provider = _local_artifact_provider_type()()
+    non_local = StabilizedInspectionInput(
+        input_id="local-provider-non-local",
+        artifact_uri="artifact://kalibra/parts/non-local.pgm",
+        content_hash="content-hash-non-local",
+    )
+    missing = StabilizedInspectionInput(
+        input_id="local-provider-missing",
+        artifact_uri=str(_inspection_fixture_path("does_not_exist.pgm")),
+        content_hash="content-hash-missing",
+    )
+    malformed = _local_artifact_fixture_input(
+        "bad_magic.pgm",
+        input_id_prefix="local-provider-malformed",
+    )
+
+    with pytest.raises(MalformedInspectionInput):
+        provider.predict(object())
+    with pytest.raises(InspectionExaminationFailure):
+        provider.predict(non_local)
+    with pytest.raises(InspectionExaminationFailure):
+        provider.predict(missing)
+    with pytest.raises(InspectionExaminationFailure):
+        provider.predict(malformed)
+
+
+def test_local_artifact_inference_provider_prediction_transforms_to_raw_result():
+    provider = _local_artifact_provider_type()()
+    inspection_input = _local_artifact_fixture_input(
+        "blob_defect.pgm",
+        input_id_prefix="local-provider-transform",
+    )
+    prediction = provider.predict(inspection_input)
+
+    output = InspectionEngine().transform_prediction(inspection_input, prediction)
+    result = output.raw_inspection_result
+
+    assert isinstance(output, InspectionEngineOutput)
+    assert isinstance(result, RawInspectionResult)
+    assert result.examination_kind == INSPECTION_PREDICTION_KIND
+    assert result.raw_measure_scale == PREDICTION_RAW_MEASURE_SCALE
+    assert result.raw_measure_kind == RAW_MEASURE_KIND
+    assert result.examination_id == prediction.prediction_id
+    assert output.inspection_evidence_record.raw_inspection_result == result
+
+
+def test_local_artifact_inference_provider_exposes_no_downstream_behavior():
+    provider = _local_artifact_provider_type()()
+
+    assert not hasattr(provider, "qualify")
+    assert not hasattr(provider, "calibrate")
+    assert not hasattr(provider, "emit")
+    assert not hasattr(provider, "evidence")
+    assert not hasattr(provider, "evaluate")
+    assert not hasattr(provider, "inspect")
+    assert not hasattr(provider, "persist")
+    assert not hasattr(provider, "raw_result")
+    assert not hasattr(provider, "route_for_review")
+    assert not hasattr(provider, "transform_prediction")
+    assert not hasattr(provider, "update_model")
+    assert not hasattr(provider, "train")
+
+
 def _deterministic_mock_provider_type():
     from src.inspection import DeterministicMockInferenceProvider
 

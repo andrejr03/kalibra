@@ -47,7 +47,10 @@ from .interfaces import (
     InspectionExaminer,
     InspectionInferenceProvider,
 )
-from .providers import DeterministicMockInferenceProvider
+from .providers import (
+    DeterministicMockInferenceProvider,
+    LocalArtifactInferenceProvider,
+)
 
 __all__ = [
     "DefectJudgment",
@@ -76,6 +79,7 @@ __all__ = [
     "InvalidInspectionInput",
     "InvalidInspectionPrediction",
     "InvalidInspectionResult",
+    "LocalArtifactInferenceProvider",
     "MalformedInspectionInput",
     "MissingContentHash",
     "MissingInputIdentity",
