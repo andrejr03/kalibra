@@ -57,6 +57,10 @@ The Inspection Engine **must**:
 - **Treat the raw measure as raw.** Hand the raw measure downstream explicitly
   labelled as *not yet trustworthy confidence*, leaving its calibration to the
   Trust Qualification Engine.
+- **Transform accepted predictions.** When an `InspectionPrediction` is
+  explicitly passed to `InspectionEngine.transform_prediction(...)`, validate it
+  and transform it into the canonical `RawInspectionResult` before evidence
+  emission.
 - **Emit a record.** Emit a durable record of each judgement, localization, and
   raw measure into the Evidence Engine as part of normal operation, so the
   engine's outputs are inspectable and regenerable.
@@ -176,6 +180,11 @@ Properties of the output that the plan fixes:
 The output is the engine's only product. Everything Kalibra later asserts about
 trust is built on top of this raw result without modifying it.
 
+`InspectionPrediction` is an ML-boundary object, not a runtime contract. It may
+enter Inspection only through `InspectionEngine.transform_prediction(...)`.
+`RawInspectionResult` remains the canonical runtime contract and the only raw
+inspection object consumed downstream.
+
 ---
 
 ## 6. Domain Boundaries
@@ -229,14 +238,17 @@ implemented. No model, technique, or framework is chosen here.
    the engine's single examination of the single input; its product is reused by
    later stages and must not be reconstructed.
 
-   The current implementation provides two interchangeable
-   `InspectionExaminer` implementations:
+   The current implementation supports three examination sources:
 
    - `DeterministicPlaceholderExaminer` — the default examiner used by
      `InspectionEngine()` and by substrate integration.
    - `DeterministicImageBaselineExaminer` — an opt-in deterministic local image
      baseline selected only by constructing
      `InspectionEngine(examiner=DeterministicImageBaselineExaminer())`.
+   - `InspectionPrediction` transformation path — an explicit path selected
+     only by calling `InspectionEngine.transform_prediction(input, prediction)`.
+     This path validates an already-produced prediction and transforms it into
+     `RawInspectionResult`; it is not part of `InspectionEngine.inspect()`.
 
    The image baseline reads local grayscale PGM P2 artifacts, computes a
    deterministic raw local-contrast measure, and returns the same downstream
@@ -244,6 +256,14 @@ implemented. No model, technique, or framework is chosen here.
    Inspection boundary with real image artifacts. It does not implement ML,
    production computer vision, calibration, trust qualification, review routing,
    evaluation, benchmark measurement, or performance claims.
+
+   ML Phase 1 also defines `InspectionInferenceProvider` and the concrete
+   `DeterministicMockInferenceProvider`. The provider is a deterministic,
+   framework-independent architecture-validation provider only. It produces
+   `InspectionPrediction`, is not wired into `InspectionEngine.inspect()`, is not
+   a Machine Learning runtime, and is not production inference. The provider does
+   not produce `RawInspectionResult`; the Inspection Engine owns the
+   transformation from prediction to raw result.
 
 3. **Judgement formation.** Derive, from the examination, an overall judgement of
    whether the input is defective.
@@ -295,6 +315,8 @@ obligations below are binding.
 - Must not carry any calibrated confidence, qualified outcome, abstention, drift
   signal, or routing decision. Trust-bearing fields must be *absent*, not present
   and empty.
+- Remains the canonical runtime contract for Inspection and for every downstream
+  domain.
 
 **Contract C — Inspection Evidence Record (emitted).**
 - Must durably preserve the raw inspection result and its link to the originating
@@ -302,6 +324,18 @@ obligations below are binding.
 - Must be regenerable from the same fixed input (P2).
 - Must faithfully represent the result as raw; it must not present the result as
   stronger or more trustworthy than it is.
+
+**Contract D — Inspection Prediction (accepted for transformation only).**
+- Must be produced by an `InspectionInferenceProvider`; the current concrete
+  provider is `DeterministicMockInferenceProvider`.
+- Must carry a prediction identity, input identity, predicted judgement,
+  predicted raw anomaly measure, and localization only when the prediction is
+  defective.
+- Must remain a pre-runtime boundary object. It is not emitted downstream and is
+  not consumed directly by Trust, Review, Evidence, Evaluation, Integration, or
+  CLI code.
+- Must not carry calibrated confidence, qualified outcome, review routing,
+  evaluation, evidence, persistence, model update, training, or UI authority.
 
 Contract invariants:
 
@@ -316,9 +350,16 @@ Contract invariants:
   exact input that produced it.
 - **Descriptive labels may differ by examiner.** The current implementation
   accepts distinct `examination_kind` and `raw_measure_scale` labels for the
-  placeholder and local image baseline examiners, while preserving
-  `raw_measure_kind = "raw_anomaly_measure"` as the downstream-compatible raw
-  measure kind.
+  placeholder examiner, local image baseline examiner, and prediction-origin
+  transformation path, while preserving `raw_measure_kind =
+  "raw_anomaly_measure"` as the downstream-compatible raw measure kind.
+- **Prediction transformation is Inspection-owned.** The implemented path is
+  `InspectionPrediction → InspectionEngine.transform_prediction(...) →
+  RawInspectionResult → InspectionEvidenceRecord`. Providers never own
+  `RawInspectionResult` or evidence emission.
+- **Downstream consumers see only raw results.** No downstream subsystem consumes
+  `InspectionPrediction` directly; all downstream domains continue to consume
+  `RawInspectionResult`.
 
 ---
 
@@ -343,6 +384,11 @@ Identified failure modes and required handling:
   could not, or vice versa. The engine must not emit a partial Raw Inspection
   Result as if complete; an incomplete result must be surfaced as a failure
   against Contract B.
+- **Malformed or invalid prediction.** A value passed to
+  `transform_prediction(...)` is not an `InspectionPrediction`, references a
+  different input, uses unsupported provenance labels, carries a non-finite raw
+  measure, or violates localization rules. The engine must refuse
+  transformation and must not convert the failure into a judgement.
 - **Evidence emission failure.** The result was assembled but could not be
   recorded. Because evidence is an obligation of normal operation (E1), the
   engine must surface this rather than report success without a record.
@@ -380,9 +426,10 @@ The Inspection Engine must be validated against:
   absence of these responsibilities is itself validated, not assumed.
 - **Single-source conformance.** Judgement, localization, and raw measure for one
   input demonstrably originate from one examination of that input.
-- **Examiner interchangeability.** Both current examiners exercise the
-  `InspectionExaminer` protocol and preserve the same downstream raw inspection
-  contract.
+- **Examination-source conformance.** Both current examiners exercise the
+  `InspectionExaminer` protocol, and the explicit prediction transformation path
+  exercises the `InspectionInferenceProvider` boundary while preserving the same
+  downstream raw inspection contract.
 - **Reproducibility.** The same fixed input yields the same result and the same
   emitted record on re-run (C2, P2).
 - **Traceability.** Every result and record is tied back to the exact originating
@@ -420,8 +467,12 @@ The engine's test suite must demonstrate, at minimum:
   input.
 - **Failure-mode tests.** Each failure mode in §9 (unstabilized input, missing
   identity, examination failure, partial result, evidence-emission failure,
-  non-reproducibility) is provoked and shown to be surfaced explicitly and not
-  disguised as a verdict.
+  invalid prediction, non-reproducibility) is provoked and shown to be surfaced
+  explicitly and not disguised as a verdict.
+- **Prediction-boundary tests.** A deterministic provider output can be
+  transformed only by explicitly calling `InspectionEngine.transform_prediction`;
+  provider output is an `InspectionPrediction`, provider methods do not emit
+  evidence, and the default `InspectionEngine.inspect()` path remains unchanged.
 - **Intake-discipline tests.** Input that has not passed intake is refused rather
   than judged.
 
@@ -459,8 +510,10 @@ engine, and naming them grants no licence to anticipate them.
   contracts and seams but not its examination technique, the implementation now
   supports both the default deterministic placeholder examiner and the opt-in
   deterministic local image baseline examiner without changing the engine's
-  boundary. The `InspectionExaminer` protocol has therefore been exercised by two
-  interchangeable implementations while preserving the same downstream contract.
+  boundary. ML Phase 1 also supports explicit transformation of
+  `InspectionPrediction` through `InspectionEngine.transform_prediction(...)`.
+  The `InspectionExaminer` and `InspectionInferenceProvider` boundaries have
+  therefore both been exercised while preserving the same downstream contract.
 - **The input contract can carry richer stabilized inputs.** Additional
   stabilized-input characteristics may be added at intake without changing the
   engine's responsibility, provided Contract A's obligations continue to hold.
