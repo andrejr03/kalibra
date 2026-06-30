@@ -227,4 +227,12 @@ def _pgm_svg_data_uri(
         f'{"".join(rects)}{overlay}'
         "</svg>"
     )
-    return "data:image/svg+xml;charset=utf-8," + quote(svg, safe=":/#%,;=()")
+    # Keep the data: URI valid as an `<img src>` and inside an unquoted CSS
+    # `url(...)` embedded in an inline `style="..."`:
+    #   - omit `;charset=utf-8` so the only `;` (a CSS declaration separator)
+    #     cannot truncate the value when used in an inline style;
+    #   - `#` would start a URI fragment (truncating the SVG at the first
+    #     fill="#...") and `%` (from width="100%") would break percent-decoding;
+    #   - `(`/`)` (from `rgb(...)` fills) would close an unquoted CSS `url()`.
+    # Encoding those keeps the projection renderable in every context.
+    return "data:image/svg+xml," + quote(svg, safe=":/,=")

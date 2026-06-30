@@ -316,10 +316,10 @@
               <div style="width:268px;flex:none;background:#090d12;border:1px solid rgba(255,255,255,0.06);border-radius:9px;padding:13px">
                 <div style="font:600 11px 'Space Grotesk';letter-spacing:0.14em;color:#7b8693;margin-bottom:11px">DEFECT LOCALIZATION</div>
                 <sc-if value="{{ inspectSel.hasLoc }}" hint-placeholder-val="{{ true }}">
-                  <div style="border-radius:7px;overflow:hidden;background:#070a0e;border:1px solid rgba(255,255,255,0.05)"><img src="../parts/generated/part_localization.png" alt="defect localization" style="width:100%;display:block"></div>
+                  <div style="border-radius:7px;overflow:hidden;background:#070a0e;border:1px solid rgba(255,255,255,0.05)"><img src="{{ inspectSel.localizationImg }}" alt="defect localization" style="width:100%;display:block"></div>
                   <div style="display:flex;align-items:center;gap:8px;margin:12px 0 10px"><span style="width:9px;height:9px;border-radius:50%;background:#e5514e;animation:kpulse 2.4s ease-in-out infinite"></span><span style="font:400 13px 'IBM Plex Sans';color:#d2d8e0">Suspected Defect</span></div>
                   <div style="height:1px;background:rgba(255,255,255,0.06);margin-bottom:10px"></div>
-                  <div style="display:flex;align-items:center;justify-content:space-between"><span style="font:400 13px 'IBM Plex Sans';color:#8a93a0">Region Confidence</span><span style="font:500 14px 'IBM Plex Mono';color:#eef1f5">{{ inspectSel.regionConfText }}</span></div>
+                  <div style="display:flex;align-items:center;justify-content:space-between"><span style="font:400 13px 'IBM Plex Sans';color:#8a93a0">{{ inspectSel.regionMetricLabel }}</span><span style="font:500 14px 'IBM Plex Mono';color:#eef1f5">{{ inspectSel.regionConfText }}</span></div>
                 </sc-if>
                 <sc-if value="{{ inspectSel.noLoc }}" hint-placeholder-val="{{ false }}">
                   <div style="border-radius:7px;overflow:hidden;background:#070a0e;border:1px solid rgba(255,255,255,0.05);aspect-ratio:520/460"><img src="../parts/generated/part_clean.png" alt="clean part with no localized defect" style="width:100%;height:100%;object-fit:cover;display:block"></div>
@@ -347,7 +347,7 @@
                   <span style="font:300 38px 'IBM Plex Sans';color:#f3f5f8;line-height:1">{{ inspectSel.rawText }}</span>
                   <div style="flex:1">
                     <div style="height:8px;border-radius:5px;background:rgba(255,255,255,0.08);overflow:hidden"><div style="{{ inspectSel.rawBarStyle }}"></div></div>
-                    <div style="display:flex;justify-content:space-between;margin-top:6px"><span style="font:400 12px 'IBM Plex Mono';color:#6b7682">0</span><span style="font:400 12px 'IBM Plex Mono';color:#6b7682">1</span></div>
+                    <div style="display:flex;justify-content:space-between;margin-top:6px"><span style="font:400 12px 'IBM Plex Mono';color:#6b7682">{{ inspectSel.rawAxisMin }}</span><span style="font:400 12px 'IBM Plex Mono';color:#6b7682">{{ inspectSel.rawAxisMax }}</span></div>
                   </div>
                 </div>
                 <div style="font:400 11px 'IBM Plex Sans';color:#5f6975;margin-top:9px;font-style:italic">A measure of how unusual the input is &mdash; <span style="color:#8a93a0;font-style:normal">not yet calibrated confidence.</span></div>
@@ -606,7 +606,7 @@
               <div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.05)"><span style="font:400 13px 'IBM Plex Sans';color:#8a93a0">Inspection result</span><span style="font:500 13px 'Space Grotesk';color:{{ esel.resultColor }}">{{ esel.result }}</span></div>
               <div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.05)"><span style="font:400 13px 'IBM Plex Sans';color:#8a93a0">Raw anomaly score</span><span style="font:500 13px 'IBM Plex Mono';color:#d2d8e0">{{ esel.rawText }}</span></div>
               <div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.05)"><span style="font:400 13px 'IBM Plex Sans';color:#8a93a0">Calibrated confidence</span><span style="font:500 13px 'IBM Plex Mono';color:#d2d8e0">{{ esel.confText }}</span></div>
-              <div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.05)"><span style="font:400 13px 'IBM Plex Sans';color:#8a93a0">Region confidence</span><span style="font:500 13px 'IBM Plex Mono';color:#d2d8e0">{{ esel.regionConfText }}</span></div>
+              <div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.05)"><span style="font:400 13px 'IBM Plex Sans';color:#8a93a0">{{ esel.regionMetricLabel }}</span><span style="font:500 13px 'IBM Plex Mono';color:#d2d8e0">{{ esel.regionConfText }}</span></div>
               <div style="display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.05)"><span style="font:400 13px 'IBM Plex Sans';color:#8a93a0">Drift score</span><span style="font:500 13px 'IBM Plex Mono';color:{{ esel.driftColor }}">{{ esel.driftText }}</span></div>
               <div style="display:flex;justify-content:space-between;padding:9px 0"><span style="font:400 13px 'IBM Plex Sans';color:#8a93a0">Run ID</span><span style="font:500 12px 'IBM Plex Mono';color:#9aa3af">{{ esel.runId }}</span></div>
             </div>
