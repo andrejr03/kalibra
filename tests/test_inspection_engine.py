@@ -8,6 +8,7 @@ import pytest
 import src.inspection.engine as inspection_engine_module
 import src.inspection as inspection_api
 from src.inspection.engine import _read_pgm_p2, _resolve_local_artifact_path
+from src.inspection.local_artifacts import local_contrast_analysis
 from src.inspection import (
     IMAGE_BASELINE_EXAMINATION_KIND,
     IMAGE_BASELINE_RAW_SCALE,
@@ -65,6 +66,14 @@ DOWNSTREAM_FIELD_NAMES = {
 FIXTURES = Path(__file__).resolve().parent / "fixtures" / "inspection"
 
 
+def _inspection_fixture_path(filename: str) -> Path:
+    return FIXTURES / filename
+
+
+def _read_pgm_fixture(filename: str) -> tuple[list[list[int]], int]:
+    return _read_pgm_p2(_inspection_fixture_path(filename))
+
+
 def make_input(
     content_hash: str = "stable-content-hash-001",
     input_id: str = "input-001",
@@ -81,12 +90,20 @@ def _baseline_engine() -> InspectionEngine:
     return InspectionEngine(examiner=DeterministicImageBaselineExaminer())
 
 
-def _baseline_input(filename: str) -> StabilizedInspectionInput:
+def _local_artifact_fixture_input(
+    filename: str,
+    *,
+    input_id_prefix: str = "baseline",
+) -> StabilizedInspectionInput:
     return StabilizedInspectionInput(
-        input_id=f"baseline-{filename}",
-        artifact_uri=str(FIXTURES / filename),
+        input_id=f"{input_id_prefix}-{filename}",
+        artifact_uri=str(_inspection_fixture_path(filename)),
         content_hash=f"content-hash-{filename}",
     )
+
+
+def _baseline_input(filename: str) -> StabilizedInspectionInput:
+    return _local_artifact_fixture_input(filename, input_id_prefix="baseline")
 
 
 def output_for_judgement(judgement: InspectionJudgement) -> InspectionEngineOutput:
@@ -235,7 +252,7 @@ def test_image_baseline_labels_are_accepted_by_contracts():
 
 
 def test_pgm_reader_parses_grid_and_maxval():
-    pixels, maxval = _read_pgm_p2(FIXTURES / "blob_defect.pgm")
+    pixels, maxval = _read_pgm_fixture("blob_defect.pgm")
 
     assert maxval == 255
     assert pixels == [
@@ -244,6 +261,26 @@ def test_pgm_reader_parses_grid_and_maxval():
         [0, 255, 255, 0],
         [0, 0, 0, 0],
     ]
+
+
+def test_shifted_blob_fixture_is_valid_changed_defect_content():
+    original_pixels, original_maxval = _read_pgm_fixture("blob_defect.pgm")
+    shifted_pixels, shifted_maxval = _read_pgm_fixture("blob_defect_shifted.pgm")
+
+    assert original_maxval == shifted_maxval == 255
+    assert shifted_pixels == [
+        [255, 255, 0, 0],
+        [255, 255, 0, 0],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+    ]
+    assert shifted_pixels != original_pixels
+
+    _, max_deviation, _, _ = local_contrast_analysis(
+        shifted_pixels,
+        shifted_maxval,
+    )
+    assert round(max_deviation * 100.0, 6) >= 50.0
 
 
 def test_pgm_reader_rejects_non_p2_and_truncated():
