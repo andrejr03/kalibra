@@ -47,11 +47,13 @@ from .interfaces import (
     InspectionExaminer,
     InspectionInferenceProvider,
 )
+from .providers import DeterministicMockInferenceProvider
 
 __all__ = [
     "DefectJudgment",
     "DefectLocalization",
     "DeterministicImageBaselineExaminer",
+    "DeterministicMockInferenceProvider",
     "DeterministicPlaceholderExaminer",
     "EvidenceEmissionFailure",
     "IMAGE_BASELINE_EXAMINATION_KIND",

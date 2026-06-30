@@ -898,6 +898,189 @@ def test_inference_provider_exposes_no_downstream_or_runtime_behavior():
     assert not hasattr(provider, "calibrate")
 
 
+def _deterministic_mock_provider_type():
+    from src.inspection import DeterministicMockInferenceProvider
+
+    return DeterministicMockInferenceProvider
+
+
+def _deterministic_mock_prediction_for(
+    judgement: InspectionJudgement,
+) -> InspectionPrediction:
+    provider = _deterministic_mock_provider_type()()
+    for index in range(300):
+        prediction = provider.predict(
+            make_input(
+                content_hash=f"mock-provider-content-hash-{index:03d}",
+                input_id=f"mock-provider-input-{index:03d}",
+            )
+        )
+        if prediction.predicted_judgement is judgement:
+            return prediction
+    raise AssertionError(f"no deterministic mock prediction produced {judgement.value}")
+
+
+def test_deterministic_mock_inference_provider_imports_from_public_api():
+    provider_type = _deterministic_mock_provider_type()
+
+    assert provider_type is inspection_api.DeterministicMockInferenceProvider
+
+
+def test_deterministic_mock_inference_provider_satisfies_provider_protocol():
+    provider: InspectionInferenceProvider = _deterministic_mock_provider_type()()
+
+    assert callable(provider.predict)
+
+
+def test_deterministic_mock_inference_provider_returns_prediction_only():
+    provider = _deterministic_mock_provider_type()()
+
+    prediction = provider.predict(make_input(input_id="mock-provider-return"))
+
+    assert isinstance(prediction, InspectionPrediction)
+    assert not isinstance(prediction, RawInspectionResult)
+
+
+def test_deterministic_mock_inference_provider_same_instance_is_deterministic():
+    provider = _deterministic_mock_provider_type()()
+    inspection_input = make_input(input_id="mock-provider-same-instance")
+
+    first = provider.predict(inspection_input)
+    second = provider.predict(inspection_input)
+
+    assert first == second
+
+
+def test_deterministic_mock_inference_provider_separate_instances_are_deterministic():
+    inspection_input = make_input(input_id="mock-provider-separate-instances")
+
+    first = _deterministic_mock_provider_type()().predict(inspection_input)
+    second = _deterministic_mock_provider_type()().predict(inspection_input)
+
+    assert first == second
+
+
+def test_deterministic_mock_inference_provider_changed_input_remains_valid():
+    provider = _deterministic_mock_provider_type()()
+    base_prediction = provider.predict(
+        make_input(
+            content_hash="mock-provider-base-content-hash",
+            input_id="mock-provider-base-input",
+        )
+    )
+    changed_prediction = provider.predict(
+        make_input(
+            content_hash="mock-provider-changed-content-hash",
+            input_id="mock-provider-changed-input",
+        )
+    )
+
+    assert isinstance(base_prediction, InspectionPrediction)
+    assert isinstance(changed_prediction, InspectionPrediction)
+    assert changed_prediction != base_prediction
+
+
+def test_deterministic_mock_inference_provider_localization_matches_judgement():
+    defect_prediction = _deterministic_mock_prediction_for(InspectionJudgement.DEFECT)
+    ok_prediction = _deterministic_mock_prediction_for(InspectionJudgement.OK)
+
+    assert defect_prediction.predicted_localization is not None
+    assert ok_prediction.predicted_localization is None
+
+
+def test_deterministic_mock_inference_provider_exposes_no_downstream_behavior():
+    provider = _deterministic_mock_provider_type()()
+
+    assert not hasattr(provider, "qualify")
+    assert not hasattr(provider, "calibrate")
+    assert not hasattr(provider, "emit")
+    assert not hasattr(provider, "evidence")
+    assert not hasattr(provider, "evaluate")
+    assert not hasattr(provider, "inspect")
+    assert not hasattr(provider, "persist")
+    assert not hasattr(provider, "raw_result")
+    assert not hasattr(provider, "route_for_review")
+    assert not hasattr(provider, "transform_prediction")
+    assert not hasattr(provider, "update_model")
+    assert not hasattr(provider, "train")
+
+
+def test_deterministic_mock_inference_provider_rejects_malformed_input():
+    provider = _deterministic_mock_provider_type()()
+
+    with pytest.raises(MalformedInspectionInput):
+        provider.predict(object())
+
+
+def test_deterministic_mock_inference_provider_prediction_transforms_to_raw_result():
+    provider = _deterministic_mock_provider_type()()
+    inspection_input = make_input(input_id="mock-provider-transform")
+    prediction = provider.predict(inspection_input)
+
+    output = InspectionEngine().transform_prediction(inspection_input, prediction)
+    result = output.raw_inspection_result
+
+    assert isinstance(prediction, InspectionPrediction)
+    assert isinstance(output, InspectionEngineOutput)
+    assert isinstance(result, RawInspectionResult)
+    assert result.examination_kind == INSPECTION_PREDICTION_KIND
+    assert result.raw_measure_scale == PREDICTION_RAW_MEASURE_SCALE
+    assert result.raw_measure_kind == RAW_MEASURE_KIND
+
+
+def test_deterministic_mock_inference_provider_evidence_is_engine_owned():
+    class RecordingEvidenceEmitter:
+        def __init__(self) -> None:
+            self.raw_results: list[RawInspectionResult] = []
+
+        def emit(self, raw_result: RawInspectionResult) -> InspectionEvidenceRecord:
+            self.raw_results.append(raw_result)
+            return InspectionEvidenceRecord(
+                record_id=f"record-{raw_result.inspection_result_id}",
+                input_id=raw_result.input_id,
+                inspection_result_id=raw_result.inspection_result_id,
+                raw_inspection_result=raw_result,
+            )
+
+    provider = _deterministic_mock_provider_type()()
+    inspection_input = make_input(input_id="mock-provider-evidence-owned")
+    evidence_emitter = RecordingEvidenceEmitter()
+
+    prediction = provider.predict(inspection_input)
+    assert evidence_emitter.raw_results == []
+
+    output = InspectionEngine(evidence_emitter=evidence_emitter).transform_prediction(
+        inspection_input,
+        prediction,
+    )
+
+    assert isinstance(output.inspection_evidence_record, InspectionEvidenceRecord)
+    assert evidence_emitter.raw_results == [output.raw_inspection_result]
+    assert output.inspection_evidence_record.raw_inspection_result == (
+        output.raw_inspection_result
+    )
+    assert not hasattr(prediction, "inspection_evidence_record")
+    assert not hasattr(prediction, "raw_inspection_result")
+
+
+def test_deterministic_mock_inference_provider_does_not_wire_default_engine_path():
+    provider = _deterministic_mock_provider_type()()
+    inspection_input = make_input(input_id="mock-provider-default-path")
+    prediction = provider.predict(inspection_input)
+    engine = InspectionEngine()
+
+    default_output = engine.inspect(inspection_input)
+    default_result = default_output.raw_inspection_result
+
+    assert not hasattr(engine, "provider")
+    assert not hasattr(engine, "inference_provider")
+    assert not hasattr(engine, "model")
+    assert not hasattr(engine, "predict")
+    assert default_result.examination_id != prediction.prediction_id
+    assert default_result.examination_kind != INSPECTION_PREDICTION_KIND
+    assert default_result.raw_measure_scale != PREDICTION_RAW_MEASURE_SCALE
+
+
 def test_inspection_engine_remains_unwired_from_inference_provider():
     engine = InspectionEngine()
 
