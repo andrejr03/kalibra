@@ -120,17 +120,18 @@
               </div>
             </div>
 
-            <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
-              <span style="font:500 16px 'IBM Plex Mono';color:#eef1f5">{{ featured.file }}</span>
-              <span style="font:500 11px 'Space Grotesk';letter-spacing:0.06em;color:#9aa3af;background:#121922;border:1px solid rgba(255,255,255,0.08);border-radius:5px;padding:3px 9px">{{ featured.partType }}</span>
-            </div>
+	            <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
+	              <span style="font:500 16px 'IBM Plex Mono';color:#eef1f5">{{ featured.file }}</span>
+	              <span style="font:500 11px 'Space Grotesk';letter-spacing:0.06em;color:#9aa3af;background:#121922;border:1px solid rgba(255,255,255,0.08);border-radius:5px;padding:3px 9px">{{ featured.partType }}</span>
+	              <span style="font:600 10px 'Space Grotesk';letter-spacing:0.12em;color:#e6a23c;background:rgba(230,162,60,0.08);border:1px solid rgba(230,162,60,0.25);border-radius:5px;padding:4px 9px">{{ featured.sourceLabel }}</span>
+	            </div>
             <div style="font:400 13px 'IBM Plex Mono';color:#6b7682;margin-bottom:2px">Run ID: {{ featured.runId }}</div>
             <div style="font:400 13px 'IBM Plex Mono';color:#6b7682;margin-bottom:16px">Batch: {{ featured.batch }}</div>
 
             <div style="display:flex;gap:16px">
               <!-- main image -->
               <div style="position:relative;flex:1;min-width:0;border-radius:9px;overflow:hidden;background:#070a0e;border:1px solid rgba(255,255,255,0.05)">
-                <img src="../parts/generated/part_main.png" alt="inspected part" style="width:100%;display:block">
+	                <img src="{{ featured.detailImg }}" alt="inspected part" style="width:100%;display:block">
                 <div style="position:absolute;left:14px;bottom:14px;display:flex;align-items:center;gap:2px;background:rgba(10,14,20,0.82);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:5px 6px">
                   <span style="font:500 12px 'IBM Plex Sans';color:#c4ccd6;padding:0 8px">Fit</span>
                   <span style="width:1px;height:16px;background:rgba(255,255,255,0.12)"></span>
@@ -143,11 +144,11 @@
               </div>
               <!-- localization inset -->
               <div style="width:268px;flex:none;background:#090d12;border:1px solid rgba(255,255,255,0.06);border-radius:9px;padding:13px">
-                <div style="font:600 11px 'Space Grotesk';letter-spacing:0.14em;color:#7b8693;margin-bottom:11px">DEFECT LOCALIZATION</div>
-                <div style="border-radius:7px;overflow:hidden;background:#070a0e;border:1px solid rgba(255,255,255,0.05)"><img src="../parts/generated/part_localization.png" alt="defect localization" style="width:100%;display:block"></div>
-                <div style="display:flex;align-items:center;gap:8px;margin:12px 0 10px"><span style="width:9px;height:9px;border-radius:50%;background:#e5514e;animation:kpulse 2.4s ease-in-out infinite"></span><span style="font:400 13px 'IBM Plex Sans';color:#d2d8e0">Suspected Defect</span></div>
-                <div style="height:1px;background:rgba(255,255,255,0.06);margin-bottom:10px"></div>
-                <div style="display:flex;align-items:center;justify-content:space-between"><span style="font:400 13px 'IBM Plex Sans';color:#8a93a0">Region Confidence</span><span style="font:500 14px 'IBM Plex Mono';color:#eef1f5">{{ featured.regionConfText }}</span></div>
+	                <div style="font:600 11px 'Space Grotesk';letter-spacing:0.14em;color:#7b8693;margin-bottom:11px">DEFECT LOCALIZATION</div>
+	                <div style="border-radius:7px;overflow:hidden;background:#070a0e;border:1px solid rgba(255,255,255,0.05)"><img src="{{ featured.localizationImg }}" alt="defect localization" style="width:100%;display:block"></div>
+	                <div style="display:flex;align-items:center;gap:8px;margin:12px 0 10px"><span style="width:9px;height:9px;border-radius:50%;background:#e5514e;animation:kpulse 2.4s ease-in-out infinite"></span><span style="font:400 13px 'IBM Plex Sans';color:#d2d8e0">{{ featured.localizationStatusText }}</span></div>
+	                <div style="height:1px;background:rgba(255,255,255,0.06);margin-bottom:10px"></div>
+	                <div style="display:flex;align-items:center;justify-content:space-between;gap:10px"><span style="font:400 13px 'IBM Plex Sans';color:#8a93a0">{{ featured.regionMetricLabel }}</span><span style="font:500 14px 'IBM Plex Mono';color:#eef1f5;text-align:right">{{ featured.regionConfText }}</span></div>
               </div>
             </div>
 
@@ -167,7 +168,7 @@
                   <span style="font:300 38px 'IBM Plex Sans';color:#f3f5f8;line-height:1">{{ featured.rawText }}</span>
                   <div style="flex:1">
                     <div style="height:8px;border-radius:5px;background:rgba(255,255,255,0.08);overflow:hidden"><div style="{{ featured.rawBarStyle }}"></div></div>
-                    <div style="display:flex;justify-content:space-between;margin-top:6px"><span style="font:400 12px 'IBM Plex Mono';color:#6b7682">0</span><span style="font:400 12px 'IBM Plex Mono';color:#6b7682">1</span></div>
+	                    <div style="display:flex;justify-content:space-between;margin-top:6px"><span style="font:400 12px 'IBM Plex Mono';color:#6b7682">{{ featured.rawAxisMin }}</span><span style="font:400 12px 'IBM Plex Mono';color:#6b7682">{{ featured.rawAxisMax }}</span></div>
                   </div>
                 </div>
                 <div style="font:400 11px 'IBM Plex Sans';color:#5f6975;margin-top:9px;font-style:italic">Not yet calibrated confidence &mdash; see Trust Qualification.</div>
@@ -228,8 +229,11 @@
                 </svg>
                 <div style="position:absolute;left:0;right:0;top:56px;text-align:center;font:400 44px 'IBM Plex Sans';color:#e6a23c;line-height:1;letter-spacing:0.01em">{{ featured.confText }}</div>
               </div>
-              <div style="font:400 13px 'IBM Plex Sans';color:#8a93a0;margin-top:-2px">Calibrated Confidence</div>
-            </div>
+	              <div style="font:400 13px 'IBM Plex Sans';color:#8a93a0;margin-top:-2px">Calibrated Confidence</div>
+	              <sc-if value="{{ featured.hasAbsenceMessages }}" hint-placeholder-val="{{ false }}">
+	                <div style="font:400 11px 'IBM Plex Sans';color:#7d93bf;margin-top:8px;text-align:center;line-height:1.4">{{ featured.calibratedConfidenceStatusText }}</div>
+	              </sc-if>
+	            </div>
 
             <div style="height:1px;background:rgba(255,255,255,0.06);margin:14px 0"></div>
 
@@ -238,21 +242,21 @@
               <span style="display:inline-flex;align-items:center;gap:6px;background:{{ featured.outcomeBg }};border:1px solid {{ featured.outcomeBorder }};border-radius:6px;padding:4px 11px"><span style="width:6px;height:6px;border-radius:50%;background:{{ featured.outcomeColor }}"></span><span style="font:600 12px 'Space Grotesk';letter-spacing:0.08em;color:{{ featured.outcomeColor }}">{{ featured.outcome }}</span></span>
             </div>
 
-            <div style="font:600 11px 'Space Grotesk';letter-spacing:0.14em;color:#7b8693;margin-bottom:10px">REASON FOR REVIEW</div>
-            <div style="display:flex;flex-direction:column;gap:8px">
-              <sc-for list="{{ featured.reasons }}" as="r" hint-placeholder-count="3">
-                <div style="display:flex;align-items:flex-start;gap:9px"><span style="width:5px;height:5px;border-radius:50%;background:#6b7682;margin-top:7px;flex:none"></span><span style="font:400 13px 'IBM Plex Sans';color:#c4ccd6">{{ r.text }}</span></div>
+	            <div style="font:600 11px 'Space Grotesk';letter-spacing:0.14em;color:#7b8693;margin-bottom:10px">{{ featured.reasonTitle }}</div>
+	            <div style="display:flex;flex-direction:column;gap:8px">
+	              <sc-for list="{{ featured.reasons }}" as="r" hint-placeholder-count="3">
+	                <div style="display:flex;align-items:flex-start;gap:9px"><span style="width:5px;height:5px;border-radius:50%;background:#6b7682;margin-top:7px;flex:none"></span><span style="font:400 13px 'IBM Plex Sans';color:#c4ccd6">{{ r.text }}</span></div>
               </sc-for>
             </div>
           </section>
 
           <!-- routing -->
           <section style="background:#0e141c;border:1px solid rgba(255,255,255,0.06);border-radius:11px;padding:16px 18px">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:13px"><span style="font:600 11px 'Space Grotesk';letter-spacing:0.14em;color:#7b8693">ROUTING</span><span style="width:8px;height:8px;border-radius:50%;background:#e6a23c;box-shadow:0 0 7px #e6a23c"></span></div>
-            <div style="display:flex;align-items:center;gap:13px">
-              <div style="width:42px;height:42px;flex:none;display:grid;place-items:center;background:#121922;border:1px solid rgba(230,162,60,0.3);border-radius:9px"><i class="ph ph-user" style="font-size:20px;color:#e6a23c"></i></div>
-              <div><div style="font:500 14px 'IBM Plex Sans';color:#eef1f5">Human Review Required</div><div style="font:400 12px 'IBM Plex Sans';color:#8a93a0;margin-top:2px">Case routed to review queue</div></div>
-            </div>
+	            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:13px"><span style="font:600 11px 'Space Grotesk';letter-spacing:0.14em;color:#7b8693">ROUTING</span><span style="{{ featured.routingDotStyle }}"></span></div>
+	            <div style="display:flex;align-items:center;gap:13px">
+	              <div style="{{ featured.routingIconBoxStyle }}"><i class="ph {{ featured.routingIcon }}" style="font-size:20px;color:{{ featured.routingColor }}"></i></div>
+	              <div><div style="font:500 14px 'IBM Plex Sans';color:#eef1f5">{{ featured.routingTitle }}</div><div style="font:400 12px 'IBM Plex Sans';color:#8a93a0;margin-top:2px">{{ featured.routingText }}</div></div>
+	            </div>
           </section>
 
           <!-- drift -->
@@ -262,7 +266,7 @@
               <div><div style="font:500 17px 'IBM Plex Sans';color:{{ featured.driftColor }}">{{ featured.driftLabel }}</div></div>
               <svg width="150" height="40" viewBox="0 0 150 40" style="flex:none"><polyline points="2,28 16,22 30,26 44,16 58,20 72,12 86,24 100,18 114,9 128,19 148,14" fill="none" stroke="#e6a23c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></polyline></svg>
             </div>
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px"><span style="font:400 12px 'IBM Plex Sans';color:#8a93a0">Drift Score</span><span style="font:500 14px 'IBM Plex Mono';color:#eef1f5">{{ featured.driftText }}</span></div>
+	            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px"><span style="font:400 12px 'IBM Plex Sans';color:#8a93a0">{{ featured.driftMetricLabel }}</span><span style="font:500 14px 'IBM Plex Mono';color:#eef1f5">{{ featured.driftText }}</span></div>
           </section>
         </div>
       </div>
@@ -610,7 +614,7 @@
             <sc-if value="{{ eselPartial }}" hint-placeholder-val="{{ false }}">
               <div style="margin-top:16px;background:rgba(125,147,191,0.07);border:1px solid rgba(125,147,191,0.3);border-radius:9px;padding:13px 15px">
                 <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px"><i class="ph ph-warning-octagon" style="font-size:15px;color:#7d93bf"></i><span style="font:600 11px 'Space Grotesk';letter-spacing:0.08em;color:#7d93bf">EVIDENCE ABSENCE</span></div>
-                <div style="font:400 12px 'IBM Plex Sans';color:#9aa3af;line-height:1.5">Calibration and localization were not recorded &mdash; the system abstained on insufficient evidence. The gap is recorded, not hidden.</div>
+	                <div style="font:400 12px 'IBM Plex Sans';color:#9aa3af;line-height:1.5">{{ esel.absenceText }}</div>
               </div>
             </sc-if>
           </section>
@@ -758,6 +762,7 @@
     <circle cx="50" cy="46" r="4.4" fill="#e6a23c"></circle>
   </svg>
 </template></x-dc>
+<script src="./local-provider-demo-data.js"></script>
 <script type="text/x-dc" data-dc-script>
 const RED='#e5514e', GREEN='#45c46a', GOLD='#e6a23c', SLATE='#7d93bf', MID='#9aa3af';
 const TH='../parts/generated/';
@@ -816,36 +821,99 @@ const PRINCIPLES = [
   {icon:'ph-gear-six',title:'ENGINEERED FOR TRUST',sub:'Not just accurate. Trustworthy.'}
 ];
 
+function makeLocalProviderCase(d){
+  if(!d) return null;
+  return {
+    seq:0,
+    seqLabel:'LOCAL',
+    file:d.file,
+    partType:'PGM Fixture',
+    batch:'tests/fixtures/inspection',
+    runId:d.inspectionResultId,
+    result:d.result,
+    raw:Math.max(0,Math.min(1,d.rawMeasureValue/100)),
+    rawText:d.rawText,
+    rawBarPercent:d.rawBarPercent,
+    conf:null,
+    outcome:'UNQUALIFIED',
+    drift:null,
+    regionConf:null,
+    thumb:null,
+    reasons:[
+      d.calibratedConfidenceStatusText,
+      d.trustStatusText,
+      d.reviewStatusText,
+      d.evaluationStatusText
+    ],
+    outcomeReason:'Inspection-only local provider projection',
+    evidence:'inspection-only',
+    sourceLabel:'LOCAL PROVIDER RESULT',
+    isLocalProviderDemo:true,
+    localProviderDemo:d
+  };
+}
+
+const LOCAL_PROVIDER_CASE = makeLocalProviderCase(window.KALIBRA_LOCAL_PROVIDER_DEMO);
+const ACTIVE_CASES = LOCAL_PROVIDER_CASE ? [LOCAL_PROVIDER_CASE,...CASES] : CASES;
+
 class Component extends DCLogic {
-  state = { screen:'overview', caseIndex:0, inspectSel:512, reviewSel:512, reviewDecisions:{}, evalDim:'detection', evidenceSel:512 };
+  state = { screen:'overview', caseIndex:0, inspectSel:ACTIVE_CASES[0].seq, reviewSel:512, reviewDecisions:{}, evalDim:'detection', evidenceSel:ACTIVE_CASES[0].seq };
 
   caseView(c){
-    const dc = driftInfo(c.drift);
+    const isLocal=!!c.isLocalProviderDemo;
+    const local=isLocal?c.localProviderDemo:null;
+    const dc = c.drift==null ? {label:'Not assessed', color:SLATE} : driftInfo(c.drift);
     const rc = resultColor(c.result);
-    const oc = outcomeColor(c.outcome);
+    const outcome=c.outcome||'UNQUALIFIED';
+    const oc = outcomeColor(outcome);
+    const rawText=c.rawText || c.raw.toFixed(2);
+    const rawBarPercent=c.rawBarPercent!=null ? c.rawBarPercent : Math.round(c.raw*100);
+    const detailImg=isLocal ? local.visualization.imageDataUri : (c.result==='OK' ? TH+'part_clean.png' : TH+'part_main.png');
+    const localizationImg=isLocal ? local.visualization.localizationDataUri : (c.result==='OK' ? TH+'part_clean.png' : TH+'part_localization.png');
+    const routingColor=(outcome==='REVIEW'||outcome==='ABSTAIN') ? GOLD : (isLocal ? SLATE : GREEN);
+    const routingTitle=isLocal ? 'No review routing' : ((outcome==='REVIEW'||outcome==='ABSTAIN') ? 'Human Review Required' : 'No human review');
+    const routingText=isLocal ? local.reviewStatusText : ((outcome==='REVIEW'||outcome==='ABSTAIN') ? 'Case routed to review queue' : 'Case not routed for review');
     return {
       ...c,
-      seqText:`${c.seq} / 10,000`,
+      seqText:isLocal ? c.seqLabel : `${c.seq} / 10,000`,
+      sourceLabel:c.sourceLabel || 'PROTOTYPE SAMPLE',
       result:c.result, resultColor:rc, resultBg:hexa(rc,0.12), resultBorder:hexa(rc,0.4),
-      rawText:c.raw.toFixed(2),
-      rawBarStyle:`width:${Math.round(c.raw*100)}%;height:100%;background:linear-gradient(90deg,${hexa(rc,0.6)},${rc});border-radius:5px`,
+      rawText,
+      rawAxisMin:'0',
+      rawAxisMax:isLocal ? '100' : '1',
+      rawBarStyle:`width:${rawBarPercent}%;height:100%;background:linear-gradient(90deg,${hexa(rc,0.6)},${rc});border-radius:5px`,
       confText: c.conf==null ? '\u2014' : c.conf.toFixed(2),
-      regionConfText: c.regionConf==null ? 'n/a' : c.regionConf.toFixed(2),
+      regionConfText: isLocal ? local.localizationText : (c.regionConf==null ? 'n/a' : c.regionConf.toFixed(2)),
+      regionMetricLabel: isLocal ? 'Normalized Region' : 'Region Confidence',
       outcomeColor:oc, outcomeBg:hexa(oc,0.12), outcomeBorder:hexa(oc,0.4),
-      driftText:c.drift.toFixed(2), driftLabel:dc.label, driftColor:dc.color,
+      outcome,
+      driftText:c.drift==null ? 'not run' : c.drift.toFixed(2), driftLabel:dc.label, driftColor:dc.color,
+      driftMetricLabel: c.drift==null ? 'Drift assessment' : 'Drift Score',
       reasons:(c.reasons||[]).map(t=>({text:t})),
-      thumbSrc:TH+c.thumb+'.png',
-      detailImg: c.result==='OK' ? TH+'part_clean.png' : TH+'part_main.png',
-      detailBg: `background-image:url(${c.result==='OK' ? TH+'part_clean.png' : TH+'part_main.png'})`,
+      thumbSrc:isLocal ? detailImg : TH+c.thumb+'.png',
+      detailImg,
+      localizationImg,
+      detailBg: `background-image:url(${detailImg})`,
       hasLoc: c.result!=='OK',
       noLoc: c.result==='OK',
+      localizationStatusText:isLocal ? 'Suspected Defect' : (c.result==='OK' ? 'No defect localized' : 'Suspected Defect'),
+      reasonTitle:isLocal ? 'ABSENCE NOTES' : 'REASON FOR REVIEW',
+      hasAbsenceMessages:isLocal,
+      calibratedConfidenceStatusText:isLocal ? local.calibratedConfidenceStatusText : '',
+      routingColor,
+      routingTitle,
+      routingText,
+      routingIcon:isLocal ? 'ph-prohibit' : ((outcome==='REVIEW'||outcome==='ABSTAIN') ? 'ph-user' : 'ph-check'),
+      routingDotStyle:`width:8px;height:8px;border-radius:50%;background:${routingColor};box-shadow:0 0 7px ${routingColor}`,
+      routingIconBoxStyle:`width:42px;height:42px;flex:none;display:grid;place-items:center;background:${hexa(routingColor,0.08)};border:1px solid ${hexa(routingColor,0.3)};border-radius:9px`,
+      absenceText:isLocal ? `${local.calibratedConfidenceStatusText} ${local.trustStatusText} ${local.reviewStatusText} ${local.evaluationStatusText}` : 'Calibration and localization were not recorded \u2014 the system abstained on insufficient evidence. The gap is recorded, not hidden.',
       outcomeReasonsText:(c.reasons||[]).join(' \u00b7 ')
     };
   }
 
   go(screen){ this.setState({screen}); }
-  byseq(q){ return CASES.find(c=>c.seq===q) || CASES[0]; }
-  gaugeXY(conf){ const cx=110,cy=108,r=92,v=(conf==null?0:conf); return {mx:(cx-r*Math.cos(v*Math.PI)).toFixed(1), my:(cy-r*Math.sin(v*Math.PI)).toFixed(1)}; }
+  byseq(q){ return ACTIVE_CASES.find(c=>c.seq===q) || ACTIVE_CASES[0]; }
+  gaugeXY(conf){ if(conf==null) return {mx:-100,my:-100}; const cx=110,cy=108,r=92,v=conf; return {mx:(cx-r*Math.cos(v*Math.PI)).toFixed(1), my:(cy-r*Math.sin(v*Math.PI)).toFixed(1)}; }
   decisionMeta(k){ return ({accept:{label:'Accepted',color:GREEN}, reject:{label:'Rejected',color:RED}, inconclusive:{label:'Inconclusive',color:GOLD}, cannot:{label:'Could not review',color:SLATE}})[k] || null; }
   recordReview(seq,k){ this.setState(st=>({reviewDecisions:{...st.reviewDecisions,[seq]:k}})); }
 
@@ -853,8 +921,8 @@ class Component extends DCLogic {
 
   renderVals(){
     const s=this.state;
-    const featured=this.caseView(CASES[s.caseIndex]);
-    const gauge=this.gaugeXY(CASES[s.caseIndex].conf);
+    const featured=this.caseView(ACTIVE_CASES[s.caseIndex]);
+    const gauge=this.gaugeXY(ACTIVE_CASES[s.caseIndex].conf);
 
     const nav=NAV.map(n=>{
       const active=n.key===s.screen;
@@ -867,20 +935,22 @@ class Component extends DCLogic {
     const recentCases=recentIds.map(id=>{
       const c=CASES.find(x=>x.seq===id);
       return {result:c.result, resultColor:resultColor(c.result), rawText:c.raw.toFixed(2), thumb:TH+c.thumb+'.png', bg:`background-image:url(${TH+c.thumb+'.png'})`,
-        go:()=>{ const i=CASES.findIndex(x=>x.seq===id); this.setState({caseIndex:i}); }};
+        go:()=>{ const i=ACTIVE_CASES.findIndex(x=>x.seq===id); this.setState({caseIndex:i}); }};
     });
     const evalCells=EVAL.map(e=>({label:e.short, value:e.value, metric:e.metric, go:()=>this.go('evaluation')}));
 
     // ---- INSPECTION ----
-    const inspectList=CASES.map(c=>({
-      seqText:'#'+c.seq, file:c.file, result:c.result, resultColor:resultColor(c.result),
-      rawText:c.raw.toFixed(2), thumb:TH+c.thumb+'.png', bg:`background-image:url(${TH+c.thumb+'.png'})`, rowStyle:this.rowStyle(c.seq===s.inspectSel),
+    const inspectList=ACTIVE_CASES.map(c=>{
+      const cv=this.caseView(c);
+      return {
+      seqText:c.isLocalProviderDemo?c.seqLabel:'#'+c.seq, file:c.file, result:c.result, resultColor:resultColor(c.result),
+      rawText:cv.rawText, thumb:cv.thumbSrc, bg:`background-image:url(${cv.thumbSrc})`, rowStyle:this.rowStyle(c.seq===s.inspectSel),
       go:()=>this.setState({inspectSel:c.seq})
-    }));
+    }});
     const inspectSel=this.caseView(this.byseq(s.inspectSel));
 
     // ---- TRUST ----
-    const tc=this.byseq(s.caseIndex!=null?CASES[s.caseIndex].seq:512);
+    const tc=this.byseq(s.caseIndex!=null?ACTIVE_CASES[s.caseIndex].seq:512);
     const tv=this.caseView(tc);
     const isAbstain=tc.outcome==='ABSTAIN';
     const toc=outcomeColor(tc.outcome);
@@ -891,11 +961,11 @@ class Component extends DCLogic {
       {key:'ABSTAIN',label:'Abstain',color:SLATE,desc:'Evidence insufficient \u2014 declined automatically.'}
     ];
     const trust={
-      rawText:tc.raw.toFixed(2), confText:(tc.conf==null?'\u2014':tc.conf.toFixed(2)),
+      rawText:tv.rawText, confText:(tc.conf==null?'\u2014':tc.conf.toFixed(2)),
       isAbstain, hasConf:tc.conf!=null, markerLeft:(tc.conf==null?0:tc.conf*100).toFixed(1)+'%',
-      gauge:this.gaugeXY(tc.conf), driftText:tc.drift.toFixed(2),
-      driftLabel:driftInfo(tc.drift).label, driftColor:driftInfo(tc.drift).color,
-      rawBarStyle:`width:${Math.round(tc.raw*100)}%;height:100%;background:linear-gradient(90deg,${hexa(resultColor(tc.result),0.6)},${resultColor(tc.result)});border-radius:5px`,
+      gauge:this.gaugeXY(tc.conf), driftText:tv.driftText,
+      driftLabel:tv.driftLabel, driftColor:tv.driftColor,
+      rawBarStyle:tv.rawBarStyle,
       outcome:tc.outcome, outcomeColor:toc, outcomeBg:hexa(toc,0.12), outcomeBorder:hexa(toc,0.4), outcomeReason:tc.outcomeReason,
       reasons:tv.reasons,
       states:statesDef.map(d=>{
@@ -908,7 +978,7 @@ class Component extends DCLogic {
     };
 
     // ---- REVIEW ----
-    const queue=CASES.filter(c=>c.outcome==='REVIEW'||c.outcome==='ABSTAIN');
+    const queue=ACTIVE_CASES.filter(c=>c.outcome==='REVIEW'||c.outcome==='ABSTAIN');
     const reviewQueue=queue.map(c=>{
       const dk=s.reviewDecisions[c.seq]; const dm=this.decisionMeta(dk);
       return { seqText:'#'+c.seq, file:c.file, outcome:c.outcome, outcomeColor:outcomeColor(c.outcome),
@@ -925,18 +995,21 @@ class Component extends DCLogic {
     };
 
     // ---- EVIDENCE ----
-    const evidenceRows=CASES.map(c=>{
-      const loc = c.result==='OK' ? {text:'n/a',muted:true} : (c.regionConf==null ? {text:'absent',flag:true} : {text:'present',ok:true});
-      const cal = c.conf==null ? {text:'not recorded',flag:true} : {text:c.conf.toFixed(2)};
-      return { seq:c.seq, seqText:'#'+c.seq, file:c.file, result:c.result, resultColor:resultColor(c.result),
-        rawText:c.raw.toFixed(2), calText:cal.text, calStyle:`font:500 13px 'IBM Plex Mono';color:${cal.flag?'#7d93bf':'#d2d8e0'}`,
+    const evidenceRows=ACTIVE_CASES.map(c=>{
+      const isLocal=!!c.isLocalProviderDemo;
+      const cv=this.caseView(c);
+      const loc = c.result==='OK' ? {text:'n/a',muted:true} : (isLocal ? {text:'present',ok:true} : (c.regionConf==null ? {text:'absent',flag:true} : {text:'present',ok:true}));
+      const cal = c.conf==null ? {text:isLocal?'not produced':'not recorded',flag:true} : {text:c.conf.toFixed(2)};
+      return { seq:c.seq, seqText:isLocal?c.seqLabel:'#'+c.seq, file:c.file, result:c.result, resultColor:resultColor(c.result),
+        rawText:cv.rawText, calText:cal.text, calStyle:`font:500 13px 'IBM Plex Mono';color:${cal.flag?'#7d93bf':'#d2d8e0'}`,
         outcome:c.outcome, outcomeColor:outcomeColor(c.outcome),
         locText:loc.text, locStyle:`font:400 12px 'IBM Plex Sans';color:${loc.flag?'#e6a23c':loc.muted?'#5f6975':'#9aa3af'}`,
         rowStyle:`display:grid;grid-template-columns:1.6fr 0.7fr 0.7fr 0.9fr 0.9fr 0.8fr;gap:8px;align-items:center;padding:11px 14px;cursor:pointer;border-radius:8px;border:1px solid ${c.seq===s.evidenceSel?'rgba(255,255,255,0.1)':'transparent'};background:${c.seq===s.evidenceSel?'#151c26':'transparent'}`,
         go:()=>this.setState({evidenceSel:c.seq}) };
     });
-    const esel=this.caseView(this.byseq(s.evidenceSel));
-    const eselPartial = this.byseq(s.evidenceSel).evidence==='partial';
+    const eselCase=this.byseq(s.evidenceSel);
+    const esel=this.caseView(eselCase);
+    const eselPartial = eselCase.evidence==='partial' || eselCase.isLocalProviderDemo;
 
     // ---- EVALUATION ----
     const evalDims=EVAL.map(e=>{
@@ -968,8 +1041,8 @@ class Component extends DCLogic {
       evidenceRows, esel, eselPartial,
       evalDims, evalSel:evalSelView, allFailures,
       datasetThumbs,
-      prevCase:()=>this.setState(st=>({caseIndex:(st.caseIndex-1+CASES.length)%CASES.length})),
-      nextCase:()=>this.setState(st=>({caseIndex:(st.caseIndex+1)%CASES.length})),
+      prevCase:()=>this.setState(st=>({caseIndex:(st.caseIndex-1+ACTIVE_CASES.length)%ACTIVE_CASES.length})),
+      nextCase:()=>this.setState(st=>({caseIndex:(st.caseIndex+1)%ACTIVE_CASES.length})),
       goEvidence:()=>this.go('evidence'), goEval:()=>this.go('evaluation'),
       noop:()=>{}
     };
