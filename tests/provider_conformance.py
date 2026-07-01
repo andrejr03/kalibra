@@ -294,10 +294,10 @@ def _assert_graph_contains_only(
         if isinstance(item, (tuple, list, frozenset)):
             continue
         item_type = type(item)
+        _assert_not_runtime_state_type(item, graph_name)
         assert item_type in allowed_types, (
             f"{graph_name} exposed non-canonical object {item_type.__name__}"
         )
-        _assert_not_runtime_state_type(item, graph_name)
 
 
 def _assert_not_runtime_state_type(item: object, graph_name: str) -> None:
@@ -326,8 +326,13 @@ def _walk(value: object, seen: set[int]) -> Iterable[object]:
     seen.add(value_id)
 
     if is_dataclass(value) and not isinstance(value, type):
+        field_names = {field.name for field in fields(value)}
         for field in fields(value):
             yield from _walk(getattr(value, field.name), seen)
+        for name, item in _instance_attributes(value).items():
+            if name not in field_names:
+                yield from _walk(name, seen)
+                yield from _walk(item, seen)
         return
     if isinstance(value, Mapping):
         for key, item in value.items():
@@ -341,3 +346,10 @@ def _walk(value: object, seen: set[int]) -> Iterable[object]:
     if isinstance(value, frozenset):
         for item in value:
             yield from _walk(item, seen)
+
+
+def _instance_attributes(value: object) -> dict[str, object]:
+    try:
+        return vars(value)
+    except TypeError:
+        return {}
