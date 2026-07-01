@@ -53,10 +53,11 @@ DEFAULT_REVIEWER_RATIONALE = (
 )
 DEFAULT_REFERENCE_SET_ID = "fixed-end-to-end-substrate-reference-v1"
 LOCAL_PROVIDER_INTEGRATION_INPUT_ID = "local-provider-end-to-end-blob-defect"
-LOCAL_PROVIDER_FIXTURE_ARTIFACT_URI = "tests/fixtures/inspection/blob_defect.pgm"
+LOCAL_PROVIDER_FIXTURE_REPO_PATH = Path("tests/fixtures/inspection/blob_defect.pgm")
 
 _REPO_ROOT = Path(__file__).resolve().parents[2]
-_LOCAL_PROVIDER_FIXTURE_PATH = _REPO_ROOT / LOCAL_PROVIDER_FIXTURE_ARTIFACT_URI
+_LOCAL_PROVIDER_FIXTURE_PATH = (_REPO_ROOT / LOCAL_PROVIDER_FIXTURE_REPO_PATH).resolve()
+LOCAL_PROVIDER_FIXTURE_ARTIFACT_URI = str(_LOCAL_PROVIDER_FIXTURE_PATH)
 
 _UNSET = object()
 
@@ -139,6 +140,10 @@ class EndToEndSubstrateIntegrationEngine:
         ),
         reviewer_rationale: str = DEFAULT_REVIEWER_RATIONALE,
     ) -> EndToEndSubstrateIntegrationResult:
+        """Compose downstream domains for an already-canonical inspection output.
+
+        This is the shared integration core, not a generic untrusted injection point.
+        """
         drift = (
             default_drift_reference()
             if drift_reference is _UNSET

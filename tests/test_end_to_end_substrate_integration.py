@@ -255,6 +255,21 @@ def test_local_provider_path_produces_end_to_end_integration_result():
     assert review_absences[0].reason == "human_review_evidence_absent"
 
 
+def test_local_provider_fixture_is_independent_of_current_working_directory(
+    tmp_path,
+    monkeypatch,
+):
+    monkeypatch.chdir(tmp_path)
+
+    result = EndToEndSubstrateIntegrationEngine().run_local_provider_fixture()
+    raw_result = result.inspection_output.raw_inspection_result
+
+    assert Path(result.source_input.artifact_uri).is_absolute()
+    assert raw_result.judgement is InspectionJudgement.DEFECT
+    assert raw_result.raw_anomaly_measure == 75.0
+    assert raw_result.raw_measure_scale == PREDICTION_RAW_MEASURE_SCALE
+
+
 def test_local_provider_path_can_route_review_only_with_explicit_drift_reference():
     result = EndToEndSubstrateIntegrationEngine().run_local_provider_fixture(
         drift_reference=DriftReference(
