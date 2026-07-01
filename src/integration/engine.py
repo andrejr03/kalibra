@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from hashlib import sha256
 import json
+from pathlib import Path
 from typing import Any
 
 from src.evaluation import (
@@ -14,6 +15,7 @@ from src.evidence import EvidenceEngine, EvidenceSourceDomain, EvidenceView
 from src.inspection import (
     InspectionEngine,
     InspectionEngineOutput,
+    LocalArtifactInferenceProvider,
     RawInspectionResult,
     StabilizedInspectionInput,
 )
@@ -50,6 +52,11 @@ DEFAULT_REVIEWER_RATIONALE = (
     "Deterministic integration reviewer decision for substrate composition."
 )
 DEFAULT_REFERENCE_SET_ID = "fixed-end-to-end-substrate-reference-v1"
+LOCAL_PROVIDER_INTEGRATION_INPUT_ID = "local-provider-end-to-end-blob-defect"
+LOCAL_PROVIDER_FIXTURE_ARTIFACT_URI = "tests/fixtures/inspection/blob_defect.pgm"
+
+_REPO_ROOT = Path(__file__).resolve().parents[2]
+_LOCAL_PROVIDER_FIXTURE_PATH = _REPO_ROOT / LOCAL_PROVIDER_FIXTURE_ARTIFACT_URI
 
 _UNSET = object()
 
@@ -84,10 +91,68 @@ class EndToEndSubstrateIntegrationEngine:
         )
 
         inspection_output = self.inspection_engine.inspect(source_input)
+        return self.run_from_inspection_output(
+            source_input=source_input,
+            inspection_output=inspection_output,
+            drift_reference=drift,
+            reviewer_decision=reviewer_decision,
+            reviewer_ref=reviewer_ref,
+            reviewer_decision_value=reviewer_decision_value,
+            reviewer_rationale=reviewer_rationale,
+        )
+
+    def run_local_provider_fixture(
+        self,
+        drift_reference: DriftReference | None = None,
+        reviewer_decision: ReviewerDecision | None = None,
+        reviewer_ref: str = DEFAULT_REVIEWER_REF,
+        reviewer_decision_value: ReviewerDecisionValue = (
+            ReviewerDecisionValue.INCONCLUSIVE
+        ),
+        reviewer_rationale: str = DEFAULT_REVIEWER_RATIONALE,
+    ) -> EndToEndSubstrateIntegrationResult:
+        source_input = local_provider_fixture_inspection_input()
+        prediction = LocalArtifactInferenceProvider().predict(source_input)
+        inspection_output = self.inspection_engine.transform_prediction(
+            source_input,
+            prediction,
+        )
+        return self.run_from_inspection_output(
+            source_input=source_input,
+            inspection_output=inspection_output,
+            drift_reference=drift_reference,
+            reviewer_decision=reviewer_decision,
+            reviewer_ref=reviewer_ref,
+            reviewer_decision_value=reviewer_decision_value,
+            reviewer_rationale=reviewer_rationale,
+        )
+
+    def run_from_inspection_output(
+        self,
+        source_input: StabilizedInspectionInput,
+        inspection_output: InspectionEngineOutput,
+        drift_reference: DriftReference | None | object = _UNSET,
+        reviewer_decision: ReviewerDecision | None = None,
+        reviewer_ref: str = DEFAULT_REVIEWER_REF,
+        reviewer_decision_value: ReviewerDecisionValue = (
+            ReviewerDecisionValue.INCONCLUSIVE
+        ),
+        reviewer_rationale: str = DEFAULT_REVIEWER_RATIONALE,
+    ) -> EndToEndSubstrateIntegrationResult:
+        drift = (
+            default_drift_reference()
+            if drift_reference is _UNSET
+            else drift_reference
+        )
+        _require_type(
+            source_input,
+            StabilizedInspectionInput,
+            "integration source input must be StabilizedInspectionInput",
+        )
         _require_type(
             inspection_output,
             InspectionEngineOutput,
-            "InspectionEngine.inspect must return InspectionEngineOutput",
+            "integration inspection output must be InspectionEngineOutput",
         )
         raw_result = inspection_output.raw_inspection_result
         _require_type(
@@ -209,6 +274,14 @@ def default_stabilized_inspection_input() -> StabilizedInspectionInput:
     )
 
 
+def local_provider_fixture_inspection_input() -> StabilizedInspectionInput:
+    return StabilizedInspectionInput(
+        input_id=LOCAL_PROVIDER_INTEGRATION_INPUT_ID,
+        artifact_uri=LOCAL_PROVIDER_FIXTURE_ARTIFACT_URI,
+        content_hash=_sha256_file(_LOCAL_PROVIDER_FIXTURE_PATH),
+    )
+
+
 def default_drift_reference() -> DriftReference:
     return DriftReference(
         reference_id=DEFAULT_DRIFT_REFERENCE_ID,
@@ -296,3 +369,11 @@ def _require_type(value: object, expected_type: type, message: str) -> None:
 def _stable_id(prefix: str, payload: dict[str, Any]) -> str:
     canonical = json.dumps(payload, sort_keys=True, separators=(",", ":"))
     return f"{prefix}:{sha256(canonical.encode('utf-8')).hexdigest()[:32]}"
+
+
+def _sha256_file(path: Path) -> str:
+    digest = sha256()
+    with path.open("rb") as file:
+        for chunk in iter(lambda: file.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
