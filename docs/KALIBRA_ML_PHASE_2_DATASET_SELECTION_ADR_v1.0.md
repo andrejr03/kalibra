@@ -39,6 +39,17 @@ replacing the earlier "license type unconfirmed." (2) The project's commercial p
 is recorded below. Neither fact makes any candidate governance-complete, so the ADR
 decision remains **DEFER DATASET SELECTION**, and MPDD remains **Deferred**.
 
+**Revision note (VisA governance update).** This revision also incorporates the
+verified findings of the
+[`VisA Licensing & Governance Investigation`](research/KALIBRA_VISA_LICENSING_AND_GOVERNANCE_INVESTIGATION_v1.0.md).
+VisA's dataset license is now verified as **CC BY 4.0**, and the repository utility
+code is verified as **Apache-2.0**. Official sources agree; the earlier CC BY-NC-SA
+statement came from a secondary tooling source and is not authoritative. Licensing is
+therefore **no longer a VisA governance blocker**. The decision still does **not**
+change, because VisA remains incomplete on non-licensing governance evidence
+(versioning, integrity, reproducibility, long-term availability, and annotation-process
+documentation), and it is not a domain match for Kalibra's target parts.
+
 **Project commercial posture (recorded).**
 
 ```text
@@ -53,8 +64,8 @@ and non-commercial terms are therefore **no longer a licensing blocker** for the
 current project. This record is **scoped to the present non-commercial posture only**;
 it is **not** a commercial authorization, and it does **not** license any commercial
 use. Should the posture ever change to commercial, non-commercial datasets would again
-become inadmissible and this ADR would require re-evaluation (§10). ShareAlike and
-attribution obligations continue to apply regardless of posture.
+become inadmissible for any future selection or implementation authorization.
+ShareAlike and attribution obligations continue to apply regardless of posture.
 
 ---
 
@@ -95,6 +106,8 @@ Dataset selection is considered against the completed ML Phase 2 planning sequen
   maintainers/sources/licensing where possible, and recorded that **no candidate is
   simultaneously clearly relevant to Kalibra's domain, clearly licensed, and free of
   saturation/narrowness concerns.**
+- **Focused governance investigations** — subsequently resolved the MPDD and VisA
+  license records without completing either candidate's full governance evidence.
 
 **Why dataset selection is now possible.** The requirements and the field are both on
 the record: the Dataset Strategy fixed *what a dataset must provide*, and the
@@ -182,16 +195,31 @@ for the first ML Phase 2 selection on its verified merits."
 ### 4.3 VisA
 
 - **Verified strengths.** Amazon Science maintainer; official source; 12 classes across
-  3 domains; large; image- **and** pixel-level annotations.
-- **Verified weaknesses.** Not specific to Kalibra's parts.
-- **Unresolved risks.** **License discrepancy** across sources (CC BY 4.0 vs
-  CC BY-NC-SA 4.0) — unresolved and decision-relevant.
-- **Licensing status.** **Unresolved** — must be confirmed against the original source.
-- **Governance readiness.** Potentially high **if** the permissive term is confirmed;
-  currently **gated** by the licensing contradiction.
-- **Suitability for Kalibra.** *(Observation.)* Attractive scale and annotation depth;
-  the license question is decisive.
-- **Decision:** `Deferred` — cannot select on a contradictory, unverified license.
+  3 domains; large; image- **and** pixel-level annotations; canonical AWS S3 archive
+  recorded in the AWS Open Data registry; official repository, AWS registry, AWS
+  Marketplace listing, and repository notice agree on the dataset license.
+- **Verified weaknesses.** Not specific to Kalibra's parts; the official paper states
+  that defects were manually generated to produce realistic anomalies; no formal
+  dataset version/DOI/release tag or official strong checksum was located.
+- **Unresolved risks.** *(Observation grounded in verified absence.)* Annotation
+  process, reviewer agreement, ambiguity handling, and quality-control procedure are
+  not fully documented at source; archival preservation guarantee is not established.
+- **Licensing status.** **Verified CC BY 4.0 for the dataset** and **Apache-2.0 for
+  repository utility code**. Official sources agree. The earlier CC BY-NC-SA statement
+  came from a secondary tooling source and is not authoritative. Commercial use,
+  redistribution, derivative works, and attribution obligations are resolved from the
+  official license record. **Licensing is no longer a VisA blocker.**
+- **Governance readiness.** **Incomplete.** Licensing is **Satisfied**. Provenance,
+  ownership, versioning, integrity, reproducibility, and long-term availability are
+  **Partially satisfied**: official authorship, AWS hosting, a dated S3 archive, and
+  split files improve governance, but no DOI/release tag/formal version, published
+  strong checksum, full annotation-process record, or archival preservation guarantee
+  completes the Dataset Strategy gate.
+- **Suitability for Kalibra.** *(Observation.)* Attractive scale, anomaly-detection
+  structure, and annotation depth; useful as a governed proxy, not a cast-aluminium or
+  machined-component domain match.
+- **Decision:** `Deferred` — licensing is resolved, but governance remains incomplete
+  and the dataset is still domain-distant from Kalibra's target parts. Not selected.
 
 ### 4.4 BTAD (BeanTech)
 
@@ -237,8 +265,8 @@ for the first ML Phase 2 selection on its verified merits."
   most directly relevant candidate, and now with a compatible, verified license;
   scientific suitability is **strong**, but governance readiness is **incomplete**.
 - **Decision:** `Deferred` — strongest domain fit and licensing now resolved, but held
-  by the four non-licensing governance blockers above. Not selected. This is the
-  priority candidate to mature toward governance readiness.
+  by the four non-licensing governance blockers above. Not selected. It remains a
+  domain-relevant candidate to mature toward governance readiness.
 
 ### 4.6 KolektorSDD
 
@@ -352,32 +380,44 @@ The principal trade-offs, stated qualitatively and without ranking:
 - **Domain relevance vs governance readiness.** The candidate closest to Kalibra's
   domain (MPDD, metal parts) now has a **verified, compatible license** but is held by
   non-licensing governance gaps (versioning, integrity, archival availability,
-  source-level documentation); the candidates with the clearest licenses (MVTec,
-  Kolektor) are also compatible under the non-commercial posture but domain-distant.
-  Governance *completeness* and domain match still do not coincide in any single
-  candidate.
+  source-level documentation). VisA now has the strongest verified licensing position
+  (CC BY 4.0 for the dataset; Apache-2.0 for utility code) and stronger public-hosting
+  evidence than MPDD, but it is also domain-distant and still incomplete on versioning,
+  integrity, annotation-process documentation, and archival preservation. MVTec and
+  Kolektor have verified non-commercial licenses compatible with the recorded posture
+  and comparatively mature institutional source records, but they are also proxies for
+  Kalibra's target domain. Governance *completeness* and domain match still do not
+  coincide in any single candidate.
 - **Anomaly detection.** The MVTec line, VisA, BTAD, MPDD, and the Kolektor datasets
   fit the sound-vs-defective framing; NEU (classification) fits it least.
 - **Localization.** Pixel/mask ground truth exists in MVTec AD, VisA, MPDD, KSDD/KSDD2,
   Magnetic Tile, and Severstal; DAGM is weak; NEU is bounding-box at best — so any
   localization claim is strongly dataset-dependent.
-- **Licensing.** Verified non-commercial and **compatible with the recorded
-  non-commercial posture** (MVTec, Kolektor, and now **MPDD** — CC BY-NC-SA 4.0
-  verified); still contradictory (VisA), unconfirmed (BTAD, DAGM, NEU), absent
-  (Magnetic Tile), or competition-gated (Severstal). Licensing is now settled for
-  MPDD, MVTec, and Kolektor; it remains the open axis for the others.
-- **Reproducibility.** Institutionally hosted datasets (MVTec, ViCoS/Kolektor,
-  Heidelberg) are easiest to fix and regenerate; competition-gated (Severstal) and
-  single-repository (Magnetic Tile) candidates carry reproducibility and
-  availability risk.
+- **Licensing.** VisA is now verified **CC BY 4.0** for the dataset, with
+  **Apache-2.0** repository utility code, making it the clearest and least restrictive
+  verified license posture among the serious candidates. MVTec, Kolektor, and MPDD are
+  verified **CC BY-NC-SA 4.0** and compatible only under the recorded non-commercial
+  posture. BTAD/DAGM/NEU remain unconfirmed, Magnetic Tile has no license located, and
+  Severstal remains competition-gated.
+- **Reproducibility and availability.** VisA's AWS Open Data registry entry, canonical
+  AWS S3 archive, dated filename, and split files materially improve its governance
+  maturity, but do not replace a formal version ID, release tag, DOI, strong checksum,
+  or preservation guarantee. MVTec and Kolektor retain strong institutional-source
+  maturity. MPDD remains weaker on versioning and archival stability because its
+  official data distribution is a personal VUT SharePoint share with no DOI or
+  published checksum. Competition-gated (Severstal) and single-repository (Magnetic
+  Tile) candidates continue to carry availability risk.
 - **Scientific evidence.** Real data is required for a real-world claim (excluding
   synthetic DAGM as a primary basis), and strong published benchmark numbers cannot be
   imported as Kalibra evidence — they inform expectations, not claims.
 
 The comparison shows a field where **no candidate is both governance-complete on
-verified facts and a match for Kalibra's domain.** With licensing now resolved for
-MPDD (and compatible for MVTec/Kolektor), the crux for the closest domain match has
-narrowed to non-licensing governance evidence — but it is not yet closed.
+verified facts and a match for Kalibra's domain.** VisA's licensing evidence has
+materially improved and is now the strongest verified licensing position. MPDD's
+evidence has also materially improved and remains the closest scientific/domain match.
+Neither is governance-complete: VisA is held by non-license governance gaps and domain
+distance, while MPDD is held by versioning, integrity, archival availability, and
+source-level documentation gaps.
 
 ---
 
@@ -400,22 +440,27 @@ selected.
   documentation of composition and annotation. The Dataset Strategy requires
   versioning, integrity verification, and long-term availability, none of which is yet
   established for MPDD.
-- **Licensing is settled for the non-commercial candidates, but domain match is not.**
-  MVTec AD/AD 2 and KSDD/KSDD2 are compatible under the non-commercial posture, but are
-  domain-distant proxies (and MVTec AD is saturated); selecting a domain-distant
-  benchmark over the closest domain match while MPDD's remaining gaps are resolvable
-  would be premature.
-- **The other candidates remain licensing-blocked.** VisA (contradictory), BTAD/DAGM/
-  NEU (unconfirmed), Magnetic Tile (absent), and Severstal (competition-gated) still
-  lack a verified, compatible license.
+- **The strongest verified licensing position is not yet governance-complete.** VisA
+  is now verified CC BY 4.0 for the dataset and Apache-2.0 for repository utility
+  code; official sources agree, and licensing no longer blocks it. But VisA still
+  lacks a formal dataset version/DOI/release tag, a published strong checksum, complete
+  annotation-process documentation, and an archival preservation guarantee, and it is a
+  domain proxy rather than a metal-component match.
+- **Other mature-license candidates remain domain-distant proxies.** MVTec AD/AD 2
+  and KSDD/KSDD2 are compatible under the non-commercial posture and have clear source
+  records, but they are not closer to Kalibra's target parts than MPDD; selecting one
+  only because its governance is tidier would still import a domain-shift caveat.
+- **Some candidates still have unresolved terms.** BTAD/DAGM/NEU remain unconfirmed,
+  Magnetic Tile remains absent-license, and Severstal remains competition-gated.
 - **Scientific conservatism forbids selecting on convenience.** Selecting before the
   closest match is governance-complete — or defaulting to a saturated benchmark to make
   progress — would import exactly the risks the governance sequence exists to prevent.
 
 Deferral is not inaction: it is the correct, evidence-respecting outcome given that no
 candidate is yet **governance-complete** on verified facts. The resolution of MPDD's
-license and the project's posture narrows the gap without closing it. The path from
-deferral to selection is defined in §9 and §11.
+license, the project's posture, and VisA's earlier licensing uncertainty all narrow
+the gap without closing it. The path from deferral to selection is defined in §9 and
+§11.
 
 ---
 
@@ -431,13 +476,19 @@ deferral to selection is defined in §9 and §11.
 - **MPDD licensing (resolved).** Licensing type is **no longer an unresolved issue for
   MPDD**: it is verified CC BY-NC-SA 4.0 and compatible with the recorded
   non-commercial posture. This is recorded as fact, not as a selection.
+- **VisA licensing (resolved).** Licensing type is **no longer an unresolved issue for
+  VisA**: official sources verify CC BY 4.0 for the dataset and Apache-2.0 for the
+  repository utility code. The previous CC BY-NC-SA statement is recorded as a
+  secondary-source error, not a continuing conflict.
 - **Governance evidence (still incomplete).** MPDD's remaining governance evidence —
   versioning/DOI, integrity hashes, archival availability, and source-level
-  composition/annotation documentation — is **not** yet established, so no candidate is
-  governance-complete.
+  composition/annotation documentation — is **not** yet established. VisA's remaining
+  governance evidence — formal versioning/DOI/release, a published strong checksum,
+  complete annotation-process documentation, and archival preservation guarantee — is
+  also **not** yet established. No candidate is governance-complete.
 - **Net effect on this ADR.** Because governance evidence remains incomplete, the
-  **Dataset Selection ADR remains deferred**; the MPDD findings advance the record but
-  do not change the decision.
+  **Dataset Selection ADR remains deferred**; the MPDD and VisA findings advance the
+  record but do not change the decision.
 - **Framework choice.** Unchanged. The Framework ADR remains in "defer selection"
   status; framework fit still cannot be finalized without an approved dataset, so
   deferral here keeps the runtime decision correctly open.
@@ -455,13 +506,13 @@ deferral to selection is defined in §9 and §11.
 - **Benchmark bias.** Selecting a saturated benchmark (e.g. MVTec AD) later could
   produce numbers that reflect community tuning rather than capability; any future
   selection must carry this caveat.
-- **Licensing uncertainty.** Reduced but not eliminated. It is **resolved** for MPDD
-  (verified CC BY-NC-SA 4.0), MVTec, and Kolektor, all compatible with the recorded
-  non-commercial posture; it **remains** for VisA, BTAD, DAGM, NEU, Magnetic Tile, and
-  Severstal, where proceeding on an unverified or contradictory license would breach
-  the Dataset Strategy. ShareAlike/attribution obligations persist, and any future
-  shift to a commercial posture would re-open admissibility for the non-commercial
-  datasets.
+- **Licensing uncertainty.** Reduced but not eliminated. It is **resolved** for VisA
+  (verified dataset CC BY 4.0; utility code Apache-2.0), MPDD (verified CC BY-NC-SA
+  4.0), MVTec, and Kolektor. MPDD, MVTec, and Kolektor remain admissible only under
+  the recorded non-commercial posture; any future shift to a commercial posture would
+  re-open their admissibility. Licensing uncertainty **remains** for BTAD, DAGM, NEU,
+  Magnetic Tile, and Severstal, where proceeding on an unverified, absent, or
+  competition-gated term would breach the Dataset Strategy.
 - **Domain mismatch.** Every verified-license candidate is a proxy for, not a match to,
   Kalibra's cast-aluminium/machining target; any first selection inherits a
   domain-shift caveat that must be disclosed and must bound the claims.
@@ -481,12 +532,15 @@ This ADR (recording the **deferral**) is considered approved when:
 - The repository owner approves the deferral decision and its reasoning.
 - The decision status and the per-candidate assessments are recorded in the project
   record.
-- The now-resolved items are recorded: the **project's non-commercial posture** and
-  **MPDD's verified CC BY-NC-SA 4.0 license**.
+- The now-resolved items are recorded: the **project's non-commercial posture**,
+  **MPDD's verified CC BY-NC-SA 4.0 license**, and **VisA's verified CC BY 4.0 dataset
+  license / Apache-2.0 repository utility-code license**.
 - The open items blocking selection — MPDD's **non-licensing governance evidence**
   (versioning/DOI, integrity hashes, archival availability, composition/annotation
-  documentation) and the **licensing confirmations** for VisA, BTAD, Magnetic Tile,
-  DAGM, NEU, and Severstal — are acknowledged as prerequisites to any future selection.
+  documentation), VisA's **non-licensing governance evidence** (formal versioning/DOI
+  or release, strong checksum, annotation-process documentation, archival preservation
+  guarantee), and the **licensing confirmations** for BTAD, Magnetic Tile, DAGM, NEU,
+  and Severstal — are acknowledged as prerequisites to any future selection.
 
 For a **future selection** to be recorded (via a superseding ADR), all of the
 following must hold for the chosen candidate: verified provenance; a verified,
@@ -500,28 +554,23 @@ before any framework-backed work begins.
 
 ## 10. Future Review
 
-This ADR should be revisited when any of the following occurs:
+This revision records two material improvements: **VisA governance evidence has
+materially improved** through verified licensing and AWS-hosted provenance evidence,
+and **MPDD governance evidence has materially improved** through verified licensing
+and a completed versioning/archival investigation. Neither improvement completes the
+Dataset Strategy gate.
 
-- **MPDD governance maturation.** MPDD's outstanding non-licensing evidence is
-  established — an official version identifier/DOI, integrity hashes, archival
-  availability, and source-level composition/annotation documentation — at which point
-  the closest domain match could become governance-complete. *(This is the nearest
-  path to a future selection.)*
-- **Licensing clarification (others).** A gating license is confirmed at source for a
-  currently licensing-blocked candidate — e.g. **VisA** (contradiction resolved to a
-  compatible term).
-- **Commercial-posture change.** The project posture changes from the recorded
-  non-commercial (research/portfolio) to commercial or bounded, which would re-open
-  admissibility of the non-commercial datasets (MPDD, MVTec, Kolektor) and require
-  re-evaluation.
-- **New industrial datasets.** A newly published dataset materially closes the domain
-  gap (cast aluminium, CNC machining, multi-camera) with clear terms.
-- **Industrial partner data.** Governed partner data becomes available for Kalibra's
-  actual domain.
-- **Kalibra-owned datasets.** Kalibra assembles its own versioned, governed data,
-  enabling direct-domain claims.
-- **ML Phase 3.** A later phase revises scope in a way that changes dataset
-  requirements.
+This ADR should be revisited only when one of the following occurs:
+
+- **MPDD governance blockers are resolved.** MPDD's outstanding non-licensing evidence
+  is established — an official version identifier/DOI or equivalent fixed release,
+  integrity hashes, archival availability, and source-level composition/annotation
+  documentation — at which point the closest domain match could be reassessed against
+  the Dataset Strategy gate.
+- **A candidate materially exceeds both current anchors.** A new public, partner, or
+  Kalibra-owned candidate provides verified governance evidence that materially exceeds
+  VisA's licensing/hosting maturity **and** scientific/domain relevance that materially
+  exceeds MPDD's present domain fit.
 
 Any such event triggers a superseding ADR version; this v1.0 deferral remains the
 record until then.
@@ -537,21 +586,26 @@ DEFER DATASET SELECTION.
 The evidence is insufficient to select a first dataset: **no candidate is yet
 governance-complete on verified facts** — the closest domain match (MPDD) now has a
 verified, compatible license but still lacks versioning, integrity verification,
-archival availability, and source-level documentation. The project's commercial
-posture is now **recorded (non-commercial)**, resolving that open question without, by
-itself, completing any candidate's governance.
+archival availability, and source-level documentation; the strongest verified
+licensing candidate (VisA) now has a permissive, official CC BY 4.0 dataset license
+but still lacks complete non-license governance evidence and remains domain-distant.
+The project's commercial posture is now **recorded (non-commercial)**, resolving that
+open question without, by itself, completing any candidate's governance.
 
 **Why no competing candidate was selected:**
 
 - **MPDD** — closest domain match; license now **verified CC BY-NC-SA 4.0** and
   compatible with the non-commercial posture, but held by non-licensing governance gaps
   (versioning/DOI, integrity hashes, archival availability, composition/annotation
-  documentation). *Deferred (priority candidate to mature).*
+  documentation). *Deferred.*
+- **VisA** — strongest verified licensing position (**CC BY 4.0** dataset;
+  **Apache-2.0** repository utility code) and canonical AWS Open Data/S3 distribution,
+  but governance remains incomplete on formal versioning/DOI or release, published
+  strong checksum, annotation-process documentation, and archival preservation; also a
+  proxy rather than Kalibra's metal-component domain. *Deferred.*
 - **MVTec AD, MVTec AD 2, KolektorSDD, KolektorSDD2** — verified **non-commercial**
   licenses, now compatible with the recorded posture; domain-distant proxies and (for
   MVTec AD) saturated, so not the closest match for a first selection. *Deferred.*
-- **VisA** — **contradictory** license across sources; cannot select on an unverified
-  term. *Deferred.*
 - **BTAD** — license/provenance at observation level, unverified; small. *Deferred.*
 - **Magnetic Tile** — **no license located**. *Deferred (→ Rejected if none exists).*
 - **Severstal** — **competition-rule licensing** conflicts with redistribution and
