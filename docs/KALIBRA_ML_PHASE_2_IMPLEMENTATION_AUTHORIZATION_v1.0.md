@@ -23,30 +23,31 @@ and
 **Current authorization status.**
 
 ```text
-AUTHORIZED WITH RESTRICTIONS — Sprint 1E only.
+AUTHORIZED WITH RESTRICTIONS — Sprint 1F only.
 
 Full ML Phase 2 implementation remains DEFERRED.
-Only the deterministic Model Loader slice (Sprint 1E) is authorized.
+Only the Loader Hardening + Provider Loader Wiring slice (Sprint 1F) is authorized.
 ONNX Runtime selected as first runtime candidate (Framework ADR).
-Model loading is authorized only for governed artifacts through a provider-private loader.
-Provider-private ONNX Runtime InferenceSession construction is authorized only inside the loader.
-No inference authorized.
-No provider behavior changes authorized.
+Loader hardening is authorized so session creation cannot bypass the model-content hash gate.
+Wiring the ONNX provider to the provider-private validated loader/session path is authorized.
+Inference is authorized only inside the existing Sprint 1C ONNX provider boundary, terminating at InspectionPrediction.
+No new prediction semantics. No provider contract changes beyond consuming the loader.
 No dataset approved. Dataset Selection ADR remains deferred.
 No evaluation protocol fixed.
-No work outside the Sprint 1E deterministic model loader slice is authorized.
+No work outside the Sprint 1F loader-hardening and provider-wiring slice is authorized.
 ```
 
-This revision (recorded under §13 and detailed in **Addendum E**) grants a single,
-narrowly bounded restricted authorization for deterministic Model Loader work
-(Sprint 1E) and nothing else. The **full** ML Phase 2 authorization remains
-**Deferred**: the §3 preconditions for general provider-and-inference work are not
-all met, and that status **must not** change to "Authorized" except by the repository
-owner and only when the conditions in §12 are met. The Sprint 1E restriction is
-defined, scoped, and bounded in **Addendum E**. The prior Sprint 1B (Addendum A),
-Sprint 1C (Addendum B), and Sprint 1D (Addendum C) grants are preserved as records
-of earlier restricted substrate, provider-boundary, and governed-artifact
-authorizations. Work outside the active Sprint 1E slice remains unauthorized.
+This revision (recorded under §13 and detailed in **Addendum F**) grants a single,
+narrowly bounded restricted authorization for Loader Hardening + Provider Loader
+Wiring work (Sprint 1F) and nothing else. The **full** ML Phase 2 authorization
+remains **Deferred**: the §3 preconditions for general provider-and-inference work
+are not all met, and that status **must not** change to "Authorized" except by the
+repository owner and only when the conditions in §12 are met. The Sprint 1F
+restriction is defined, scoped, and bounded in **Addendum F**. The prior Sprint 1B
+(Addendum A), Sprint 1C (Addendum B), Sprint 1D (Addendum C), and Sprint 1E
+(Addendum E) grants are preserved as records of earlier restricted substrate,
+provider-boundary, governed-artifact, and model-loader authorizations. Work outside
+the active Sprint 1F slice remains unauthorized.
 
 ---
 
@@ -68,7 +69,7 @@ are met, recorded, and signed off by the repository owner (§10, §11). Absent t
 the standing status of the full authorization is Deferred (§11). It grants no
 authority to select a framework or make any scientific, benchmark, or product claim;
 the sole active implementation authority it currently grants is the restricted Sprint
-1E slice recorded in Addendum E, and, beyond that, at most the conditional
+1F slice recorded in Addendum F, and, beyond that, at most the conditional
 permission to begin implementation under the constraints of §8 once every gate is
 green.
 
@@ -315,9 +316,9 @@ The following checklist is suitable for repository-owner sign-off. **Full** ML P
 authorization requires every item checked; any unchecked item leaves the full
 authorization at Deferred. The checklist distinguishes the full authorization (still
 incomplete) from the restricted slice authorizations: Sprint 1B (Addendum A),
-Sprint 1C (Addendum B), Sprint 1D (Addendum C), and the active Sprint 1E Model
-Loader slice (Addendum E), which is allowed only while every Sprint 1E restriction
-is met.
+Sprint 1C (Addendum B), Sprint 1D (Addendum C), Sprint 1E (Addendum E), and the
+active Sprint 1F Loader Hardening + Provider Loader Wiring slice (Addendum F), which
+is allowed only while every Sprint 1F restriction is met.
 
 **Full ML Phase 2 authorization — status: INCOMPLETE.**
 
@@ -450,10 +451,48 @@ Sprint 1E — Model Loader (Addendum E)
 [x] No inspection logic, provider behavior change, prediction change, Trust,
     Review, Evidence, Evaluation, dataset, benchmark, performance measurement,
     CLI, UI, scientific-claim, or product-claim path implied
-[ ] Sprint 1E validation evidence recorded on completion (Addendum E §E.7)
+[x] Sprint 1E validation evidence recorded on completion (Addendum E §E.7)
+```
+
+Sprint 1E validation evidence, recorded on completion:
+
+```text
+tests/test_model_loader.py: 13 passed
+tests/test_model_artifact.py: 32 passed
+tests/test_onnx_provider.py: 12 passed, 1 skipped
+tests/test_provider_conformance.py: 9 passed
+full suite: 426 passed, 1 skipped
+compileall: passed
+git diff --check: passed
 ```
 
 An unchecked or breached Sprint 1E item voids only the Sprint 1E grant; it does not
+and cannot advance the full authorization, which remains governed by §3–§9 and §12.
+
+**Sprint 1F restricted authorization (Addendum F) — status: ALLOWED under
+restrictions.**
+
+```text
+Sprint 1F — Loader Hardening + Provider Loader Wiring (Addendum F)
+[x] Framework ADR approved and updated: ONNX Runtime selected as first
+    runtime candidate
+[x] Provider conformance and deterministic-replay harness in place
+[x] ONNX Runtime discovery substrate in place, isolated, absence-safe
+[x] ONNX Session Substrate in place for deterministic configuration values
+[x] ONNX-backed provider boundary proof in place (Sprint 1C, Addendum B)
+[x] Governed Model Artifact value objects in place (Sprint 1D, Addendum C)
+[x] Deterministic provider-private Model Loader in place (Sprint 1E, Addendum E)
+[x] Sprint 1F scope bounded to loader hardening (no session creation may bypass
+    the model-content hash gate) and provider-private loader/session wiring into
+    the existing ONNX provider, with output remaining exactly InspectionPrediction
+[x] Architecture contracts reaffirmed unchanged (Addendum F §F.4)
+[x] No new prediction semantics, RawInspectionResult construction, Trust, Review,
+    Evidence, Evaluation, dataset, benchmark, performance-measurement, CLI, UI,
+    scientific-claim, or product-claim path implied
+[ ] Sprint 1F validation evidence recorded on completion (Addendum F §F.7)
+```
+
+An unchecked or breached Sprint 1F item voids only the Sprint 1F grant; it does not
 and cannot advance the full authorization, which remains governed by §3–§9 and §12.
 
 ---
@@ -483,17 +522,17 @@ implementation to begin, and neither may be recorded except by the repository ow
 **Recorded outcome for this revision.**
 
 ```text
-AUTHORIZED WITH RESTRICTIONS — Sprint 1E only (Addendum E).
+AUTHORIZED WITH RESTRICTIONS — Sprint 1F only (Addendum F).
 Full ML Phase 2 implementation remains DEFERRED.
 ```
 
-The active restriction is the entirety of Addendum E: only the deterministic Model
-Loader slice defined there is permitted, and all work outside that slice remains
-unauthorized. The Sprint 1B substrate grant (Addendum A), Sprint 1C provider-boundary
-proof (Addendum B), and Sprint 1D governed-artifact grant (Addendum C) remain
-recorded as prior restricted authorizations. The unmet items for the full
-authorization remain the dataset gate (§5), the evaluation gate (§6), and full owner
-sign-off (§10, §12).
+The active restriction is the entirety of Addendum F: only the Loader Hardening +
+Provider Loader Wiring slice defined there is permitted, and all work outside that
+slice remains unauthorized. The Sprint 1B substrate grant (Addendum A), Sprint 1C
+provider-boundary proof (Addendum B), Sprint 1D governed-artifact grant (Addendum C),
+and Sprint 1E model-loader grant (Addendum E) remain recorded as prior restricted
+authorizations. The unmet items for the full authorization remain the dataset gate
+(§5), the evaluation gate (§6), and full owner sign-off (§10, §12).
 
 ---
 
@@ -550,20 +589,22 @@ chooses no dataset, picks no metric, and expresses no preference; it fixes the
 objective conditions under which implementation may begin. The full ML Phase 2
 authorization remains Deferred until those conditions are met and signed off by the
 repository owner. The only active implementation permission this revision grants is
-the restricted Sprint 1E slice recorded in Addendum E.
+the restricted Sprint 1F slice recorded in Addendum F.
 
 ```text
-Sprint 1E may proceed under restriction.
+Sprint 1F may proceed under restriction.
 Full ML Phase 2 implementation remains blocked.
 ```
 
-Model loading is now authorized. Inference remains unauthorized.
+Loader hardening and provider-private loader wiring are now authorized. Inference is
+authorized only inside the existing Sprint 1C ONNX provider boundary; dataset,
+evaluation, product, and scientific work remain unauthorized.
 
 Three principles are affirmed and binding:
 
 - **ML Phase 2 implementation remains blocked until the full authorization is
   granted.** Framework-backed provider work is permitted only inside the constraints
-  of an Authorized or restricted grant. The Sprint 1E grant (Addendum E) is such a
+  of an Authorized or restricted grant. The Sprint 1F grant (Addendum F) is such a
   restricted grant and extends to nothing beyond its recorded scope; all other ML
   Phase 2 implementation remains blocked while the full status is Deferred.
 - **Architecture governance remains authoritative over implementation convenience.**
@@ -1039,11 +1080,12 @@ Full ML Phase 2 implementation remains blocked.
 
 ## Addendum E — Sprint 1E Restricted Authorization (Model Loader)
 
-This addendum records the active restricted authorization granted under §11
-("Authorized with restrictions"). It authorizes exactly one bounded engineering
+This addendum records the Sprint 1E restricted authorization granted under §11
+("Authorized with restrictions"). It authorized exactly one bounded engineering
 slice and nothing else. It is a deterministic, provider-private Model Loader slice,
 not an inference authorization, not a provider behavior-change authorization, and not
-a general ML Phase 2 authorization.
+a general ML Phase 2 authorization. It is preserved as the record of the deterministic
+Model Loader; the active next restricted grant is Sprint 1F in Addendum F.
 
 ### E.1 Authorized Slice
 
@@ -1215,3 +1257,185 @@ Full ML Phase 2 implementation remains blocked.
 ```
 
 Model loading is now authorized. Inference remains unauthorized.
+
+## Addendum F — Sprint 1F Restricted Authorization (Loader Hardening + Provider Loader Wiring)
+
+This addendum records the active restricted authorization granted under §11
+("Authorized with restrictions"). It authorizes exactly one bounded engineering
+slice and nothing else. It hardens the deterministic Model Loader and wires it into
+the existing Sprint 1C ONNX provider; it is not a new-prediction-semantics
+authorization, not a dataset or evaluation authorization, and not a general ML
+Phase 2 authorization.
+
+### F.1 Authorized Slice
+
+```text
+Sprint 1F — Loader Hardening + Provider Loader Wiring
+```
+
+Sprint 1F is loader-hardening and provider-wiring work only: closing the trusted
+surface so that no `InferenceSession` can be created without the model-content hash
+gate, and wiring the ONNX-backed `InspectionInferenceProvider` (Sprint 1C) to obtain
+its session through the provider-private validated loader path (Sprint 1E). Provider
+output remains exactly `InspectionPrediction`.
+
+### F.2 Permitted Scope
+
+Sprint 1F work **may** include, and only include:
+
+- hardening `create_inference_session(...)` so it cannot bypass the model-content
+  hash gate;
+- ensuring `InferenceSession` creation always follows verified model validation;
+- replacing any direct provider session construction with the deterministic loader
+  path, if applicable;
+- wiring the ONNX provider to consume the provider-private validated loader/session
+  path;
+- preserving provider output as exactly `InspectionPrediction`;
+- deterministic replay and provider conformance tests;
+- tests proving that:
+  - a model-content hash mismatch blocks session creation;
+  - a manually forged `ValidatedModelLoad` cannot bypass verification;
+  - provider behavior remains deterministic;
+  - no ONNX Runtime, runtime, session, tensor, or model object escapes the provider.
+
+Sprint 1F may execute inference **only** inside the existing Sprint 1C ONNX provider
+boundary, and only where required to preserve the already-authorized Sprint 1C
+provider behavior. It introduces **no new prediction semantics**, no dataset-driven
+inference, and no production model lifecycle.
+
+### F.3 Forbidden Scope
+
+Sprint 1F work **must not** include:
+
+- provider construction of `RawInspectionResult`;
+- Trust Qualification Engine changes;
+- Human Review Engine changes;
+- Evidence Engine changes;
+- Evaluation Engine changes;
+- dataset ingestion;
+- dataset selection;
+- benchmark execution;
+- performance measurement;
+- CLI integration;
+- UI integration;
+- scientific claims;
+- product claims;
+- new prediction semantics;
+- dataset-driven inference;
+- production model lifecycle work.
+
+Any of these voids the Sprint 1F grant for the affected work (§8, §9) and remains
+unauthorized until explicitly approved by a later restricted grant or full
+authorization under §12. Inference outside the existing Sprint 1C provider boundary,
+or any change to what crosses that boundary, is not authorized.
+
+### F.4 Architecture Constraints (Unchanged and Binding)
+
+All existing ownership remains binding exactly as fixed by §7–§9:
+
+```text
+ONNX Runtime / Loader
+    ↓
+Provider-private InferenceSession
+    ↓
+OnnxInspectionInferenceProvider
+    ↓
+InspectionPrediction
+    ↓
+InspectionEngine.transform_prediction(...)
+    ↓
+RawInspectionResult
+    ↓
+Trust
+    ↓
+Review
+    ↓
+Evidence
+    ↓
+Evaluation
+```
+
+Only `InspectionPrediction` may cross the provider boundary. The hardened loader and
+its `InferenceSession` remain provider-private; no session object, runtime object,
+tensor, execution-provider object, model object, or intermediate output may cross any
+provider or domain boundary. Sprint 1F must not modify `InspectionPrediction`,
+`InspectionEngine.transform_prediction(...)`, `RawInspectionResult`, or any Trust,
+Review, Evidence, Evaluation, integration, CLI, UI, or prototype contract. The
+provider's public contract is unchanged except that it now obtains its session
+through the validated loader path.
+
+### F.5 Framework Decision Linkage
+
+The Framework ADR
+([`KALIBRA_ML_PHASE_2_FRAMEWORK_ADR_v1.0.md`](KALIBRA_ML_PHASE_2_FRAMEWORK_ADR_v1.0.md))
+records **ONNX Runtime as the first selected runtime candidate**.
+
+- Sprint 1A introduced runtime discovery.
+- Sprint 1B introduced session configuration.
+- Sprint 1C introduced the provider boundary proof.
+- Sprint 1D introduced governed model artifacts.
+- Sprint 1E introduced deterministic model loading.
+- Sprint 1F hardens that loader and wires it into the Sprint 1C provider.
+
+No new inference capability beyond the existing Sprint 1C provider boundary is
+authorized. Sprint 1F may not select a dataset, produce evaluation evidence, report
+runtime performance, or create a scientific or product claim.
+
+### F.6 Dataset and Evaluation Status
+
+Recorded as of this revision:
+
+- **No dataset is selected.** The Dataset Selection ADR remains **DEFER DATASET
+  SELECTION**.
+- Loader hardening and provider wiring are engineering substrate only. A wired,
+  loaded model is not a selected production model, not a dataset artifact, not
+  evaluation evidence, and not a basis for any inspection-quality claim.
+- **No evaluation protocol is fixed.** Metrics, statistical procedure, and benchmark
+  policy application remain deferred under the Evaluation Strategy.
+
+Therefore Sprint 1F **may not produce scientific claims** of any kind. Its outputs
+are engineering-tier only under the three-tier claim policy: hardened session
+creation, hash-gate enforcement, provider-private wiring, deterministic replay, and
+provider conformance — never inference quality, accuracy, performance, benchmark,
+calibration, or product claims.
+
+### F.7 Required Validation for Sprint 1F
+
+Any Sprint 1F implementation must pass, and record the output of:
+
+```bash
+python3 -m pytest tests/test_model_loader.py -q
+python3 -m pytest tests/test_onnx_provider.py -q
+python3 -m pytest tests/test_provider_conformance.py -q
+python3 -m pytest tests/test_model_artifact.py -q
+python3 -m pytest -q
+python3 -m compileall -q src tests scripts
+git diff --check
+git status --short
+```
+
+It must additionally record checks proving:
+
+- no forged validation object can create a session without content-hash
+  verification;
+- no provider path bypasses loader validation;
+- a model-content hash mismatch blocks session creation;
+- provider output remains exactly `InspectionPrediction`;
+- no runtime, session, tensor, or model object crosses the provider boundary;
+- no downstream domain package changed (`src/trust/`, `src/review/`,
+  `src/evidence/`, `src/evaluation/`, `src/integration/`, `src/prototype_ui/`);
+- no CLI, UI, or integration path changed;
+- no dataset ingestion, dataset selection, benchmark, performance-measurement,
+  production model lifecycle, scientific-claim, or product-claim path was added;
+- no new prediction semantics were introduced.
+
+### F.8 Standing Recommendation
+
+```text
+Sprint 1F may proceed under restriction.
+Full ML Phase 2 implementation remains blocked.
+```
+
+Loader hardening and provider-private loader wiring are now authorized. Inference is
+authorized only inside the existing Sprint 1C ONNX provider boundary; dataset,
+evaluation, product, and scientific work remains unauthorized.
