@@ -23,28 +23,30 @@ and
 **Current authorization status.**
 
 ```text
-AUTHORIZED WITH RESTRICTIONS — Sprint 1D only.
+AUTHORIZED WITH RESTRICTIONS — Sprint 1E only.
 
-General ML Phase 2 implementation remains BLOCKED.
-Only the Governed Model Artifact value-object slice (Sprint 1D) is authorized.
+Full ML Phase 2 implementation remains DEFERRED.
+Only the deterministic Model Loader slice (Sprint 1E) is authorized.
 ONNX Runtime selected as first runtime candidate (Framework ADR).
-No model loading, ONNX session creation, or inference authorized.
+Model loading is authorized only for governed artifacts through a provider-private loader.
+Provider-private ONNX Runtime InferenceSession construction is authorized only inside the loader.
+No inference authorized.
 No provider behavior changes authorized.
 No dataset approved. Dataset Selection ADR remains deferred.
 No evaluation protocol fixed.
-No work outside the Sprint 1D governed model artifact slice is authorized.
+No work outside the Sprint 1E deterministic model loader slice is authorized.
 ```
 
-This revision (recorded under §13 and detailed in **Addendum C**) grants a single,
-narrowly bounded restricted authorization for the Governed Model Artifact
-value-object slice (Sprint 1D) and nothing else. The **full**
-ML Phase 2 authorization remains **Deferred**: the §3 preconditions for general
-provider-and-inference work are not all met, and that status **must not** change to
-"Authorized" except by the repository owner and only when the conditions in §12 are
-met. The Sprint 1D restriction is defined, scoped, and bounded in **Addendum C**;
-the prior Sprint 1B (Addendum A) and Sprint 1C (Addendum B) grants are preserved as
-records of earlier restricted substrate and provider-boundary authorizations. Work
-outside the active Sprint 1D slice remains unauthorized.
+This revision (recorded under §13 and detailed in **Addendum E**) grants a single,
+narrowly bounded restricted authorization for deterministic Model Loader work
+(Sprint 1E) and nothing else. The **full** ML Phase 2 authorization remains
+**Deferred**: the §3 preconditions for general provider-and-inference work are not
+all met, and that status **must not** change to "Authorized" except by the repository
+owner and only when the conditions in §12 are met. The Sprint 1E restriction is
+defined, scoped, and bounded in **Addendum E**. The prior Sprint 1B (Addendum A),
+Sprint 1C (Addendum B), and Sprint 1D (Addendum C) grants are preserved as records
+of earlier restricted substrate, provider-boundary, and governed-artifact
+authorizations. Work outside the active Sprint 1E slice remains unauthorized.
 
 ---
 
@@ -66,7 +68,7 @@ are met, recorded, and signed off by the repository owner (§10, §11). Absent t
 the standing status of the full authorization is Deferred (§11). It grants no
 authority to select a framework or make any scientific, benchmark, or product claim;
 the sole active implementation authority it currently grants is the restricted Sprint
-1D slice recorded in Addendum C, and, beyond that, at most the conditional
+1E slice recorded in Addendum E, and, beyond that, at most the conditional
 permission to begin implementation under the constraints of §8 once every gate is
 green.
 
@@ -313,8 +315,9 @@ The following checklist is suitable for repository-owner sign-off. **Full** ML P
 authorization requires every item checked; any unchecked item leaves the full
 authorization at Deferred. The checklist distinguishes the full authorization (still
 incomplete) from the restricted slice authorizations: Sprint 1B (Addendum A),
-Sprint 1C (Addendum B), and the active Sprint 1D governed model artifact slice
-(Addendum C), which is allowed only while every Sprint 1D restriction is met.
+Sprint 1C (Addendum B), Sprint 1D (Addendum C), and the active Sprint 1E Model
+Loader slice (Addendum E), which is allowed only while every Sprint 1E restriction
+is met.
 
 **Full ML Phase 2 authorization — status: INCOMPLETE.**
 
@@ -427,6 +430,32 @@ Sprint 1D — Governed Model Artifact (Addendum C)
 An unchecked or breached Sprint 1D item voids only the Sprint 1D grant; it does not
 and cannot advance the full authorization, which remains governed by §3–§9 and §12.
 
+**Sprint 1E restricted authorization (Addendum E) — status: ALLOWED under
+restrictions.**
+
+```text
+Sprint 1E — Model Loader (Addendum E)
+[x] Framework ADR approved and updated: ONNX Runtime selected as first
+    runtime candidate
+[x] Provider conformance and deterministic-replay harness in place
+[x] ONNX Runtime discovery substrate in place, isolated, absence-safe
+[x] ONNX Session Substrate in place for deterministic configuration values
+[x] ONNX-backed provider boundary proof in place (Sprint 1C, Addendum B)
+[x] Governed Model Artifact value objects in place (Sprint 1D, Addendum C)
+[x] Sprint 1E scope bounded to deterministic provider-private model loading:
+    governed artifact loading, identity/version/fingerprint/compatibility
+    validation, provider-private InferenceSession construction, deterministic
+    loader errors, and loader tests — no inference
+[x] Architecture contracts reaffirmed unchanged (Addendum E §E.4)
+[x] No inspection logic, provider behavior change, prediction change, Trust,
+    Review, Evidence, Evaluation, dataset, benchmark, performance measurement,
+    CLI, UI, scientific-claim, or product-claim path implied
+[ ] Sprint 1E validation evidence recorded on completion (Addendum E §E.7)
+```
+
+An unchecked or breached Sprint 1E item voids only the Sprint 1E grant; it does not
+and cannot advance the full authorization, which remains governed by §3–§9 and §12.
+
 ---
 
 ## 11. Approval Decision
@@ -454,16 +483,17 @@ implementation to begin, and neither may be recorded except by the repository ow
 **Recorded outcome for this revision.**
 
 ```text
-AUTHORIZED WITH RESTRICTIONS — Sprint 1D only (Addendum C).
-Full ML Phase 2 authorization: DEFERRED (unchanged).
+AUTHORIZED WITH RESTRICTIONS — Sprint 1E only (Addendum E).
+Full ML Phase 2 implementation remains DEFERRED.
 ```
 
-The active restriction is the entirety of Addendum C: only the Governed Model
-Artifact value-object slice defined there is permitted, and all work outside that
-slice remains unauthorized. The Sprint 1B substrate grant (Addendum A) and the
-Sprint 1C provider-boundary proof (Addendum B) remain recorded as prior restricted
-authorizations. The unmet items for the full authorization remain the dataset gate
-(§5), the evaluation gate (§6), and full owner sign-off (§10, §12).
+The active restriction is the entirety of Addendum E: only the deterministic Model
+Loader slice defined there is permitted, and all work outside that slice remains
+unauthorized. The Sprint 1B substrate grant (Addendum A), Sprint 1C provider-boundary
+proof (Addendum B), and Sprint 1D governed-artifact grant (Addendum C) remain
+recorded as prior restricted authorizations. The unmet items for the full
+authorization remain the dataset gate (§5), the evaluation gate (§6), and full owner
+sign-off (§10, §12).
 
 ---
 
@@ -520,18 +550,20 @@ chooses no dataset, picks no metric, and expresses no preference; it fixes the
 objective conditions under which implementation may begin. The full ML Phase 2
 authorization remains Deferred until those conditions are met and signed off by the
 repository owner. The only active implementation permission this revision grants is
-the restricted Sprint 1D slice recorded in Addendum C.
+the restricted Sprint 1E slice recorded in Addendum E.
 
 ```text
-Sprint 1D may proceed under restriction.
+Sprint 1E may proceed under restriction.
 Full ML Phase 2 implementation remains blocked.
 ```
+
+Model loading is now authorized. Inference remains unauthorized.
 
 Three principles are affirmed and binding:
 
 - **ML Phase 2 implementation remains blocked until the full authorization is
   granted.** Framework-backed provider work is permitted only inside the constraints
-  of an Authorized or restricted grant. The Sprint 1D grant (Addendum C) is such a
+  of an Authorized or restricted grant. The Sprint 1E grant (Addendum E) is such a
   restricted grant and extends to nothing beyond its recorded scope; all other ML
   Phase 2 implementation remains blocked while the full status is Deferred.
 - **Architecture governance remains authoritative over implementation convenience.**
@@ -850,11 +882,12 @@ Full ML Phase 2 implementation remains blocked.
 
 ## Addendum C — Sprint 1D Restricted Authorization (Governed Model Artifact)
 
-This addendum records the active restricted authorization granted under §11
-("Authorized with restrictions"). It authorizes exactly one bounded engineering
-slice and nothing else. It is a governed model artifact **value-object** slice, not
-a model-loading, session, inference, or provider authorization, and not a general
-ML Phase 2 authorization.
+This addendum records the Sprint 1D restricted authorization granted under §11
+("Authorized with restrictions"). It authorized exactly one bounded engineering
+slice and nothing else. It is preserved as the historical record of the governed
+model artifact **value-object** slice; the active next restricted grant is Sprint
+1E in Addendum E. Sprint 1D was not a model-loading, session, inference, or provider
+authorization, and not a general ML Phase 2 authorization.
 
 ### C.1 Authorized Slice
 
@@ -1003,3 +1036,182 @@ It must additionally record checks proving:
 Sprint 1D may proceed under restriction.
 Full ML Phase 2 implementation remains blocked.
 ```
+
+## Addendum E — Sprint 1E Restricted Authorization (Model Loader)
+
+This addendum records the active restricted authorization granted under §11
+("Authorized with restrictions"). It authorizes exactly one bounded engineering
+slice and nothing else. It is a deterministic, provider-private Model Loader slice,
+not an inference authorization, not a provider behavior-change authorization, and not
+a general ML Phase 2 authorization.
+
+### E.1 Authorized Slice
+
+```text
+Sprint 1E — Model Loader
+```
+
+Sprint 1E is model-loading work only: deterministically loading a governed model
+artifact, validating that the artifact matches its recorded identity, version,
+fingerprint, and compatibility metadata, and constructing an ONNX Runtime
+`InferenceSession` that remains provider-private. The loader may load a model. It may
+not perform inference.
+
+### E.2 Permitted Scope
+
+Sprint 1E work **may** include, and only include:
+
+- deterministic model loading;
+- loading a governed model artifact;
+- validating model identity;
+- validating model version;
+- validating model fingerprint;
+- validating compatibility metadata;
+- constructing a provider-private `InferenceSession`;
+- deterministic loader error handling;
+- loader tests.
+
+The loader must remain provider-private. Its loaded session, runtime handles, model
+objects, tensors, execution-provider state, options, intermediate outputs, and errors
+must not become public domain contracts and must not appear in `InspectionPrediction`,
+`RawInspectionResult`, Trust, Review, Evidence, Evaluation, integration, CLI, UI, or
+prototype code. Tests may inspect loader behavior only to prove the provider-private
+boundary, deterministic loading, deterministic failure behavior, and absence of
+inference.
+
+### E.3 Forbidden Scope
+
+Sprint 1E work **must not** include:
+
+- inspection logic;
+- provider behavior changes;
+- prediction changes;
+- Trust Qualification Engine changes;
+- Human Review Engine changes;
+- Evidence Engine changes;
+- Evaluation Engine changes;
+- dataset ingestion;
+- benchmark execution;
+- performance measurement;
+- CLI integration;
+- UI integration;
+- scientific claims;
+- product claims;
+- inference.
+
+The loader may load a model. It may **not** perform inference. Any work that uses a
+loaded model or `InferenceSession` to compute outputs, produce predictions, alter
+provider behavior, wire a runtime surface into CLI/UI/integration, or imply inspection
+quality voids the Sprint 1E grant for the affected work (§8, §9) and remains
+unauthorized until explicitly approved by a later restricted grant or full
+authorization under §12.
+
+### E.4 Architecture Constraints (Unchanged and Binding)
+
+All existing ownership remains binding exactly as fixed by §7–§9:
+
+```text
+Provider-private Model Loader
+    ↓
+Provider-private InferenceSession
+    ↓
+No inference authorized; no session object crosses any boundary
+    ↓
+InspectionPrediction
+    ↓
+InspectionEngine.transform_prediction(...)
+    ↓
+RawInspectionResult
+    ↓
+Trust
+    ↓
+Review
+    ↓
+Evidence
+    ↓
+Evaluation
+```
+
+The loader exists entirely before `InspectionPrediction`. It may construct
+`InferenceSession`, but that session must remain provider-private. No session object,
+runtime object, tensor, execution-provider object, model object, or intermediate
+output may cross any provider or domain boundary. Sprint 1E must not modify
+`InspectionPrediction`, `InspectionInferenceProvider`,
+`InspectionEngine.transform_prediction(...)`, `RawInspectionResult`, or any Trust,
+Review, Evidence, Evaluation, integration, CLI, UI, or prototype contract.
+
+### E.5 Framework Decision Linkage
+
+The Framework ADR
+([`KALIBRA_ML_PHASE_2_FRAMEWORK_ADR_v1.0.md`](KALIBRA_ML_PHASE_2_FRAMEWORK_ADR_v1.0.md))
+records **ONNX Runtime as the first selected runtime candidate**.
+
+- Sprint 1A introduced runtime discovery.
+- Sprint 1B introduced session configuration.
+- Sprint 1C introduced provider boundary proof.
+- Sprint 1D introduced governed model artifacts.
+- Sprint 1E introduces deterministic model loading only.
+
+No inference is authorized. Sprint 1E may construct a provider-private
+`InferenceSession` only as the deterministic result of loading and validating a
+governed artifact. It may not execute the session, produce predictions, report
+runtime performance, or create a scientific or product claim.
+
+### E.6 Dataset and Evaluation Status
+
+Recorded as of this revision:
+
+- **No dataset is selected.** The Dataset Selection ADR remains **DEFER DATASET
+  SELECTION**.
+- Governed model loading is engineering substrate only. A loaded model is not a
+  selected production model, not a dataset artifact, not evaluation evidence, and not
+  a basis for any inspection-quality claim.
+- **No evaluation protocol is fixed.** Metrics, statistical procedure, and benchmark
+  policy application remain deferred under the Evaluation Strategy.
+
+Therefore Sprint 1E **may not produce scientific claims** of any kind. Its outputs
+are engineering-tier only under the three-tier claim policy: deterministic loading,
+metadata validation, fingerprint enforcement, compatibility enforcement, and
+provider-private session construction — never inference quality, accuracy,
+performance, benchmark, calibration, or product claims.
+
+### E.7 Required Validation for Sprint 1E
+
+Any Sprint 1E implementation must pass, and record the output of:
+
+```bash
+python3 -m pytest tests/test_model_loader.py -q
+python3 -m pytest tests/test_model_artifact.py -q
+python3 -m pytest tests/test_onnx_provider.py -q
+python3 -m pytest -q
+python3 -m compileall -q src tests scripts
+git diff --check
+git status --short
+```
+
+It must additionally record checks proving:
+
+- only governed artifacts may load;
+- fingerprint mismatch fails;
+- compatibility mismatch fails;
+- missing model fails;
+- invalid model fails;
+- no inference occurs;
+- no runtime object crosses provider boundary;
+- no inspection logic changed;
+- no downstream domain package changed (`src/trust/`, `src/review/`,
+  `src/evidence/`, `src/evaluation/`);
+- no integration, CLI, UI, or prototype wiring changed;
+- no provider behavior changed;
+- no dataset ingestion, evaluation, benchmark, performance measurement, production
+  model lifecycle, CLI, UI, prototype, scientific-claim, or product-claim path was
+  added.
+
+### E.8 Standing Recommendation
+
+```text
+Sprint 1E may proceed under restriction.
+Full ML Phase 2 implementation remains blocked.
+```
+
+Model loading is now authorized. Inference remains unauthorized.
