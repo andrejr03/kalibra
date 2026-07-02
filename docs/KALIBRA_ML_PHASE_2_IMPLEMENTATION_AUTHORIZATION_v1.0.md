@@ -23,15 +23,23 @@ and
 **Current authorization status.**
 
 ```text
-DEFERRED.
-No framework selected.
-No dataset approved.
+AUTHORIZED WITH RESTRICTIONS — Sprint 1B only.
+
+General ML Phase 2 implementation remains BLOCKED.
+Only the ONNX Session Substrate (Sprint 1B) is authorized.
+ONNX Runtime selected as first runtime candidate (Framework ADR).
+No dataset approved. Dataset Selection ADR remains deferred.
 No evaluation protocol fixed.
-No implementation authorized.
+No provider / inference / model-loading / dataset / evaluation work authorized.
 ```
 
-This status **must not** change to "Authorized" except by the repository owner and
-only when the conditions in §12 are met.
+This revision (recorded under §13 and detailed in **Addendum A**) grants a single,
+narrowly bounded restricted authorization for the ONNX Session Substrate slice and
+nothing else. The **full** ML Phase 2 authorization remains **Deferred**: the §3
+preconditions for provider-and-inference work are not all met, and that status
+**must not** change to "Authorized" except by the repository owner and only when the
+conditions in §12 are met. The Sprint 1B restriction is defined, scoped, and bounded
+in **Addendum A**; work outside it remains unauthorized.
 
 ---
 
@@ -50,9 +58,11 @@ Until they are, ML Phase 2 implementation remains blocked.
 
 The document authorizes implementation **only** when the objective conditions of §3–§9
 are met, recorded, and signed off by the repository owner (§10, §11). Absent that,
-its standing status is Deferred (§11). It grants no authority to write code, select a
-framework, or make any claim; it grants, at most, the conditional permission to begin
-implementation under the constraints of §8 once every gate is green.
+the standing status of the full authorization is Deferred (§11). It grants no
+authority to select a framework or make any claim; the sole implementation authority
+it currently grants is the restricted Sprint 1B slice recorded in Addendum A, and,
+beyond that, at most the conditional permission to begin implementation under the
+constraints of §8 once every gate is green.
 
 ---
 
@@ -89,8 +99,9 @@ repository state. Each item is already present and validated; none is re-opened 
   closed, with an explicit list of what remains unclaimed.
 - **Scientific Architecture Plan.** The ML Phase 2 scientific baseline (objectives,
   anomaly-detection-first scope, evidence obligations, roadmap).
-- **Framework ADR.** The proposed runtime-evaluation decision process, which selects
-  no framework and defers implementation.
+- **Framework ADR.** The runtime-evaluation decision process, updated to record
+  **ONNX Runtime as the first selected runtime candidate** while keeping provider
+  implementation deferred.
 - **Dataset Strategy.** The dataset evidence requirements (provenance, licensing,
   ownership, traceability, reproducibility, versioning, integrity verification,
   long-term availability, honest content and ground truth, leak-free frozen splits,
@@ -292,8 +303,13 @@ owner-approved change to the referenced governing document.
 
 ## 10. Authorization Checklist
 
-The following checklist is suitable for repository-owner sign-off. Authorization
-requires every item checked; any unchecked item leaves the status at Deferred.
+The following checklist is suitable for repository-owner sign-off. **Full** ML Phase 2
+authorization requires every item checked; any unchecked item leaves the full
+authorization at Deferred. The checklist distinguishes the full authorization (still
+incomplete) from the Sprint 1B restricted authorization (Addendum A), which is
+allowed only while every Sprint 1B restriction is met.
+
+**Full ML Phase 2 authorization — status: INCOMPLETE.**
 
 ```text
 Preconditions (§3)
@@ -342,6 +358,25 @@ Sign-off
 [ ] Repository owner approves the authorization decision (§11)
 ```
 
+**Sprint 1B restricted authorization (Addendum A) — status: ALLOWED under
+restrictions.**
+
+```text
+Sprint 1B — ONNX Session Substrate (Addendum A)
+[x] Framework ADR approved and updated: ONNX Runtime selected as first
+    runtime candidate
+[x] Provider conformance and deterministic-replay harness in place and green
+[x] ONNX Runtime discovery substrate in place, isolated, absence-safe
+[x] Sprint 1B scope bounded to session-configuration value modeling
+    (Addendum A §A.2), with all forbidden items (§A.3) excluded
+[x] Architecture contracts reaffirmed unchanged (Addendum A §A.4)
+[x] No dataset, evaluation, benchmark, or scientific claim implied
+[ ] Sprint 1B validation evidence recorded on completion (Addendum A §A.7)
+```
+
+An unchecked or breached Sprint 1B item voids only the Sprint 1B grant; it does not
+and cannot advance the full authorization, which remains governed by §3–§9 and §12.
+
 ---
 
 ## 11. Approval Decision
@@ -357,13 +392,27 @@ The repository owner records exactly one of the following outcomes.
   recorded and binding, and work outside them remains unauthorized.
 - **Deferred.** One or more prerequisites are unmet. Implementation remains blocked;
   the unmet items are recorded as the reason. **This is the standing default until a
-  full sign-off occurs**, and it is the current status of this document.
+  full sign-off occurs**, and it remains the status of the **full** ML Phase 2
+  authorization.
 - **Rejected.** The proposal violates the architecture (§7), the claim policy, or a
   prohibition (§9) in a way that cannot be remedied by meeting a checklist item.
   Implementation is refused, and the violated rule is recorded as the reason.
 
 No outcome other than **Authorized** or **Authorized with restrictions** permits
 implementation to begin, and neither may be recorded except by the repository owner.
+
+**Recorded outcome for this revision.**
+
+```text
+AUTHORIZED WITH RESTRICTIONS — Sprint 1B only (Addendum A).
+Full ML Phase 2 authorization: DEFERRED (unchanged).
+```
+
+The restriction is the entirety of Addendum A: only the ONNX Session Substrate
+slice defined there is permitted, and all provider, inference, model-loading,
+dataset, and evaluation work remains unauthorized. The unmet items for the full
+authorization remain the dataset gate (§5), the evaluation gate (§6), and full
+owner sign-off (§10, §12).
 
 ---
 
@@ -416,19 +465,160 @@ evaluation gates are equally required.
 ## 14. Closing Statement
 
 This document is the final governance gate before ML Phase 2 implementation. It
-selects no framework, chooses no dataset, picks no metric, and expresses no
-preference; it fixes the objective conditions under which implementation may begin and
-records the standing status as Deferred until those conditions are met and signed off
-by the repository owner.
+chooses no dataset, picks no metric, and expresses no preference; it fixes the
+objective conditions under which implementation may begin. The full ML Phase 2
+authorization remains Deferred until those conditions are met and signed off by the
+repository owner. The only implementation permission this revision grants is the
+restricted Sprint 1B slice recorded in Addendum A.
+
+```text
+Sprint 1B may proceed under restriction.
+Full ML Phase 2 implementation remains blocked.
+```
 
 Three principles are affirmed and binding:
 
-- **ML Phase 2 implementation remains blocked until this authorization is granted.**
-  No framework-backed provider work is permitted while the status is Deferred, and
-  none is permitted outside the constraints of an Authorized or restricted grant.
+- **ML Phase 2 implementation remains blocked until the full authorization is
+  granted.** No framework-backed provider work is permitted while the full status is
+  Deferred, and none is permitted outside the constraints of an Authorized or
+  restricted grant. The Sprint 1B grant (Addendum A) is such a restricted grant and
+  extends to nothing beyond its recorded scope.
 - **Architecture governance remains authoritative over implementation convenience.**
   The provider abstraction and the Inspection, Trust, Review, Evidence, and Evaluation
   ownerships hold regardless of how much easier a violation would make the work.
 - **Scientific evidence remains authoritative over engineering preference.** No claim
   is made, and no implementation is authorized to imply one, ahead of the reproducible
   evidence that supports it.
+
+---
+
+## Addendum A — Sprint 1B Restricted Authorization (ONNX Session Substrate)
+
+This addendum records the single restricted authorization granted under §11
+("Authorized with restrictions"). It authorizes exactly one bounded engineering
+slice and nothing else. It is a narrow implementation authorization update, not a
+general ML Phase 2 authorization.
+
+### A.1 Authorized Slice
+
+```text
+Sprint 1B — ONNX Session Substrate
+```
+
+Sprint 1B is substrate-only work: representing, validating, and testing ONNX
+Runtime session **configuration** as deterministic values, without creating
+sessions, loading models, creating tensors, or running inference.
+
+### A.2 Permitted Scope
+
+Sprint 1B work **may** include, and only include:
+
+- a session configuration object or value model;
+- a deterministic runtime options representation;
+- an execution-provider policy representation;
+- a model artifact **reference** type if needed (a reference by path/hash/identity —
+  never loaded content);
+- validation of session configuration inputs;
+- tests proving that no inference, session, tensor, or runtime object crosses any
+  provider or domain boundary.
+
+All Sprint 1B code remains under `src/frameworks/` (with its tests under `tests/`),
+isolated from every Kalibra domain package.
+
+### A.3 Forbidden Scope
+
+Sprint 1B work **must not** include:
+
+- any `InspectionInferenceProvider` implementation;
+- any model-specific inspection logic;
+- any real model inference;
+- any production model loading;
+- any dataset ingestion;
+- any evaluation metrics;
+- any benchmark claims;
+- any CLI/UI integration.
+
+Any of these voids the Sprint 1B grant for the affected work (§8, §9) and remains
+unauthorized until the full authorization is granted under §12.
+
+### A.4 Architecture Constraints (Unchanged and Binding)
+
+All existing boundaries remain binding exactly as fixed by §7–§9:
+
+```text
+InspectionInferenceProvider
+    ↓
+InspectionPrediction
+    ↓
+InspectionEngine.transform_prediction(...)
+    ↓
+RawInspectionResult
+    ↓
+Trust
+    ↓
+Review
+    ↓
+Evidence
+    ↓
+Evaluation
+```
+
+Sprint 1B must not modify these contracts, move any ownership, or wire any
+framework object across any of them. Session-configuration values are framework
+substrate values; they must never appear inside `InspectionPrediction`,
+`RawInspectionResult`, or any downstream record.
+
+### A.5 Framework Decision Linkage
+
+The Framework ADR
+([`KALIBRA_ML_PHASE_2_FRAMEWORK_ADR_v1.0.md`](KALIBRA_ML_PHASE_2_FRAMEWORK_ADR_v1.0.md))
+records **ONNX Runtime as the first selected runtime candidate**. That selection
+permits only bounded ONNX **substrate** work — runtime discovery (Sprint 1A,
+complete) and session-configuration modeling (Sprint 1B, this grant). It does not
+permit a provider implementation, inference, or model loading; those remain gated
+by the full authorization (§4, §12).
+
+### A.6 Dataset and Evaluation Status
+
+Recorded as of this revision:
+
+- **No dataset is selected.** The Dataset Selection ADR remains **DEFER DATASET
+  SELECTION**.
+- The Data Strategy Decision Memo treats **VisA as the governance anchor** and
+  **MPDD as the domain anchor**; neither is selected or acquired.
+- **No evaluation protocol is fixed.** Metrics, statistical procedure, and benchmark
+  policy application remain deferred under the Evaluation Strategy.
+
+Therefore Sprint 1B **may not produce scientific claims** of any kind. Its outputs
+are engineering-tier only under the three-tier claim policy: configuration
+modeling, validation behavior, and boundary tests — never accuracy, performance,
+benchmark, or product claims.
+
+### A.7 Required Validation for Sprint 1B
+
+Any Sprint 1B implementation must pass, and record the output of:
+
+```bash
+python3 -m pytest tests/test_onnx_runtime_substrate.py -q
+python3 -m pytest tests/test_provider_conformance.py -q
+python3 -m pytest -q
+python3 -m compileall -q src tests scripts
+git diff --check
+```
+
+It must additionally record checks proving:
+
+- no domain package (`src/inspection/`, `src/trust/`, `src/review/`,
+  `src/evidence/`, `src/evaluation/`, `src/integration/`, `src/prototype_ui/`)
+  changed unless explicitly justified;
+- no provider implementation added;
+- no inference path added;
+- no model loading path added;
+- no benchmark/performance wording introduced.
+
+### A.8 Standing Recommendation
+
+```text
+Sprint 1B may proceed under restriction.
+Full ML Phase 2 implementation remains blocked.
+```
