@@ -2,16 +2,17 @@
 
 ## 1. Purpose
 
-This Architecture Decision Record defines how Kalibra will evaluate candidate
-inference runtimes for ML Phase 2.
+This Architecture Decision Record defines how Kalibra evaluated candidate
+inference runtimes for ML Phase 2 and records the first selected runtime
+candidate for a future framework-backed provider.
 
-It does not authorize implementation. It does not select a runtime framework.
+It does not authorize implementation. It does not authorize model loading,
+session creation, inference, benchmark claims, dataset selection, or Sprint 1B.
 It records the decision process, evaluation criteria, candidate trade-offs, and
-current recommendation after the ML Phase 2 Scientific Architecture Plan.
+runtime selection after the ML Phase 2 Scientific Architecture Plan.
 
-Framework selection is deferred until the scientific architecture is approved
-because a framework choice cannot be separated from the scientific decisions it
-serves:
+Framework selection is a bounded engineering decision that remains subordinate
+to the scientific decisions it serves:
 
 - the inspection approach;
 - the fixed dataset and split policy;
@@ -20,15 +21,17 @@ serves:
 - the reproducibility obligations;
 - the claims Kalibra is allowed to make.
 
-Choosing a framework before those decisions are fixed would turn an engineering
-preference into an implicit scientific commitment. That would violate Kalibra's
-rule that evidence precedes assertion.
+Choosing a framework does not settle those scientific decisions and must not be
+treated as evidence that the future method works. Treating a runtime choice as a
+dataset, evaluation, or capability claim would violate Kalibra's rule that
+evidence precedes assertion.
 
 Status of this ADR:
 
 ```text
-Proposed decision process.
-No framework selected.
+ONNX Runtime selected as the first framework-backed inference runtime candidate.
+No model loading, session creation, inference, benchmark claim, or dataset
+selection authorized.
 No implementation authorized.
 ```
 
@@ -53,14 +56,26 @@ The current repository baseline includes:
   boundary and composition path, not production ML quality.
 
 The ML Phase 2 Scientific Architecture Plan defines runtime framework selection
-as a deferred decision that must be recorded in a dedicated ADR before any
-framework-backed provider implementation begins.
+as a decision that must be recorded in a dedicated ADR before any
+framework-backed provider implementation begins. This ADR now records ONNX
+Runtime as that first selected runtime candidate while keeping implementation
+authorization separate.
 
-Runtime selection is now the next architectural decision because the provider
-seam is ready but the first framework-backed implementation would introduce a
-new dependency boundary. That boundary must be evaluated before code is added,
-so the framework cannot quietly reshape Kalibra's contracts, claims, evidence
-model, or reproducibility posture.
+Runtime selection was the next architectural decision because the provider seam
+was ready but the first framework-backed implementation would introduce a new
+dependency boundary. That boundary had to be evaluated before provider code was
+added, so the framework could not quietly reshape Kalibra's contracts, claims,
+evidence model, or reproducibility posture.
+
+Sprint 1A added a narrow ONNX Runtime substrate in
+`src/frameworks/onnx_runtime.py`. That module only detects runtime availability,
+runtime version, execution-provider ordering, and read-only capability
+information. Its tests prove graceful absence handling, deterministic capability
+reporting, no session creation, no model loading, no tensor creation, no
+inference API, and no filesystem or network access. This substrate supports the
+runtime-selection decision without implementing a provider or changing any
+Inspection, Trust, Review, Evidence, Evaluation, integration, CLI, or prototype
+behavior.
 
 Official candidate references checked for this ADR include:
 
@@ -117,7 +132,8 @@ popularity.
 
 ## 4. Candidate Frameworks
 
-This section evaluates the candidate runtimes neutrally. It selects none.
+This section preserves the candidate evaluation that led to the selected first
+runtime candidate. Selection is recorded in §8.
 
 ### ONNX Runtime
 
@@ -426,10 +442,11 @@ Qualitative comparison:
 Interpretation:
 
 - The matrix is a planning instrument, not a scorecard.
-- "Excellent" does not mean approved.
+- "Excellent" does not mean scientifically validated.
 - "Weak" does not mean disqualified by itself.
-- Final selection requires Kalibra-specific proof under the approval criteria in
-  this ADR.
+- The ONNX Runtime selection is an engineering boundary decision only. It does
+  not prove inspection quality, calibration quality, localization quality, or
+  product readiness.
 
 ## 7. Risks
 
@@ -476,54 +493,71 @@ Selecting a runtime does not prove detection quality, calibration quality,
 localization quality, robustness, or product readiness. The ADR must not be used
 as a proxy for benchmark evidence.
 
-## 8. Current Recommendation
+## 8. Decision
 
-Current recommendation:
+Decision:
 
 ```text
-Defer framework selection and defer implementation.
+Select ONNX Runtime as the first framework-backed inference runtime candidate
+for ML Phase 2.
 ```
 
 Reasoning:
 
-- The ML Phase 2 Scientific Architecture Plan requires this ADR before
-  implementation, but it also requires dataset and evaluation strategy approval
-  before implementation.
-- No specific dataset, model approach, metric policy, or hardware target has
-  been approved.
-- No candidate has been tested in this repository against Kalibra's fixed
-  provider boundary, deterministic replay requirements, and evidence-chain
-  expectations.
-- Candidate documentation shows all five runtimes can plausibly support local
-  inference, but plausibility is not sufficient evidence for adoption.
-- Selecting a framework now would be premature and could bias dataset and model
-  decisions that should remain evidence-led.
+- **Inference-only fit.** ONNX Runtime is an inference-focused runtime rather
+  than a training framework. That aligns with Kalibra's requirement that the
+  future framework-backed provider execute inference behind the provider seam and
+  return only an `InspectionPrediction`.
+- **Provider-boundary compatibility.** ONNX Runtime can remain private to a
+  future `InspectionInferenceProvider`. Runtime tensors, sessions, execution
+  providers, device handles, model artifacts, intermediate outputs, and framework
+  metadata must not cross into `InspectionPrediction`,
+  `InspectionEngine.transform_prediction(...)`, Trust, Review, Evidence, or
+  Evaluation.
+- **Offline execution.** ONNX Runtime supports local execution, including CPU
+  execution. That fits Kalibra's offline, batch, locally reproducible boundary.
+- **Deterministic replay potential.** ONNX Runtime provides a bounded runtime
+  surface where model artifact, execution provider, runtime version, threading,
+  preprocessing, and hardware assumptions can be recorded and tested. Determinism
+  remains a requirement to prove for each future provider; it is not assumed by
+  selection.
+- **Model-artifact boundary.** ONNX introduces a clear model artifact boundary
+  that can be versioned, hashed, and kept provider-private. Export/conversion
+  remains a risk to validate, but the artifact boundary is clearer than a
+  training-framework runtime object.
+- **Portability.** ONNX Runtime has a cross-platform runtime story with CPU
+  execution as the appropriate baseline and optional execution providers that can
+  remain non-load-bearing unless explicitly approved.
+- **Substrate isolation already proven.** The committed Sprint 1A substrate
+  `src/frameworks/onnx_runtime.py` exposes only availability, version,
+  execution-provider ordering, default-provider discovery, and read-only
+  capability information. Its tests prove that this repository can isolate ONNX
+  Runtime discovery without session creation, model loading, tensor creation,
+  inference, filesystem access, network access, or domain-boundary changes.
 
-Shortlist for later proof-of-fit:
-
-- Keep all five candidates open for the next decision cycle.
-- Give first proof-of-fit attention to ONNX Runtime, TensorFlow Lite / LiteRT,
-  and OpenVINO if the approved dataset/model approach is exportable to those
-  inference-focused runtimes.
-- Treat PyTorch as strong for research and model development, but require an
-  explicit justification before using it as the runtime dependency.
-- Treat OpenCV DNN as a pragmatic baseline candidate for simple vision models,
-  but require operator-support and packaging evidence before adoption.
-
-No framework is selected by this ADR.
+This decision does **not** authorize model loading, ONNX session creation,
+inference, a framework-backed provider, benchmark claims, dataset selection,
+evaluation protocol selection, or Sprint 1B. It only selects ONNX Runtime as the
+first runtime candidate to use if and when the implementation authorization gate
+is revised.
 
 ## 9. Consequences
 
 ### Implementation impact
 
-No framework-backed provider may be implemented yet. Future provider work must
-wait until the framework decision, dataset strategy, and evaluation strategy are
-approved.
+No framework-backed provider may be implemented yet. ONNX Runtime is selected as
+the first runtime candidate, but future provider work must wait until the
+implementation authorization is revised and the remaining dataset and evaluation
+gates are closed. Selection of ONNX Runtime does not permit model loading,
+session creation, tensor creation, inference, benchmark claims, or downstream
+domain changes.
 
 ### Documentation impact
 
-The next documents must close the evidence gaps this ADR identifies. The
-framework ADR remains proposed until approval criteria are satisfied.
+The next documentation step is to revise the ML Phase 2 Implementation
+Authorization if the repository owner chooses to authorize the next slice. That
+revision must preserve the constraints in this ADR and must explicitly state
+whether Sprint 1B is authorized.
 
 ### Testing impact
 
@@ -531,6 +565,8 @@ Future tests must include:
 
 - provider-boundary tests proving only `InspectionPrediction` exits the provider;
 - deterministic replay tests for repeated inference;
+- mandatory use of the provider conformance harness for every framework-backed
+  provider;
 - environment/version capture tests;
 - failure tests for missing model artifacts, incompatible runtime versions, and
   nondeterministic outputs;
@@ -539,9 +575,10 @@ Future tests must include:
 
 ### Reproducibility impact
 
-Deferring selection preserves reproducibility by avoiding an unpinned runtime
-dependency before the project knows which artifacts and environment must be
-fixed.
+Selecting ONNX Runtime fixes the first runtime candidate but does not yet fix a
+model artifact, preprocessing path, execution-provider policy, dataset, or
+evaluation protocol. Each future result must still be reproducible from pinned
+runtime, model, input, preprocessing, configuration, and hardware evidence.
 
 ### Future provider implementations
 
@@ -550,27 +587,35 @@ Future providers must remain interchangeable implementations behind
 inside a valid `InspectionPrediction`, but it may not change downstream
 contracts or domain ownership.
 
+`InspectionPrediction`, `InspectionInferenceProvider`,
+`InspectionEngine.transform_prediction(...)`, Trust, Review, Evidence, and
+Evaluation ownership are preserved. ONNX Runtime objects may not cross any domain
+boundary.
+
 ## 10. Approval Criteria
 
-This ADR may be considered approved only when all conditions below are met.
+This ADR records the first runtime-candidate selection. Sprint 1B or any
+framework-backed provider implementation still requires the conditions below.
 
 - The repository owner approves the ML Phase 2 Scientific Architecture Plan.
-- The repository owner approves this ADR's decision process and current
-  recommendation.
+- The repository owner approves this ADR's decision process and ONNX Runtime
+  selection.
 - A specific target runtime environment is named: operating system, Python
   version, CPU baseline, and any optional accelerator policy.
-- Candidate licenses and runtime package dependencies are reviewed and recorded.
+- ONNX Runtime license and runtime package dependencies are reviewed and
+  recorded.
 - A dataset strategy document exists and defines the dataset, labels, splits,
   provenance, and fixture role.
 - An evaluation strategy document exists and defines metrics, procedure,
   reproducibility evidence, and non-claims.
-- A proof-of-fit plan exists for one or more shortlisted runtimes, limited to the
-  provider boundary and explicitly out of implementation scope until approved.
-- Approval explicitly states whether the ADR remains in "defer selection" status
-  or is revised to select one runtime.
+- A proof-of-fit implementation plan exists for ONNX Runtime, limited to the
+  provider boundary and explicitly preserving all downstream domain ownership.
+- The ML Phase 2 Implementation Authorization is updated by the repository owner
+  to authorize the next bounded implementation slice.
 
-A runtime may be selected only after these conditions are met and the selection
-is recorded as an update or superseding ADR.
+ONNX Runtime is selected by this ADR. Implementation remains blocked until the
+Implementation Authorization is revised and the remaining dataset and evaluation
+conditions are satisfied or explicitly restricted by the repository owner.
 
 ## 11. Open Questions
 
@@ -590,17 +635,27 @@ is recorded as an update or superseding ADR.
   non-reproducible?
 - How will evaluation distinguish runtime numerical differences from model
   quality differences?
+- What exact restrictions will the Implementation Authorization place on Sprint
+  1B before any ONNX Runtime provider work begins?
 
 ## 12. Next Decision
 
 Recommended next planning artifact:
 
 ```text
-KALIBRA_ML_PHASE_2_DATASET_STRATEGY_v1.0.md
+KALIBRA_ML_PHASE_2_IMPLEMENTATION_AUTHORIZATION_v1.0.md
 ```
 
-Dataset strategy should come next because framework fit cannot be finalized
-without knowing the data, labels, splits, provenance, localization support,
-hardware expectations, and evaluation evidence obligations. Until that document
-is approved, framework-backed implementation remains deferred.
+Implementation Authorization should be revised next because ONNX Runtime is now
+selected as the first framework-backed inference runtime candidate, but provider
+implementation is still not authorized. That revision must record whether Sprint
+1B is permitted and under what restrictions.
 
+Remaining conditions before Sprint 1B:
+
+- the Implementation Authorization must be updated by the repository owner;
+- the provider conformance and deterministic replay harness remains mandatory;
+- no dataset is yet selected;
+- no evaluation protocol is yet fixed;
+- no model loading, session creation, inference, benchmark claim, or downstream
+  domain change is authorized by this ADR.
