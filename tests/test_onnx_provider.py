@@ -99,6 +99,50 @@ def test_onnx_provider_passes_conformance_harness(monkeypatch) -> None:
     assert_provider_boundary_isolation(case)
 
 
+def test_onnx_provider_real_runtime_integration() -> None:
+    ort = pytest.importorskip("onnxruntime")
+
+    def build_provider() -> OnnxInspectionInferenceProvider:
+        return OnnxInspectionInferenceProvider(
+            session_configuration=_session_configuration()
+        )
+
+    provider = build_provider()
+    inspection_input = _inspection_input()
+
+    prediction = provider.predict(inspection_input)
+    assert type(prediction) is InspectionPrediction
+    assert not isinstance(prediction, RawInspectionResult)
+
+    engine = InspectionEngine()
+    first_output = engine.transform_prediction(inspection_input, prediction)
+    assert type(first_output.raw_inspection_result) is RawInspectionResult
+
+    replay_prediction = build_provider().predict(inspection_input)
+    assert replay_prediction == prediction
+    second_output = engine.transform_prediction(inspection_input, replay_prediction)
+    assert second_output.raw_inspection_result == first_output.raw_inspection_result
+    assert second_output == first_output
+
+    case = ProviderConformanceCase(
+        name="onnx_inspection_inference_provider_real_runtime",
+        provider_factory=build_provider,
+        input_factory=_inspection_input,
+    )
+    assert_provider_conforms_to_prediction_contract(case)
+    assert_provider_deterministic_replay(case)
+    assert_provider_boundary_isolation(case)
+
+    assert not any(
+        isinstance(value, ort.InferenceSession)
+        for value in _walk_object_graph(prediction)
+    )
+    assert not any(
+        isinstance(value, ort.InferenceSession)
+        for value in _walk_object_graph(first_output)
+    )
+
+
 def test_onnx_runtime_objects_do_not_leak_downstream(monkeypatch) -> None:
     runtime = FakeRuntime()
     provider = _provider(monkeypatch, runtime=runtime)
