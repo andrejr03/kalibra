@@ -23,25 +23,28 @@ and
 **Current authorization status.**
 
 ```text
-AUTHORIZED WITH RESTRICTIONS — Sprint 1C only.
+AUTHORIZED WITH RESTRICTIONS — Sprint 1D only.
 
 General ML Phase 2 implementation remains BLOCKED.
-Only the ONNX-backed InspectionInferenceProvider boundary proof (Sprint 1C) is
-authorized.
+Only the Governed Model Artifact value-object slice (Sprint 1D) is authorized.
 ONNX Runtime selected as first runtime candidate (Framework ADR).
+No model loading, ONNX session creation, or inference authorized.
+No provider behavior changes authorized.
 No dataset approved. Dataset Selection ADR remains deferred.
 No evaluation protocol fixed.
-No work outside the Sprint 1C provider-boundary proof is authorized.
+No work outside the Sprint 1D governed model artifact slice is authorized.
 ```
 
-This revision (recorded under §13 and detailed in **Addendum B**) grants a single,
-narrowly bounded restricted authorization for the ONNX-backed
-`InspectionInferenceProvider` boundary-proof slice and nothing else. The **full**
+This revision (recorded under §13 and detailed in **Addendum C**) grants a single,
+narrowly bounded restricted authorization for the Governed Model Artifact
+value-object slice (Sprint 1D) and nothing else. The **full**
 ML Phase 2 authorization remains **Deferred**: the §3 preconditions for general
 provider-and-inference work are not all met, and that status **must not** change to
 "Authorized" except by the repository owner and only when the conditions in §12 are
-met. The Sprint 1C restriction is defined, scoped, and bounded in **Addendum B**;
-work outside it remains unauthorized.
+met. The Sprint 1D restriction is defined, scoped, and bounded in **Addendum C**;
+the prior Sprint 1B (Addendum A) and Sprint 1C (Addendum B) grants are preserved as
+records of earlier restricted substrate and provider-boundary authorizations. Work
+outside the active Sprint 1D slice remains unauthorized.
 
 ---
 
@@ -63,7 +66,7 @@ are met, recorded, and signed off by the repository owner (§10, §11). Absent t
 the standing status of the full authorization is Deferred (§11). It grants no
 authority to select a framework or make any scientific, benchmark, or product claim;
 the sole active implementation authority it currently grants is the restricted Sprint
-1C slice recorded in Addendum B, and, beyond that, at most the conditional
+1D slice recorded in Addendum C, and, beyond that, at most the conditional
 permission to begin implementation under the constraints of §8 once every gate is
 green.
 
@@ -309,9 +312,9 @@ owner-approved change to the referenced governing document.
 The following checklist is suitable for repository-owner sign-off. **Full** ML Phase 2
 authorization requires every item checked; any unchecked item leaves the full
 authorization at Deferred. The checklist distinguishes the full authorization (still
-incomplete) from the restricted slice authorizations: Sprint 1B (Addendum A) and the
-active Sprint 1C provider-boundary proof (Addendum B), which is allowed only while
-every Sprint 1C restriction is met.
+incomplete) from the restricted slice authorizations: Sprint 1B (Addendum A),
+Sprint 1C (Addendum B), and the active Sprint 1D governed model artifact slice
+(Addendum C), which is allowed only while every Sprint 1D restriction is met.
 
 **Full ML Phase 2 authorization — status: INCOMPLETE.**
 
@@ -401,6 +404,29 @@ Sprint 1C — ONNX-backed InspectionInferenceProvider boundary proof (Addendum B
 An unchecked or breached Sprint 1C item voids only the Sprint 1C grant; it does not
 and cannot advance the full authorization, which remains governed by §3–§9 and §12.
 
+**Sprint 1D restricted authorization (Addendum C) — status: ALLOWED under
+restrictions.**
+
+```text
+Sprint 1D — Governed Model Artifact (Addendum C)
+[x] Framework ADR approved and updated: ONNX Runtime selected as first
+    runtime candidate
+[x] Provider conformance and deterministic-replay harness in place
+[x] ONNX Runtime discovery substrate in place, isolated, absence-safe
+[x] ONNX Session Substrate in place for deterministic configuration values
+[x] ONNX-backed provider boundary proof in place (Sprint 1C, Addendum B)
+[x] Sprint 1D scope bounded to immutable governed model artifact value objects
+    (identity, version, hash, provenance, compatibility metadata), deterministic
+    fingerprinting, and metadata validation — no loading, session, or inference
+[x] Architecture contracts reaffirmed unchanged (Addendum C §C.4)
+[x] No model loading, ONNX session creation, inference, provider behavior change,
+    dataset, evaluation, benchmark, scientific, product, CLI, or UI claim implied
+[ ] Sprint 1D validation evidence recorded on completion (Addendum C §C.7)
+```
+
+An unchecked or breached Sprint 1D item voids only the Sprint 1D grant; it does not
+and cannot advance the full authorization, which remains governed by §3–§9 and §12.
+
 ---
 
 ## 11. Approval Decision
@@ -428,16 +454,16 @@ implementation to begin, and neither may be recorded except by the repository ow
 **Recorded outcome for this revision.**
 
 ```text
-AUTHORIZED WITH RESTRICTIONS — Sprint 1C only (Addendum B).
+AUTHORIZED WITH RESTRICTIONS — Sprint 1D only (Addendum C).
 Full ML Phase 2 authorization: DEFERRED (unchanged).
 ```
 
-The active restriction is the entirety of Addendum B: only the ONNX-backed
-`InspectionInferenceProvider` boundary-proof slice defined there is permitted, and
-all work outside that slice remains unauthorized. The Sprint 1B substrate grant
-remains recorded in Addendum A as prior restricted substrate authorization. The
-unmet items for the full authorization remain the dataset gate (§5), the evaluation
-gate (§6), and full owner sign-off (§10, §12).
+The active restriction is the entirety of Addendum C: only the Governed Model
+Artifact value-object slice defined there is permitted, and all work outside that
+slice remains unauthorized. The Sprint 1B substrate grant (Addendum A) and the
+Sprint 1C provider-boundary proof (Addendum B) remain recorded as prior restricted
+authorizations. The unmet items for the full authorization remain the dataset gate
+(§5), the evaluation gate (§6), and full owner sign-off (§10, §12).
 
 ---
 
@@ -494,10 +520,10 @@ chooses no dataset, picks no metric, and expresses no preference; it fixes the
 objective conditions under which implementation may begin. The full ML Phase 2
 authorization remains Deferred until those conditions are met and signed off by the
 repository owner. The only active implementation permission this revision grants is
-the restricted Sprint 1C slice recorded in Addendum B.
+the restricted Sprint 1D slice recorded in Addendum C.
 
 ```text
-Sprint 1C may proceed under restriction.
+Sprint 1D may proceed under restriction.
 Full ML Phase 2 implementation remains blocked.
 ```
 
@@ -505,7 +531,7 @@ Three principles are affirmed and binding:
 
 - **ML Phase 2 implementation remains blocked until the full authorization is
   granted.** Framework-backed provider work is permitted only inside the constraints
-  of an Authorized or restricted grant. The Sprint 1C grant (Addendum B) is such a
+  of an Authorized or restricted grant. The Sprint 1D grant (Addendum C) is such a
   restricted grant and extends to nothing beyond its recorded scope; all other ML
   Phase 2 implementation remains blocked while the full status is Deferred.
 - **Architecture governance remains authoritative over implementation convenience.**
@@ -651,10 +677,12 @@ Full ML Phase 2 implementation remains blocked.
 
 ## Addendum B — Sprint 1C Restricted Authorization (ONNX-backed Provider Boundary Proof)
 
-This addendum records the active restricted authorization granted under §11
-("Authorized with restrictions"). It authorizes exactly one bounded engineering
+This addendum records the Sprint 1C restricted authorization granted under §11
+("Authorized with restrictions"). It authorized exactly one bounded engineering
 slice and nothing else. It is a narrow provider-boundary proof, not a general ML
-Phase 2 authorization and not a production model authorization.
+Phase 2 authorization and not a production model authorization. It is preserved as
+the record of the ONNX-backed provider boundary proof; the active next restricted
+grant is Sprint 1D in Addendum C.
 
 ### B.1 Authorized Slice
 
@@ -817,5 +845,161 @@ It must additionally record checks proving:
 
 ```text
 Sprint 1C may proceed under restriction.
+Full ML Phase 2 implementation remains blocked.
+```
+
+## Addendum C — Sprint 1D Restricted Authorization (Governed Model Artifact)
+
+This addendum records the active restricted authorization granted under §11
+("Authorized with restrictions"). It authorizes exactly one bounded engineering
+slice and nothing else. It is a governed model artifact **value-object** slice, not
+a model-loading, session, inference, or provider authorization, and not a general
+ML Phase 2 authorization.
+
+### C.1 Authorized Slice
+
+```text
+Sprint 1D — Governed Model Artifact
+```
+
+Sprint 1D is value-object-only work: representing, fingerprinting, and validating a
+governed model artifact as immutable deterministic values — model identity, model
+version, model hash, model provenance, and model compatibility metadata — without
+loading any model, creating any ONNX session, or running any inference. It extends
+the Sprint 1B model artifact **reference** type (Addendum A §A.2) into a fuller
+governed artifact value object that is still identity/hash-by-reference and never
+loaded content.
+
+### C.2 Permitted Scope
+
+Sprint 1D work **may** include, and only include:
+
+- immutable model artifact value objects;
+- a model identity representation;
+- a model version representation;
+- a model hash (content hash) representation;
+- a model provenance representation;
+- a model compatibility metadata representation;
+- deterministic model artifact fingerprinting over those immutable values;
+- validation of model artifact metadata;
+- tests proving immutability, deterministic fingerprinting, metadata validation,
+  and that no model is loaded and no runtime, session, tensor, or inference object
+  is created or crosses any provider or domain boundary.
+
+All Sprint 1D code remains under `src/frameworks/` (with its tests under `tests/`),
+isolated from every Kalibra domain package. Model artifact values are framework
+substrate values.
+
+### C.3 Forbidden Scope
+
+Sprint 1D work **must not** include:
+
+- any model loading;
+- any ONNX session creation (`InferenceSession` creation);
+- any inference;
+- any provider behavior change (no change to `InspectionInferenceProvider`, the
+  ONNX-backed provider, `InspectionPrediction`,
+  `InspectionEngine.transform_prediction(...)`, or `RawInspectionResult`);
+- any dataset ingestion, dataset selection, dataset splitting, or dataset
+  governance change;
+- any evaluation metrics or evaluation protocol;
+- any benchmark code, benchmark results, benchmark claims, performance, accuracy,
+  or calibration claims;
+- any CLI/UI, integration, or prototype wiring;
+- any production model lifecycle work (acquisition, training, export, registry,
+  upgrade, replacement, or monitoring);
+- any scientific or product claim.
+
+Any of these voids the Sprint 1D grant for the affected work (§8, §9) and remains
+unauthorized until explicitly approved by a later restricted grant or full
+authorization under §12.
+
+### C.4 Architecture Constraints (Unchanged and Binding)
+
+All existing boundaries remain binding exactly as fixed by §7–§9:
+
+```text
+InspectionInferenceProvider
+    ↓
+InspectionPrediction
+    ↓
+InspectionEngine.transform_prediction(...)
+    ↓
+RawInspectionResult
+    ↓
+Trust
+    ↓
+Review
+    ↓
+Evidence
+    ↓
+Evaluation
+```
+
+Sprint 1D must not modify these contracts, move any ownership, or change any
+provider behavior. Governed model artifact values are framework substrate values;
+they must never appear inside `InspectionPrediction`, `RawInspectionResult`, or any
+downstream record, and they must never cause a model to be loaded, a session to be
+created, or inference to run.
+
+### C.5 Framework Decision Linkage
+
+The Framework ADR
+([`KALIBRA_ML_PHASE_2_FRAMEWORK_ADR_v1.0.md`](KALIBRA_ML_PHASE_2_FRAMEWORK_ADR_v1.0.md))
+records **ONNX Runtime as the first selected runtime candidate**. Sprint 1A proved
+isolated runtime discovery, Sprint 1B proved deterministic session-configuration
+modeling, and Sprint 1C proved a provider-local ONNX inference path terminating at
+`InspectionPrediction`. Sprint 1D extends that permission only to governed model
+artifact value modeling and validation.
+
+This grant does not authorize model loading, ONNX session creation, inference,
+provider behavior changes, dataset work, evaluation work, benchmark work,
+downstream wiring, or any scientific or product claim.
+
+### C.6 Dataset and Evaluation Status
+
+Recorded as of this revision:
+
+- **No dataset is selected.** The Dataset Selection ADR remains **DEFER DATASET
+  SELECTION**.
+- Governed model artifact value objects are engineering substrate only. They are
+  not a selected model, not a production model, not a dataset artifact, and not a
+  basis for any inspection-quality claim.
+- **No evaluation protocol is fixed.** Metrics, statistical procedure, and benchmark
+  policy application remain deferred under the Evaluation Strategy.
+
+Therefore Sprint 1D **may not produce scientific claims** of any kind. Its outputs
+are engineering-tier only under the three-tier claim policy: immutable value
+modeling, deterministic fingerprinting, and metadata validation behavior — never
+accuracy, performance, benchmark, or product claims.
+
+### C.7 Required Validation for Sprint 1D
+
+Any Sprint 1D implementation must pass, and record the output of:
+
+```bash
+python3 -m pytest tests/test_onnx_model_artifact.py -q
+python3 -m pytest tests/test_onnx_provider.py -q
+python3 -m pytest -q
+python3 -m compileall -q src tests scripts
+git diff --check
+git status --short
+```
+
+It must additionally record checks proving:
+
+- no domain package changed (`src/inspection/`, `src/trust/`, `src/review/`,
+  `src/evidence/`, `src/evaluation/`, `src/integration/`, `src/prototype_ui/`);
+- no provider behavior changed;
+- no model loading path added;
+- no ONNX session creation or inference path added;
+- no runtime, session, tensor, or model object created or crossing any boundary;
+- no dataset ingestion, evaluation, benchmark, production model lifecycle, CLI, UI,
+  prototype, scientific-claim, or product-claim path was added.
+
+### C.8 Standing Recommendation
+
+```text
+Sprint 1D may proceed under restriction.
 Full ML Phase 2 implementation remains blocked.
 ```
