@@ -5,9 +5,14 @@ from dataclasses import dataclass, field
 from hashlib import sha256
 import json
 from math import isfinite
-from typing import Any
 
-from src.frameworks import model_artifact, model_loader, onnx_runtime, onnx_session
+from src.frameworks import (
+    image_preprocessing,
+    model_artifact,
+    model_loader,
+    onnx_runtime,
+    onnx_session,
+)
 
 from .domain import (
     DefectLocalization,
@@ -67,13 +72,8 @@ class OnnxInspectionInferenceProvider:
                 "ONNX provider requires StabilizedInspectionInput"
             )
 
-        raw_input = _input_tensor(
-            _raw_measure_input(
-                inspection_input,
-                self.provider_id,
-                self._configuration_hash,
-            )
-        )
+        preprocessed = _preprocess_input(inspection_input)
+        raw_input = _input_tensor(preprocessed)
         raw_output = _run_session(self._session, self._input_name, raw_input)
         raw_measure = round(_scalar_output(raw_output), 6)
         if raw_measure < 0.0 or raw_measure > 100.0:
@@ -97,9 +97,21 @@ class OnnxInspectionInferenceProvider:
                 "configuration_hash": self._configuration_hash,
                 "input_id": inspection_input.input_id,
                 "provider_id": self.provider_id,
+                "preprocessing_contract_id": (
+                    preprocessed.preprocessing_contract_id
+                ),
                 "raw_measure": raw_measure,
             },
         )
+        model_metadata = {
+            "method": self.provider_id,
+            "version": "1",
+            "model_reference_id": (
+                self.session_configuration.model_reference.reference_id
+            ),
+            "configuration_hash": self._configuration_hash,
+        }
+        model_metadata.update(image_preprocessing.preprocessing_metadata(preprocessed))
 
         return InspectionPrediction(
             input_id=inspection_input.input_id,
@@ -107,14 +119,7 @@ class OnnxInspectionInferenceProvider:
             predicted_judgement=judgement,
             predicted_raw_anomaly_measure=raw_measure,
             predicted_localization=localization,
-            model_metadata={
-                "method": self.provider_id,
-                "version": "1",
-                "model_reference_id": (
-                    self.session_configuration.model_reference.reference_id
-                ),
-                "configuration_hash": self._configuration_hash,
-            },
+            model_metadata=model_metadata,
         )
 
 
@@ -241,28 +246,24 @@ def _run_session(session: object, input_name: str, raw_input: object) -> object:
     return outputs[0]
 
 
-def _raw_measure_input(
+def _preprocess_input(
     inspection_input: StabilizedInspectionInput,
-    provider_id: str,
-    configuration_hash: str,
-) -> float:
-    digest = _digest(
-        {
-            "artifact_uri": inspection_input.artifact_uri,
-            "configuration_hash": configuration_hash,
-            "content_hash": inspection_input.content_hash,
-            "input_id": inspection_input.input_id,
-            "input_kind": inspection_input.input_kind,
-            "intake_status": inspection_input.intake_status,
-            "metadata": sorted(inspection_input.metadata.items()),
-            "provider_id": provider_id,
-        }
-    )
-    return round(_unit_interval(digest[:16]) * 100.0, 6)
+) -> image_preprocessing.PreprocessedImageTensor:
+    try:
+        return image_preprocessing.preprocess_image(inspection_input)
+    except image_preprocessing.ImagePreprocessingError as exc:
+        raise InspectionExaminationFailure(
+            f"ONNX provider image preprocessing failed: {exc}"
+        ) from exc
 
 
-def _input_tensor(raw_measure: float) -> object:
-    return _numpy().array([raw_measure], dtype="float32")
+def _input_tensor(
+    preprocessed: image_preprocessing.PreprocessedImageTensor,
+) -> object:
+    return _numpy().array(
+        preprocessed.tensor_values,
+        dtype=preprocessed.tensor_dtype,
+    ).reshape(preprocessed.tensor_shape)
 
 
 def _scalar_output(value: object) -> float:

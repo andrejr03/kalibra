@@ -6,9 +6,15 @@ from hashlib import sha256
 import inspect
 from pathlib import Path
 
+import numpy
 import pytest
 
-from src.frameworks import model_artifact, model_loader, onnx_session
+from src.frameworks import (
+    image_preprocessing,
+    model_artifact,
+    model_loader,
+    onnx_session,
+)
 from provider_conformance import (
     ProviderConformanceCase,
     assert_provider_boundary_isolation,
@@ -43,7 +49,10 @@ FIXTURE_DIR = (
     / "inspection"
     / "onnx_placeholder"
 )
+IMAGE_FIXTURE_DIR = Path(__file__).resolve().parent / "fixtures" / "inspection"
 PLACEHOLDER_MODEL_PATH = FIXTURE_DIR / "placeholder_identity.onnx"
+DEFAULT_IMAGE_PATH = IMAGE_FIXTURE_DIR / "blob_defect.pgm"
+SHIFTED_IMAGE_PATH = IMAGE_FIXTURE_DIR / "blob_defect_shifted.pgm"
 
 
 def test_onnx_provider_satisfies_inference_provider_boundary(monkeypatch) -> None:
@@ -164,6 +173,85 @@ def test_onnx_provider_does_not_bypass_loader_content_hash_validation(
     assert runtime.sessions == []
 
 
+def test_onnx_provider_uses_preprocessed_image_tensor_not_metadata_hash(
+    monkeypatch,
+) -> None:
+    runtime = FakeRuntime()
+    _install_runtime(monkeypatch, runtime)
+    calls = []
+
+    def fake_preprocess(inspection_input: StabilizedInspectionInput):
+        calls.append(inspection_input)
+        return image_preprocessing.PreprocessedImageTensor(
+            tensor_values=(12.5,)
+        )
+
+    monkeypatch.setattr(
+        image_preprocessing,
+        "preprocess_image",
+        fake_preprocess,
+    )
+    provider = OnnxInspectionInferenceProvider(
+        session_configuration=_session_configuration()
+    )
+    inspection_input = _inspection_input(
+        metadata={"fixture": "metadata-does-not-drive-input"}
+    )
+
+    prediction = provider.predict(inspection_input)
+
+    assert calls == [inspection_input]
+    assert prediction.predicted_raw_anomaly_measure == 12.5
+    assert _last_session_input_values(runtime.sessions[0]) == (12.5,)
+    assert prediction.model_metadata["preprocessing_contract_id"] == (
+        image_preprocessing.PREPROCESSING_CONTRACT_ID
+    )
+    assert prediction.model_metadata["input_tensor_shape"] == "1"
+    assert prediction.model_metadata["input_tensor_dtype"] == "float32"
+    source = inspect.getsource(providers_onnx)
+    assert "_raw_measure_input" not in source
+    assert "sorted(inspection_input.metadata.items())" not in source
+
+
+def test_changing_image_bytes_changes_provider_input_and_prediction(
+    monkeypatch,
+) -> None:
+    runtime = FakeRuntime()
+    provider = _provider(monkeypatch, runtime=runtime)
+
+    first = provider.predict(
+        _inspection_input(input_id="same-input", image_path=DEFAULT_IMAGE_PATH)
+    )
+    second = provider.predict(
+        _inspection_input(input_id="same-input", image_path=SHIFTED_IMAGE_PATH)
+    )
+
+    first_value, second_value = _session_run_values(runtime.sessions[0])
+    assert first_value == pytest.approx(25.0)
+    assert second_value == pytest.approx(10.294118)
+    assert first.predicted_raw_anomaly_measure == pytest.approx(first_value)
+    assert second.predicted_raw_anomaly_measure == pytest.approx(second_value)
+    assert first.predicted_raw_anomaly_measure != (
+        second.predicted_raw_anomaly_measure
+    )
+    assert first.prediction_id != second.prediction_id
+
+
+def test_changing_metadata_alone_does_not_substitute_for_image_content(
+    monkeypatch,
+) -> None:
+    provider = _provider(monkeypatch)
+
+    first = provider.predict(
+        _inspection_input(metadata={"fixture": "first-metadata"})
+    )
+    second = provider.predict(
+        _inspection_input(metadata={"fixture": "changed-metadata"})
+    )
+
+    assert first == second
+
+
 def test_onnx_provider_real_runtime_integration() -> None:
     ort = pytest.importorskip("onnxruntime")
 
@@ -221,6 +309,8 @@ def test_onnx_runtime_objects_do_not_leak_downstream(monkeypatch) -> None:
         FakeInferenceSession,
         FakeSessionInput,
         FakeSessionOptions,
+        image_preprocessing.PreprocessedImageTensor,
+        numpy.ndarray,
     )
     assert not any(
         isinstance(value, forbidden_types)
@@ -325,12 +415,18 @@ def _conformance_case(monkeypatch) -> ProviderConformanceCase:
     )
 
 
-def _inspection_input() -> StabilizedInspectionInput:
+def _inspection_input(
+    *,
+    input_id: str = "onnx-provider-input",
+    image_path: Path = DEFAULT_IMAGE_PATH,
+    content_hash: str | None = None,
+    metadata: Mapping[str, str] | None = None,
+) -> StabilizedInspectionInput:
     return StabilizedInspectionInput(
-        input_id="onnx-provider-input",
-        artifact_uri="artifact://kalibra/onnx-provider/boundary-input.png",
-        content_hash="onnx-provider-boundary-input-content-hash",
-        metadata={"fixture": "onnx-provider-boundary"},
+        input_id=input_id,
+        artifact_uri=str(image_path),
+        content_hash=content_hash or _image_hash(image_path),
+        metadata=metadata or {"fixture": image_path.name},
     )
 
 
@@ -354,6 +450,24 @@ def _session_configuration(
 
 def _placeholder_model_hash() -> str:
     return sha256(PLACEHOLDER_MODEL_PATH.read_bytes()).hexdigest()
+
+
+def _image_hash(path: Path) -> str:
+    return sha256(path.read_bytes()).hexdigest()
+
+
+def _last_session_input_values(session: "FakeInferenceSession") -> tuple[float, ...]:
+    return tuple(
+        float(value)
+        for value in session.run_inputs[-1]["raw_input"].reshape(-1)
+    )
+
+
+def _session_run_values(session: "FakeInferenceSession") -> tuple[float, ...]:
+    return tuple(
+        float(run_input["raw_input"].reshape(-1)[0])
+        for run_input in session.run_inputs
+    )
 
 
 class FakeGraphOptimizationLevel:
@@ -385,12 +499,14 @@ class FakeInferenceSession:
         self.sess_options = sess_options
         self.providers = providers
         self.provider_options = provider_options
+        self.run_inputs: list[dict[str, object]] = []
 
     def get_inputs(self):
         return (FakeSessionInput("raw_input"),)
 
     def run(self, output_names, inputs):
         assert output_names is None
+        self.run_inputs.append(dict(inputs))
         return [inputs["raw_input"]]
 
 
