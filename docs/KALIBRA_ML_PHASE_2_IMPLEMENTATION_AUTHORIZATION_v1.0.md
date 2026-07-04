@@ -489,8 +489,34 @@ Sprint 1F — Loader Hardening + Provider Loader Wiring (Addendum F)
 [x] No new prediction semantics, RawInspectionResult construction, Trust, Review,
     Evidence, Evaluation, dataset, benchmark, performance-measurement, CLI, UI,
     scientific-claim, or product-claim path implied
-[ ] Sprint 1F validation evidence recorded on completion (Addendum F §F.7)
+[x] Sprint 1F validation evidence recorded on completion (Addendum F §F.7)
 ```
+
+Sprint 1F validation evidence, recorded on completion:
+
+```text
+tests/test_model_loader.py: 17 passed
+tests/test_onnx_provider.py: 14 passed, 1 skipped
+tests/test_provider_conformance.py: 9 passed
+tests/test_model_artifact.py: 32 passed
+full suite: 432 passed, 1 skipped
+compileall: passed
+git diff --check: passed
+```
+
+Sprint 1F successfully delivered, within the Addendum F restrictions:
+
+- deterministic loader hardening
+- enforced model-content hash gate (no session creation may bypass it)
+- provider-private loader/session wiring into the existing ONNX provider
+- deterministic replay preserved
+- provider boundary preserved (output remains exactly InspectionPrediction)
+- no downstream domain changes (Trust, Review, Evidence, Evaluation, Integration,
+  Prototype, dataset, benchmark, performance, CLI, UI, scientific/product claim)
+
+The recorded outcome is unchanged: AUTHORIZED WITH RESTRICTIONS — Sprint 1F only
+(Addendum F). Sprint 2 and Sprint 1G remain unauthorized, and full ML Phase 2
+implementation remains DEFERRED. This update records Sprint 1F as completed only.
 
 An unchecked or breached Sprint 1F item voids only the Sprint 1F grant; it does not
 and cannot advance the full authorization, which remains governed by §3–§9 and §12.
