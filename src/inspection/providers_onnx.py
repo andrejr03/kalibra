@@ -12,6 +12,7 @@ from src.frameworks import (
     model_loader,
     onnx_runtime,
     onnx_session,
+    output_mapping,
 )
 
 from .domain import (
@@ -74,33 +75,28 @@ class OnnxInspectionInferenceProvider:
 
         preprocessed = _preprocess_input(inspection_input)
         raw_input = _input_tensor(preprocessed)
-        raw_output = _run_session(self._session, self._input_name, raw_input)
-        raw_measure = round(_scalar_output(raw_output), 6)
-        if raw_measure < 0.0 or raw_measure > 100.0:
-            raise InspectionExaminationFailure(
-                "ONNX placeholder output must stay within raw 0-100 scale"
-            )
-
-        judgement = (
-            InspectionJudgement.DEFECT
-            if raw_measure >= self.defect_threshold
-            else InspectionJudgement.OK
+        raw_outputs = _run_session(self._session, self._input_name, raw_input)
+        mapped_output = _map_output(
+            raw_outputs,
+            inspection_input,
+            preprocessed,
+            self.defect_threshold,
         )
-        localization = (
-            _localization_from_input(inspection_input)
-            if judgement is InspectionJudgement.DEFECT
-            else None
-        )
+        judgement = _inspection_judgement(mapped_output.predicted_status)
+        localization = _localization_from_mapped_output(mapped_output)
         prediction_id = _stable_id(
             "onnx-placeholder-prediction",
             {
                 "configuration_hash": self._configuration_hash,
                 "input_id": inspection_input.input_id,
+                "output_mapping_contract_id": (
+                    mapped_output.model_metadata["output_mapping_contract_id"]
+                ),
                 "provider_id": self.provider_id,
                 "preprocessing_contract_id": (
                     preprocessed.preprocessing_contract_id
                 ),
-                "raw_measure": raw_measure,
+                "raw_measure": mapped_output.raw_anomaly_measure,
             },
         )
         model_metadata = {
@@ -112,12 +108,13 @@ class OnnxInspectionInferenceProvider:
             "configuration_hash": self._configuration_hash,
         }
         model_metadata.update(image_preprocessing.preprocessing_metadata(preprocessed))
+        model_metadata.update(mapped_output.model_metadata)
 
         return InspectionPrediction(
             input_id=inspection_input.input_id,
             prediction_id=prediction_id,
             predicted_judgement=judgement,
-            predicted_raw_anomaly_measure=raw_measure,
+            predicted_raw_anomaly_measure=mapped_output.raw_anomaly_measure,
             predicted_localization=localization,
             model_metadata=model_metadata,
         )
@@ -239,11 +236,7 @@ def _run_session(session: object, input_name: str, raw_input: object) -> object:
         outputs = run(None, {input_name: raw_input})
     except Exception as exc:
         raise InspectionExaminationFailure("ONNX Runtime inference failed") from exc
-    if not isinstance(outputs, list) or not outputs:
-        raise InspectionExaminationFailure(
-            "ONNX Runtime inference returned no outputs"
-        )
-    return outputs[0]
+    return outputs
 
 
 def _preprocess_input(
@@ -266,18 +259,24 @@ def _input_tensor(
     ).reshape(preprocessed.tensor_shape)
 
 
-def _scalar_output(value: object) -> float:
-    array = _numpy().asarray(value, dtype="float64")
-    if array.size != 1:
-        raise InspectionExaminationFailure(
-            "ONNX placeholder output must contain exactly one raw measure"
+def _map_output(
+    raw_outputs: object,
+    inspection_input: StabilizedInspectionInput,
+    preprocessed: image_preprocessing.PreprocessedImageTensor,
+    defect_threshold: float,
+) -> output_mapping.MappedModelOutput:
+    try:
+        return output_mapping.map_onnx_outputs(
+            raw_outputs,
+            input_id=inspection_input.input_id,
+            content_hash=inspection_input.content_hash,
+            defect_threshold=defect_threshold,
+            preprocessing_contract_id=preprocessed.preprocessing_contract_id,
         )
-    raw_measure = float(array.reshape(-1)[0])
-    if not isfinite(raw_measure):
+    except output_mapping.OutputMappingError as exc:
         raise InspectionExaminationFailure(
-            "ONNX placeholder output raw measure must be finite"
-        )
-    return raw_measure
+            f"ONNX provider output mapping failed: {exc}"
+        ) from exc
 
 
 def _numpy() -> object:
@@ -290,28 +289,28 @@ def _numpy() -> object:
     return numpy
 
 
-def _localization_from_input(
-    inspection_input: StabilizedInspectionInput,
-) -> DefectLocalization:
-    digest = _digest(
-        {
-            "content_hash": inspection_input.content_hash,
-            "input_id": inspection_input.input_id,
-            "localization": "onnx-placeholder-boundary",
-        }
-    )
-    width = 0.2
-    height = 0.18
-    x_min = round(0.05 + _unit_interval(digest[0:8]) * (0.95 - width), 6)
-    y_min = round(0.05 + _unit_interval(digest[8:16]) * (0.95 - height), 6)
+def _inspection_judgement(predicted_status: str) -> InspectionJudgement:
+    if predicted_status == output_mapping.PREDICTED_STATUS_DEFECT:
+        return InspectionJudgement.DEFECT
+    if predicted_status == output_mapping.PREDICTED_STATUS_OK:
+        return InspectionJudgement.OK
+    raise InspectionExaminationFailure("ONNX provider mapped status is invalid")
+
+
+def _localization_from_mapped_output(
+    mapped_output: output_mapping.MappedModelOutput,
+) -> DefectLocalization | None:
+    mapped_localization = mapped_output.localization
+    if mapped_localization is None:
+        return None
     return DefectLocalization(
         region=NormalizedBoundingBox(
-            x_min=x_min,
-            y_min=y_min,
-            x_max=round(x_min + width, 6),
-            y_max=round(y_min + height, 6),
+            x_min=mapped_localization.x_min,
+            y_min=mapped_localization.y_min,
+            x_max=mapped_localization.x_max,
+            y_max=mapped_localization.y_max,
         ),
-        localization_kind="onnx_placeholder_suspected_region",
+        localization_kind=mapped_localization.localization_kind,
     )
 
 
@@ -322,10 +321,6 @@ def _stable_id(prefix: str, payload: Mapping[str, object]) -> str:
 def _digest(payload: Mapping[str, object]) -> str:
     canonical = json.dumps(payload, sort_keys=True, separators=(",", ":"))
     return sha256(canonical.encode("utf-8")).hexdigest()
-
-
-def _unit_interval(hex_fragment: str) -> float:
-    return int(hex_fragment, 16) / float((16 ** len(hex_fragment)) - 1)
 
 
 __all__ = [

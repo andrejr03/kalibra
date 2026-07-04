@@ -14,6 +14,7 @@ from src.frameworks import (
     model_artifact,
     model_loader,
     onnx_session,
+    output_mapping,
 )
 from provider_conformance import (
     ProviderConformanceCase,
@@ -252,6 +253,89 @@ def test_changing_metadata_alone_does_not_substitute_for_image_content(
     assert first == second
 
 
+def test_onnx_provider_uses_governed_output_mapper(monkeypatch) -> None:
+    runtime = FakeRuntime()
+    _install_runtime(monkeypatch, runtime)
+    calls = []
+
+    def fake_map_outputs(
+        outputs,
+        *,
+        input_id,
+        content_hash,
+        defect_threshold,
+        preprocessing_contract_id,
+    ):
+        calls.append(
+            {
+                "outputs": outputs,
+                "input_id": input_id,
+                "content_hash": content_hash,
+                "defect_threshold": defect_threshold,
+                "preprocessing_contract_id": preprocessing_contract_id,
+            }
+        )
+        return output_mapping.MappedModelOutput(
+            predicted_status=output_mapping.PREDICTED_STATUS_DEFECT,
+            raw_anomaly_measure=62.5,
+            localization=output_mapping.MappedLocalization(
+                x_min=0.1,
+                y_min=0.2,
+                x_max=0.3,
+                y_max=0.4,
+                localization_kind="mapped_placeholder_region",
+            ),
+            localization_kind="mapped_placeholder_region",
+            model_metadata={
+                "output_mapping_contract_id": (
+                    output_mapping.OUTPUT_MAPPING_CONTRACT_ID
+                ),
+                "output_mapping_version": output_mapping.MAPPING_VERSION,
+                "output_shape": "1",
+                "output_dtype": "float32",
+                "raw_measure_scale": output_mapping.RAW_MEASURE_SCALE,
+            },
+        )
+
+    monkeypatch.setattr(
+        output_mapping,
+        "map_onnx_outputs",
+        fake_map_outputs,
+    )
+    inspection_input = _inspection_input()
+    provider = OnnxInspectionInferenceProvider(
+        session_configuration=_session_configuration()
+    )
+
+    prediction = provider.predict(inspection_input)
+
+    assert len(calls) == 1
+    assert calls[0]["outputs"][0] is runtime.sessions[0].run_inputs[-1]["raw_input"]
+    assert calls[0]["input_id"] == inspection_input.input_id
+    assert calls[0]["content_hash"] == inspection_input.content_hash
+    assert calls[0]["preprocessing_contract_id"] == (
+        image_preprocessing.PREPROCESSING_CONTRACT_ID
+    )
+    assert prediction.predicted_judgement.value == "defect"
+    assert prediction.predicted_raw_anomaly_measure == 62.5
+    assert prediction.predicted_localization is not None
+    assert prediction.predicted_localization.localization_kind == (
+        "mapped_placeholder_region"
+    )
+    assert prediction.model_metadata["output_mapping_contract_id"] == (
+        output_mapping.OUTPUT_MAPPING_CONTRACT_ID
+    )
+
+
+def test_onnx_provider_contains_no_inline_output_scalar_mapping() -> None:
+    source = inspect.getsource(providers_onnx)
+
+    assert "output_mapping.map_onnx_outputs" in source
+    assert "_scalar_output" not in source
+    assert "asarray(value" not in source
+    assert "placeholder output must contain exactly one raw measure" not in source
+
+
 def test_onnx_provider_real_runtime_integration() -> None:
     ort = pytest.importorskip("onnxruntime")
 
@@ -310,6 +394,8 @@ def test_onnx_runtime_objects_do_not_leak_downstream(monkeypatch) -> None:
         FakeSessionInput,
         FakeSessionOptions,
         image_preprocessing.PreprocessedImageTensor,
+        output_mapping.MappedLocalization,
+        output_mapping.MappedModelOutput,
         numpy.ndarray,
     )
     assert not any(
@@ -323,7 +409,7 @@ def test_onnx_runtime_objects_do_not_leak_downstream(monkeypatch) -> None:
 
 
 def test_onnx_provider_does_not_construct_raw_inspection_result() -> None:
-    source = inspect.getsource(providers_onnx)
+    source = inspect.getsource(providers_onnx) + inspect.getsource(output_mapping)
 
     assert "RawInspectionResult" not in source
 
