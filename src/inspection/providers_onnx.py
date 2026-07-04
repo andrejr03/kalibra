@@ -5,10 +5,9 @@ from dataclasses import dataclass, field
 from hashlib import sha256
 import json
 from math import isfinite
-from pathlib import Path
 from typing import Any
 
-from src.frameworks import onnx_runtime, onnx_session
+from src.frameworks import model_artifact, model_loader, onnx_runtime, onnx_session
 
 from .domain import (
     DefectLocalization,
@@ -22,13 +21,6 @@ from .errors import InspectionExaminationFailure, MalformedInspectionInput
 
 ONNX_BOUNDARY_PROVIDER_ID = "onnx-inspection-inference-provider-boundary-v1"
 ONNX_PLACEHOLDER_MODEL_REFERENCE_ID = "onnx-placeholder-boundary-model-v1"
-
-_SESSION_OPTIMIZATION_LEVELS = {
-    onnx_session.OPTIMIZATION_LEVEL_DISABLE_ALL: "ORT_DISABLE_ALL",
-    onnx_session.OPTIMIZATION_LEVEL_BASIC: "ORT_ENABLE_BASIC",
-    onnx_session.OPTIMIZATION_LEVEL_EXTENDED: "ORT_ENABLE_EXTENDED",
-    onnx_session.OPTIMIZATION_LEVEL_ALL: "ORT_ENABLE_ALL",
-}
 
 
 @dataclass(frozen=True)
@@ -49,16 +41,19 @@ class OnnxInspectionInferenceProvider:
                 "ONNX provider defect threshold must be finite"
             )
 
-        model_path = _placeholder_model_path(configuration)
-        _verify_placeholder_model_reference(configuration, model_path)
-        runtime = _load_runtime()
-        session = _create_session(runtime, configuration, model_path)
+        artifact = _placeholder_model_artifact(configuration)
+        loaded_model = _load_placeholder_model(artifact, configuration)
+        session = loaded_model._session_for_provider()
 
-        object.__setattr__(self, "session_configuration", configuration)
+        object.__setattr__(
+            self,
+            "session_configuration",
+            loaded_model.session_configuration,
+        )
         object.__setattr__(
             self,
             "_configuration_hash",
-            onnx_session.session_configuration_hash(configuration),
+            loaded_model.session_configuration_hash,
         )
         object.__setattr__(self, "_session", session)
         object.__setattr__(self, "_input_name", _single_input_name(session))
@@ -123,9 +118,9 @@ class OnnxInspectionInferenceProvider:
         )
 
 
-def _placeholder_model_path(
+def _placeholder_model_artifact(
     configuration: onnx_session.OnnxSessionConfiguration,
-) -> Path:
+) -> model_artifact.GovernedModelArtifact:
     model_reference = configuration.model_reference
     if model_reference.reference_id != ONNX_PLACEHOLDER_MODEL_REFERENCE_ID:
         raise InspectionExaminationFailure(
@@ -135,128 +130,81 @@ def _placeholder_model_path(
         raise InspectionExaminationFailure(
             "ONNX placeholder model requires an artifact path"
         )
-    path = Path(model_reference.artifact_path).expanduser().resolve()
-    if not path.exists() or not path.is_file():
-        raise InspectionExaminationFailure(
-            f"ONNX placeholder model is missing or unreadable: {path}"
-        )
-    return path
-
-
-def _verify_placeholder_model_reference(
-    configuration: onnx_session.OnnxSessionConfiguration,
-    model_path: Path,
-) -> None:
-    expected_hash = configuration.model_reference.content_sha256
-    if expected_hash is None:
+    if model_reference.content_sha256 is None:
         raise InspectionExaminationFailure(
             "ONNX placeholder model requires a recorded content hash"
         )
-    actual_hash = sha256(model_path.read_bytes()).hexdigest()
-    if actual_hash != expected_hash:
-        raise InspectionExaminationFailure(
-            "ONNX placeholder model content hash does not match configuration"
+
+    try:
+        return model_artifact.canonical_model_artifact(
+            identity="kalibra/inspection/onnx-placeholder-boundary-model",
+            version="1.0.0",
+            content_hash=model_reference.content_sha256,
+            artifact_path=model_reference.artifact_path,
+            artifact_format=model_artifact.MODEL_ARTIFACT_FORMAT_ONNX,
+            producer="Kalibra deterministic ONNX provider fixture",
+            provenance=(
+                "Deterministic placeholder ONNX model for provider boundary proof"
+            ),
+            lineage=(
+                (
+                    "source",
+                    "tests/fixtures/inspection/onnx_placeholder/"
+                    "generate_placeholder_onnx.py",
+                ),
+            ),
+            framework_name=model_artifact.MODEL_FRAMEWORK_ONNX_RUNTIME,
+            framework_version=_framework_version_for_artifact(),
+            onnx_opset=17,
+            compatibility_declaration="CPU baseline compatibility only",
         )
+    except (TypeError, ValueError) as exc:
+        raise InspectionExaminationFailure(
+            "ONNX provider model artifact construction failed"
+        ) from exc
 
 
-def _load_runtime() -> object:
-    runtime = onnx_runtime._load_onnxruntime()
-    if runtime is None:
+def _framework_version_for_artifact() -> str:
+    framework_version = onnx_runtime.onnx_runtime_version()
+    if framework_version is None:
         raise InspectionExaminationFailure("ONNX Runtime is unavailable")
-    if not callable(getattr(runtime, "InferenceSession", None)):
-        raise InspectionExaminationFailure(
-            "ONNX Runtime does not expose InferenceSession"
-        )
-    return runtime
+    return framework_version
 
 
-def _create_session(
-    runtime: object,
+def _load_placeholder_model(
+    artifact: model_artifact.GovernedModelArtifact,
     configuration: onnx_session.OnnxSessionConfiguration,
-    model_path: Path,
-) -> object:
-    provider_names = _provider_names(configuration)
-    _validate_provider_availability(provider_names)
+) -> model_loader.ProviderPrivateLoadedModel:
+    loader_configuration = _loader_session_configuration(artifact, configuration)
     try:
-        return runtime.InferenceSession(
-            str(model_path),
-            sess_options=_session_options(runtime, configuration.session_options),
-            providers=provider_names,
-            provider_options=_provider_options(configuration),
+        return model_loader.load_governed_model(
+            artifact,
+            session_configuration=loader_configuration,
+            expected_artifact_fingerprint=(
+                model_artifact.model_artifact_fingerprint(artifact)
+            ),
         )
-    except InspectionExaminationFailure:
-        raise
-    except Exception as exc:
+    except model_loader.ModelLoaderError as exc:
         raise InspectionExaminationFailure(
-            "ONNX Runtime session creation failed"
+            f"ONNX provider validated model loading failed: {exc}"
         ) from exc
 
 
-def _provider_names(
+def _loader_session_configuration(
+    artifact: model_artifact.GovernedModelArtifact,
     configuration: onnx_session.OnnxSessionConfiguration,
-) -> tuple[str, ...]:
-    return tuple(provider.name for provider in configuration.execution_providers)
-
-
-def _provider_options(
-    configuration: onnx_session.OnnxSessionConfiguration,
-) -> tuple[dict[str, str], ...]:
-    return tuple(
-        dict(provider.provider_options)
-        for provider in configuration.execution_providers
+) -> onnx_session.OnnxSessionConfiguration:
+    reference = configuration.model_reference
+    return onnx_session.OnnxSessionConfiguration(
+        model_reference=onnx_session.OnnxModelReference(
+            reference_id=model_artifact.model_artifact_identity(artifact),
+            artifact_path=reference.artifact_path,
+            content_sha256=reference.content_sha256,
+        ),
+        execution_providers=configuration.execution_providers,
+        session_options=configuration.session_options,
+        execution_provider_policy=configuration.execution_provider_policy,
     )
-
-
-def _validate_provider_availability(provider_names: tuple[str, ...]) -> None:
-    available = onnx_runtime.available_execution_providers()
-    if not available:
-        raise InspectionExaminationFailure(
-            "ONNX Runtime exposes no execution providers"
-        )
-    missing = tuple(
-        provider_name
-        for provider_name in provider_names
-        if provider_name not in available
-    )
-    if missing:
-        raise InspectionExaminationFailure(
-            "ONNX Runtime is missing requested execution provider"
-        )
-
-
-def _session_options(
-    runtime: object,
-    options: onnx_session.OnnxSessionOptions,
-) -> object:
-    session_options_factory = getattr(runtime, "SessionOptions", None)
-    if not callable(session_options_factory):
-        raise InspectionExaminationFailure(
-            "ONNX Runtime does not expose SessionOptions"
-        )
-    session_options = session_options_factory()
-    setattr(session_options, "intra_op_num_threads", options.intra_op_num_threads)
-    setattr(session_options, "inter_op_num_threads", options.inter_op_num_threads)
-    setattr(
-        session_options,
-        "graph_optimization_level",
-        _graph_optimization_level(runtime, options.optimization_level),
-    )
-    return session_options
-
-
-def _graph_optimization_level(runtime: object, optimization_level: str) -> object:
-    graph_levels = getattr(runtime, "GraphOptimizationLevel", None)
-    if graph_levels is None:
-        raise InspectionExaminationFailure(
-            "ONNX Runtime does not expose graph optimization levels"
-        )
-    runtime_level_name = _SESSION_OPTIMIZATION_LEVELS[optimization_level]
-    try:
-        return getattr(graph_levels, runtime_level_name)
-    except AttributeError as exc:
-        raise InspectionExaminationFailure(
-            "ONNX Runtime graph optimization level is incompatible"
-        ) from exc
 
 
 def _single_input_name(session: object) -> str:

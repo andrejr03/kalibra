@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import fields, is_dataclass
+from dataclasses import fields, is_dataclass, replace
 from hashlib import sha256
 from pathlib import Path
 from typing import Iterable, Mapping, Sequence
@@ -9,7 +9,6 @@ import pytest
 
 from src.frameworks import model_loader, onnx_runtime, onnx_session
 from src.frameworks import model_artifact
-from src.inspection import providers_onnx
 
 
 VALID_MODEL_BYTES = b"valid-onnx-model-bytes"
@@ -136,6 +135,70 @@ def test_invalid_onnx_model_fails_without_partial_load(monkeypatch, tmp_path) ->
     assert runtime.sessions == []
 
 
+def test_session_creation_is_not_public_loader_api() -> None:
+    assert not hasattr(model_loader, "create_inference_session")
+    assert "create_inference_session" not in model_loader.__all__
+
+
+def test_forged_validated_model_load_cannot_bypass_content_hash_verification(
+    tmp_path,
+) -> None:
+    runtime = FakeRuntime()
+    model_path = _write_model(tmp_path, VALID_MODEL_BYTES)
+    artifact = _artifact_for_path(model_path)
+    validated = model_loader.validate_model_before_loading(
+        artifact,
+        runtime=runtime,
+    )
+    model_path.write_bytes(INVALID_MODEL_BYTES)
+
+    with pytest.raises(model_loader.ModelLoaderValidationError, match="fingerprint"):
+        model_loader._create_inference_session(validated, runtime=runtime)
+
+    assert runtime.sessions == []
+
+
+def test_forged_validated_model_load_cannot_bypass_artifact_fingerprint_validation(
+    tmp_path,
+) -> None:
+    runtime = FakeRuntime()
+    artifact = _artifact_for_path(_write_model(tmp_path, VALID_MODEL_BYTES))
+    validated = model_loader.validate_model_before_loading(
+        artifact,
+        runtime=runtime,
+    )
+    forged = replace(validated, artifact_fingerprint="f" * 64)
+
+    with pytest.raises(
+        model_loader.ModelLoaderValidationError,
+        match="artifact fingerprint",
+    ):
+        model_loader._create_inference_session(forged, runtime=runtime)
+
+    assert runtime.sessions == []
+
+
+def test_forged_validated_model_load_cannot_bypass_compatibility_validation(
+    tmp_path,
+) -> None:
+    validation_runtime = FakeRuntime()
+    incompatible_runtime = FakeRuntime(version="1.18.0")
+    artifact = _artifact_for_path(_write_model(tmp_path, VALID_MODEL_BYTES))
+    validated = model_loader.validate_model_before_loading(
+        artifact,
+        runtime=validation_runtime,
+    )
+
+    with pytest.raises(model_loader.ModelLoaderCompatibilityError, match="version"):
+        model_loader._create_inference_session(
+            validated,
+            runtime=incompatible_runtime,
+        )
+
+    assert validation_runtime.sessions == []
+    assert incompatible_runtime.sessions == []
+
+
 def test_duplicate_validation_inconsistencies_fail_before_loading(
     monkeypatch,
     tmp_path,
@@ -237,11 +300,9 @@ def test_runtime_objects_do_not_leak_from_public_loader_surface(
     assert not hasattr(loaded, "onnx_session")
 
 
-def test_provider_behavior_is_not_changed_by_loader_sprint() -> None:
-    provider_source = Path(providers_onnx.__file__).read_text(encoding="utf-8")
+def test_loader_does_not_depend_on_provider_or_downstream_domains() -> None:
     loader_source = Path(model_loader.__file__).read_text(encoding="utf-8")
 
-    assert "model_loader" not in provider_source
     forbidden_loader_text = (
         "src.inspection",
         "src.trust",

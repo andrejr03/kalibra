@@ -107,7 +107,7 @@ def load_governed_model(
         expected_compatibility=expected_compatibility,
         runtime=runtime,
     )
-    private_session = create_inference_session(validated, runtime=runtime)
+    private_session = _create_inference_session(validated, runtime=runtime)
     return ProviderPrivateLoadedModel(
         artifact=validated.artifact,
         model_path=validated.model_path,
@@ -167,13 +167,12 @@ def validate_model_before_loading(
     )
 
 
-def create_inference_session(
+def _create_inference_session(
     validated_model: ValidatedModelLoad,
     *,
     runtime: object | None = None,
 ) -> ProviderPrivateInferenceSession:
-    if not isinstance(validated_model, ValidatedModelLoad):
-        raise TypeError("validated_model must be a ValidatedModelLoad")
+    validated_model = _validate_session_creation_inputs(validated_model)
 
     runtime_object = _load_runtime(runtime)
     _validate_compatibility(
@@ -209,6 +208,57 @@ def create_inference_session(
     return ProviderPrivateInferenceSession(
         session_configuration_hash=validated_model.session_configuration_hash,
         _runtime_session=runtime_session,
+    )
+
+
+def _validate_session_creation_inputs(
+    validated_model: ValidatedModelLoad,
+) -> ValidatedModelLoad:
+    if not isinstance(validated_model, ValidatedModelLoad):
+        raise TypeError("validated_model must be a ValidatedModelLoad")
+
+    canonical_artifact = _canonical_artifact(validated_model.artifact)
+    actual_fingerprint = _artifact_fingerprint(canonical_artifact)
+    if actual_fingerprint != validated_model.artifact_fingerprint:
+        raise ModelLoaderValidationError("model artifact fingerprint mismatch")
+
+    model_path = _resolved_model_path(canonical_artifact)
+    try:
+        supplied_model_path = Path(validated_model.model_path).expanduser().resolve()
+    except TypeError as exc:
+        raise ModelLoaderValidationError("validated model path is invalid") from exc
+    if supplied_model_path != model_path:
+        raise ModelLoaderValidationError("validated model path mismatch")
+
+    content_sha256 = _read_and_hash_model(model_path)
+    if content_sha256 != canonical_artifact.content_hash.content_sha256:
+        raise ModelLoaderValidationError("model fingerprint mismatch")
+    if content_sha256 != validated_model.model_content_sha256:
+        raise ModelLoaderValidationError("validated model content hash mismatch")
+
+    configuration = _canonical_session_configuration(
+        canonical_artifact,
+        model_path,
+        validated_model.session_configuration,
+    )
+    if configuration != validated_model.session_configuration:
+        raise ModelLoaderValidationError(
+            "validated session configuration mismatch"
+        )
+
+    configuration_hash = onnx_session.session_configuration_hash(configuration)
+    if configuration_hash != validated_model.session_configuration_hash:
+        raise ModelLoaderValidationError(
+            "validated session configuration hash mismatch"
+        )
+
+    return ValidatedModelLoad(
+        artifact=canonical_artifact,
+        model_path=model_path,
+        model_content_sha256=content_sha256,
+        artifact_fingerprint=actual_fingerprint,
+        session_configuration=configuration,
+        session_configuration_hash=configuration_hash,
     )
 
 
@@ -502,7 +552,6 @@ __all__ = [
     "ProviderPrivateInferenceSession",
     "ProviderPrivateLoadedModel",
     "ValidatedModelLoad",
-    "create_inference_session",
     "load_governed_model",
     "load_model",
     "validate_model_before_loading",

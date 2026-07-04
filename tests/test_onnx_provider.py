@@ -8,6 +8,7 @@ from pathlib import Path
 
 import pytest
 
+from src.frameworks import model_artifact, model_loader, onnx_session
 from provider_conformance import (
     ProviderConformanceCase,
     assert_provider_boundary_isolation,
@@ -97,6 +98,70 @@ def test_onnx_provider_passes_conformance_harness(monkeypatch) -> None:
     assert_provider_conforms_to_prediction_contract(case)
     assert_provider_deterministic_replay(case)
     assert_provider_boundary_isolation(case)
+
+
+def test_onnx_provider_uses_validated_model_loader_path(monkeypatch) -> None:
+    runtime = FakeRuntime()
+    _install_runtime(monkeypatch, runtime)
+    calls = []
+
+    def fake_load_governed_model(
+        artifact,
+        *,
+        session_configuration,
+        expected_artifact_fingerprint,
+        **kwargs,
+    ):
+        calls.append(
+            (
+                artifact,
+                session_configuration,
+                expected_artifact_fingerprint,
+                kwargs,
+            )
+        )
+        assert type(artifact) is model_artifact.GovernedModelArtifact
+        assert type(session_configuration) is OnnxSessionConfiguration
+        assert expected_artifact_fingerprint == (
+            model_artifact.model_artifact_fingerprint(artifact)
+        )
+        assert session_configuration.model_reference.reference_id == (
+            model_artifact.model_artifact_identity(artifact)
+        )
+        assert session_configuration.model_reference.content_sha256 == (
+            _placeholder_model_hash()
+        )
+        assert kwargs == {}
+        return FakeLoadedModel(session_configuration)
+
+    monkeypatch.setattr(
+        model_loader,
+        "load_governed_model",
+        fake_load_governed_model,
+    )
+
+    provider = OnnxInspectionInferenceProvider(
+        session_configuration=_session_configuration()
+    )
+    prediction = provider.predict(_inspection_input())
+
+    assert type(prediction) is InspectionPrediction
+    assert len(calls) == 1
+    assert runtime.sessions == []
+
+
+def test_onnx_provider_does_not_bypass_loader_content_hash_validation(
+    monkeypatch,
+) -> None:
+    runtime = FakeRuntime()
+    _install_runtime(monkeypatch, runtime)
+
+    with pytest.raises(InspectionExaminationFailure, match="fingerprint"):
+        OnnxInspectionInferenceProvider(
+            session_configuration=_session_configuration(content_sha256="0" * 64)
+        )
+
+    assert runtime.sessions == []
 
 
 def test_onnx_provider_real_runtime_integration() -> None:
@@ -358,8 +423,25 @@ class FakeRuntime:
         return session
 
 
+class FakeLoadedModel:
+    def __init__(self, configuration: OnnxSessionConfiguration) -> None:
+        self.session_configuration = configuration
+        self.session_configuration_hash = onnx_session.session_configuration_hash(
+            configuration
+        )
+        self.session = FakeInferenceSession(
+            str(PLACEHOLDER_MODEL_PATH.resolve()),
+            sess_options=FakeSessionOptions(),
+            providers=("CPUExecutionProvider",),
+            provider_options=(),
+        )
+
+    def _session_for_provider(self):
+        return self.session
+
+
 class IncompatibleRuntime:
-    __version__ = "0.0"
+    __version__ = "1.17.3"
     GraphOptimizationLevel = FakeGraphOptimizationLevel
     SessionOptions = FakeSessionOptions
 
