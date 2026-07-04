@@ -23,31 +23,34 @@ and
 **Current authorization status.**
 
 ```text
-AUTHORIZED WITH RESTRICTIONS — Sprint 1F only.
+AUTHORIZED WITH RESTRICTIONS — Sprint 1G only.
 
 Full ML Phase 2 implementation remains DEFERRED.
-Only the Loader Hardening + Provider Loader Wiring slice (Sprint 1F) is authorized.
+Only the Deterministic Image Preprocessing slice (Sprint 1G) is authorized.
 ONNX Runtime selected as first runtime candidate (Framework ADR).
-Loader hardening is authorized so session creation cannot bypass the model-content hash gate.
-Wiring the ONNX provider to the provider-private validated loader/session path is authorized.
-Inference is authorized only inside the existing Sprint 1C ONNX provider boundary, terminating at InspectionPrediction.
-No new prediction semantics. No provider contract changes beyond consuming the loader.
-No dataset approved. Dataset Selection ADR remains deferred.
+Deterministic decoding of existing local image fixtures into a declared tensor contract is authorized.
+Fixed-shape preprocessing, normalization, and validation/rejection of malformed images are authorized.
+The preprocessed tensor may feed the existing ONNX provider on a provider-private path only.
+Only InspectionPrediction may cross the provider boundary; no tensor, session, runtime, or preprocessing object may escape.
+No new real/trained model. No output mapping changes beyond consuming the preprocessed tensor.
+No dataset ingestion. Dataset Selection ADR remains deferred.
+No benchmark, evaluation metric, lifecycle/telemetry, or CLI/UI integration.
 No evaluation protocol fixed.
-No work outside the Sprint 1F loader-hardening and provider-wiring slice is authorized.
+No work outside the Sprint 1G deterministic image preprocessing slice is authorized.
 ```
 
-This revision (recorded under §13 and detailed in **Addendum F**) grants a single,
-narrowly bounded restricted authorization for Loader Hardening + Provider Loader
-Wiring work (Sprint 1F) and nothing else. The **full** ML Phase 2 authorization
+This revision (recorded under §13 and detailed in **Addendum G**) grants a single,
+narrowly bounded restricted authorization for Deterministic Image Preprocessing work
+(Sprint 1G) and nothing else. The **full** ML Phase 2 authorization
 remains **Deferred**: the §3 preconditions for general provider-and-inference work
 are not all met, and that status **must not** change to "Authorized" except by the
-repository owner and only when the conditions in §12 are met. The Sprint 1F
-restriction is defined, scoped, and bounded in **Addendum F**. The prior Sprint 1B
-(Addendum A), Sprint 1C (Addendum B), Sprint 1D (Addendum C), and Sprint 1E
-(Addendum E) grants are preserved as records of earlier restricted substrate,
-provider-boundary, governed-artifact, and model-loader authorizations. Work outside
-the active Sprint 1F slice remains unauthorized.
+repository owner and only when the conditions in §12 are met. The Sprint 1G
+restriction is defined, scoped, and bounded in **Addendum G**. The prior Sprint 1B
+(Addendum A), Sprint 1C (Addendum B), Sprint 1D (Addendum C), Sprint 1E
+(Addendum E), and Sprint 1F (Addendum F) grants are preserved as records of earlier
+restricted substrate, provider-boundary, governed-artifact, model-loader, and
+loader-hardening/provider-wiring authorizations. Work outside the active Sprint 1G
+slice remains unauthorized.
 
 ---
 
@@ -69,7 +72,7 @@ are met, recorded, and signed off by the repository owner (§10, §11). Absent t
 the standing status of the full authorization is Deferred (§11). It grants no
 authority to select a framework or make any scientific, benchmark, or product claim;
 the sole active implementation authority it currently grants is the restricted Sprint
-1F slice recorded in Addendum F, and, beyond that, at most the conditional
+1G slice recorded in Addendum G, and, beyond that, at most the conditional
 permission to begin implementation under the constraints of §8 once every gate is
 green.
 
@@ -316,9 +319,9 @@ The following checklist is suitable for repository-owner sign-off. **Full** ML P
 authorization requires every item checked; any unchecked item leaves the full
 authorization at Deferred. The checklist distinguishes the full authorization (still
 incomplete) from the restricted slice authorizations: Sprint 1B (Addendum A),
-Sprint 1C (Addendum B), Sprint 1D (Addendum C), Sprint 1E (Addendum E), and the
-active Sprint 1F Loader Hardening + Provider Loader Wiring slice (Addendum F), which
-is allowed only while every Sprint 1F restriction is met.
+Sprint 1C (Addendum B), Sprint 1D (Addendum C), Sprint 1E (Addendum E), Sprint 1F
+(Addendum F), and the active Sprint 1G Deterministic Image Preprocessing slice
+(Addendum G), which is allowed only while every Sprint 1G restriction is met.
 
 **Full ML Phase 2 authorization — status: INCOMPLETE.**
 
@@ -521,6 +524,37 @@ implementation remains DEFERRED. This update records Sprint 1F as completed only
 An unchecked or breached Sprint 1F item voids only the Sprint 1F grant; it does not
 and cannot advance the full authorization, which remains governed by §3–§9 and §12.
 
+**Sprint 1G restricted authorization (Addendum G) — status: ALLOWED under
+restrictions.**
+
+```text
+Sprint 1G — Deterministic Image Preprocessing (Addendum G)
+[x] Framework ADR approved and updated: ONNX Runtime selected as first
+    runtime candidate
+[x] Provider conformance and deterministic-replay harness in place
+[x] ONNX Runtime discovery substrate in place, isolated, absence-safe
+[x] ONNX Session Substrate in place for deterministic configuration values
+[x] ONNX-backed provider boundary proof in place (Sprint 1C, Addendum B)
+[x] Governed Model Artifact value objects in place (Sprint 1D, Addendum C)
+[x] Deterministic provider-private Model Loader in place (Sprint 1E, Addendum E)
+[x] Loader hardening + provider loader wiring in place (Sprint 1F, Addendum F)
+[x] Sprint 1G scope bounded to deterministic image artifact decoding, fixed-shape
+    preprocessing, normalization into a declared tensor contract, validation/
+    rejection of malformed images, existing local fixtures only, a provider-private
+    preprocessing path feeding the ONNX provider, metadata recording of the
+    preprocessing contract, and deterministic replay tests
+[x] Architecture contracts reaffirmed unchanged (Addendum G §G.4): only
+    InspectionPrediction crosses the provider boundary; no tensor, session, runtime,
+    or preprocessing object escapes it
+[x] No new real/trained model, no output mapping change beyond consuming the
+    preprocessed tensor, no dataset ingestion, benchmark, evaluation metric,
+    lifecycle/telemetry, CLI/UI, scientific-claim, or product-claim path implied
+[ ] Sprint 1G validation evidence recorded on completion (Addendum G §G.7)
+```
+
+An unchecked or breached Sprint 1G item voids only the Sprint 1G grant; it does not
+and cannot advance the full authorization, which remains governed by §3–§9 and §12.
+
 ---
 
 ## 11. Approval Decision
@@ -548,17 +582,18 @@ implementation to begin, and neither may be recorded except by the repository ow
 **Recorded outcome for this revision.**
 
 ```text
-AUTHORIZED WITH RESTRICTIONS — Sprint 1F only (Addendum F).
+AUTHORIZED WITH RESTRICTIONS — Sprint 1G only (Addendum G).
 Full ML Phase 2 implementation remains DEFERRED.
 ```
 
-The active restriction is the entirety of Addendum F: only the Loader Hardening +
-Provider Loader Wiring slice defined there is permitted, and all work outside that
-slice remains unauthorized. The Sprint 1B substrate grant (Addendum A), Sprint 1C
+The active restriction is the entirety of Addendum G: only the Deterministic Image
+Preprocessing slice defined there is permitted, and all work outside that slice
+remains unauthorized. The Sprint 1B substrate grant (Addendum A), Sprint 1C
 provider-boundary proof (Addendum B), Sprint 1D governed-artifact grant (Addendum C),
-and Sprint 1E model-loader grant (Addendum E) remain recorded as prior restricted
-authorizations. The unmet items for the full authorization remain the dataset gate
-(§5), the evaluation gate (§6), and full owner sign-off (§10, §12).
+Sprint 1E model-loader grant (Addendum E), and Sprint 1F loader-hardening + provider-
+wiring grant (Addendum F) remain recorded as prior restricted authorizations. The
+unmet items for the full authorization remain the dataset gate (§5), the evaluation
+gate (§6), and full owner sign-off (§10, §12).
 
 ---
 
@@ -615,22 +650,24 @@ chooses no dataset, picks no metric, and expresses no preference; it fixes the
 objective conditions under which implementation may begin. The full ML Phase 2
 authorization remains Deferred until those conditions are met and signed off by the
 repository owner. The only active implementation permission this revision grants is
-the restricted Sprint 1F slice recorded in Addendum F.
+the restricted Sprint 1G slice recorded in Addendum G.
 
 ```text
-Sprint 1F may proceed under restriction.
+Sprint 1G may proceed under restriction.
 Full ML Phase 2 implementation remains blocked.
 ```
 
-Loader hardening and provider-private loader wiring are now authorized. Inference is
-authorized only inside the existing Sprint 1C ONNX provider boundary; dataset,
-evaluation, product, and scientific work remain unauthorized.
+Deterministic image preprocessing into a declared tensor contract is now authorized,
+on a provider-private path feeding the existing Sprint 1C ONNX provider boundary.
+Only `InspectionPrediction` may cross that boundary; no tensor, session, runtime, or
+preprocessing object may escape it. Dataset, evaluation, lifecycle, product, and
+scientific work remain unauthorized.
 
 Three principles are affirmed and binding:
 
 - **ML Phase 2 implementation remains blocked until the full authorization is
   granted.** Framework-backed provider work is permitted only inside the constraints
-  of an Authorized or restricted grant. The Sprint 1F grant (Addendum F) is such a
+  of an Authorized or restricted grant. The Sprint 1G grant (Addendum G) is such a
   restricted grant and extends to nothing beyond its recorded scope; all other ML
   Phase 2 implementation remains blocked while the full status is Deferred.
 - **Architecture governance remains authoritative over implementation convenience.**
@@ -1465,3 +1502,191 @@ Full ML Phase 2 implementation remains blocked.
 Loader hardening and provider-private loader wiring are now authorized. Inference is
 authorized only inside the existing Sprint 1C ONNX provider boundary; dataset,
 evaluation, product, and scientific work remains unauthorized.
+
+## Addendum G — Sprint 1G Restricted Authorization (Deterministic Image Preprocessing)
+
+This addendum records the active restricted authorization granted under §11
+("Authorized with restrictions"). It authorizes exactly one bounded engineering
+slice and nothing else. It introduces deterministic image preprocessing that turns an
+existing local image fixture into a declared tensor contract on a provider-private
+path feeding the existing Sprint 1C ONNX provider; it is not a new-model
+authorization, not an output-mapping authorization, not a dataset or evaluation
+authorization, and not a general ML Phase 2 authorization.
+
+### G.1 Authorized Slice
+
+```text
+Sprint 1G — Deterministic Image Preprocessing
+```
+
+Sprint 1G is preprocessing work only: deterministically decoding a local image
+artifact, applying fixed-shape preprocessing and normalization into a declared tensor
+contract, validating and rejecting malformed images, and recording the preprocessing
+contract as metadata. The preprocessed tensor may feed the existing ONNX provider on a
+provider-private path. Provider output remains exactly `InspectionPrediction`.
+
+### G.2 Permitted Scope
+
+Sprint 1G work **may** include, and only include:
+
+- deterministic image artifact decoding;
+- fixed-shape preprocessing;
+- normalization into a declared tensor contract (fixed shape and dtype);
+- validation and deterministic rejection of malformed, off-contract, or corrupt
+  images;
+- use of existing local fixtures only
+  (for example `tests/fixtures/inspection/*.pgm`);
+- a provider-private preprocessing path that feeds the existing ONNX provider;
+- recording the preprocessing contract (shape, dtype, normalization) as governed
+  metadata on the resulting prediction;
+- deterministic replay tests proving that identical input bytes yield an identical
+  tensor and identical `InspectionPrediction`, and that malformed inputs are rejected.
+
+The preprocessing path is provider-private. The decoded image, the intermediate
+buffers, the normalized tensor, and any runtime object must not become public domain
+contracts and must not appear in `InspectionPrediction`, `RawInspectionResult`, Trust,
+Review, Evidence, Evaluation, integration, CLI, UI, or prototype code.
+
+### G.3 Forbidden Scope
+
+Sprint 1G work **must not** include:
+
+- any new real or trained model;
+- any output mapping change beyond consuming the preprocessed tensor;
+- any dataset ingestion;
+- any dataset selection or splitting;
+- any benchmark logic;
+- any evaluation metrics;
+- any lifecycle or telemetry tracking;
+- any CLI integration;
+- any UI or prototype integration;
+- any scientific, product, or performance claim;
+- provider construction of `RawInspectionResult`;
+- Trust, Review, Evidence, or Evaluation Engine changes.
+
+Any of these voids the Sprint 1G grant for the affected work (§8, §9) and remains
+unauthorized until explicitly approved by a later restricted grant or full
+authorization under §12. The preprocessed tensor may feed the ONNX provider, but the
+provider's behavior beyond consuming that tensor is unchanged, and no new inference
+semantics are introduced.
+
+### G.4 Architecture Constraints (Unchanged and Binding)
+
+All existing ownership remains binding exactly as fixed by §7–§9:
+
+```text
+Local image fixture
+    ↓
+Provider-private Deterministic Preprocessing (decode → fixed shape → normalize → tensor)
+    ↓
+Provider-private InferenceSession (existing Sprint 1C/1F path)
+    ↓
+OnnxInspectionInferenceProvider
+    ↓
+InspectionPrediction
+    ↓
+InspectionEngine.transform_prediction(...)
+    ↓
+RawInspectionResult
+    ↓
+Trust
+    ↓
+Review
+    ↓
+Evidence
+    ↓
+Evaluation
+```
+
+Only `InspectionPrediction` may cross the provider boundary. The preprocessing stage,
+the decoded image, the normalized tensor, and the `InferenceSession` all remain
+provider-private; no tensor, session, runtime object, execution-provider object, model
+object, preprocessing object, or intermediate output may cross any provider or domain
+boundary. Sprint 1G must not modify `InspectionPrediction`,
+`InspectionInferenceProvider`, `InspectionEngine.transform_prediction(...)`,
+`RawInspectionResult`, or any Trust, Review, Evidence, Evaluation, integration, CLI,
+UI, or prototype contract. The provider's public contract is unchanged except that its
+input tensor is now produced by the provider-private preprocessing path rather than a
+metadata-derived scalar.
+
+### G.5 Framework Decision Linkage
+
+The Framework ADR
+([`KALIBRA_ML_PHASE_2_FRAMEWORK_ADR_v1.0.md`](KALIBRA_ML_PHASE_2_FRAMEWORK_ADR_v1.0.md))
+records **ONNX Runtime as the first selected runtime candidate**.
+
+- Sprint 1A introduced runtime discovery.
+- Sprint 1B introduced session configuration.
+- Sprint 1C introduced the provider boundary proof.
+- Sprint 1D introduced governed model artifacts.
+- Sprint 1E introduced deterministic model loading.
+- Sprint 1F hardened that loader and wired it into the Sprint 1C provider.
+- Sprint 1G introduces deterministic image preprocessing feeding that provider.
+
+No new model, no new inference semantics beyond consuming the preprocessed tensor, and
+no dataset, evaluation, lifecycle, scientific, or product work is authorized. The
+placeholder ONNX model remains the only model; Sprint 1G does not replace, retrain, or
+add a model.
+
+### G.6 Dataset and Evaluation Status
+
+Recorded as of this revision:
+
+- **No dataset is selected.** The Dataset Selection ADR remains **DEFER DATASET
+  SELECTION**. Existing local fixtures are engineering test inputs only, not a
+  selected dataset.
+- Deterministic preprocessing is engineering substrate only. A decoded, normalized
+  tensor is not a selected dataset artifact, not evaluation evidence, and not a basis
+  for any inspection-quality claim.
+- **No evaluation protocol is fixed.** Metrics, statistical procedure, and benchmark
+  policy application remain deferred under the Evaluation Strategy.
+
+Therefore Sprint 1G **may not produce scientific claims** of any kind. Its outputs are
+engineering-tier only under the three-tier claim policy: deterministic decoding,
+fixed-shape preprocessing, normalization into a declared tensor contract, malformed-
+input rejection, provider-private wiring, preprocessing-contract metadata, and
+deterministic replay — never inference quality, accuracy, performance, benchmark,
+calibration, or product claims.
+
+### G.7 Required Validation for Sprint 1G
+
+Any Sprint 1G implementation must pass, and record the output of:
+
+```bash
+python3 -m pytest tests/test_image_preprocessing.py -q
+python3 -m pytest tests/test_onnx_provider.py -q
+python3 -m pytest tests/test_provider_conformance.py -q
+python3 -m pytest -q
+python3 -m compileall -q src tests scripts
+git diff --check
+git status --short
+```
+
+It must additionally record checks proving:
+
+- identical input bytes yield an identical preprocessed tensor and identical
+  `InspectionPrediction`;
+- malformed, off-contract, or corrupt images are deterministically rejected;
+- the preprocessing path uses existing local fixtures only;
+- the preprocessed tensor stays provider-private and does not cross the provider
+  boundary;
+- provider output remains exactly `InspectionPrediction`;
+- no tensor, session, runtime, or preprocessing object crosses the provider boundary;
+- no downstream domain package changed (`src/trust/`, `src/review/`,
+  `src/evidence/`, `src/evaluation/`, `src/integration/`, `src/prototype_ui/`);
+- no CLI, UI, or integration path changed;
+- no new real/trained model, output mapping change beyond consuming the tensor,
+  dataset ingestion, benchmark, evaluation metric, lifecycle/telemetry, scientific-
+  claim, or product-claim path was added.
+
+### G.8 Standing Recommendation
+
+```text
+Sprint 1G may proceed under restriction.
+Full ML Phase 2 implementation remains blocked.
+```
+
+Deterministic image preprocessing into a declared tensor contract is now authorized,
+on a provider-private path feeding the existing Sprint 1C ONNX provider boundary. Only
+`InspectionPrediction` may cross that boundary; dataset, evaluation, lifecycle,
+product, and scientific work remains unauthorized.
