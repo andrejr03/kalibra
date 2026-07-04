@@ -549,8 +549,26 @@ Sprint 1G — Deterministic Image Preprocessing (Addendum G)
 [x] No new real/trained model, no output mapping change beyond consuming the
     preprocessed tensor, no dataset ingestion, benchmark, evaluation metric,
     lifecycle/telemetry, CLI/UI, scientific-claim, or product-claim path implied
-[ ] Sprint 1G validation evidence recorded on completion (Addendum G §G.7)
+[x] Sprint 1G validation evidence recorded on completion (Addendum G §G.7)
 ```
+
+Sprint 1G completion evidence recorded:
+
+```text
+tests/test_image_preprocessing.py: 8 passed
+tests/test_onnx_provider.py: 17 passed, 1 skipped
+tests/test_provider_conformance.py: 9 passed
+full suite: 443 passed, 1 skipped
+compileall: passed
+git diff --check: passed
+```
+
+Sprint 1G successfully delivered deterministic local PGM P2 decoding, SHA-256
+content-hash validation before preprocessing, fixed-shape preprocessing,
+deterministic normalization into the declared tensor contract, provider input
+derived from image bytes rather than metadata hashing, preservation of the provider
+boundary with output remaining exactly `InspectionPrediction`, and no downstream
+domain changes.
 
 An unchecked or breached Sprint 1G item voids only the Sprint 1G grant; it does not
 and cannot advance the full authorization, which remains governed by §3–§9 and §12.
@@ -1679,10 +1697,28 @@ It must additionally record checks proving:
   dataset ingestion, benchmark, evaluation metric, lifecycle/telemetry, scientific-
   claim, or product-claim path was added.
 
+Sprint 1G completion evidence:
+
+```text
+tests/test_image_preprocessing.py: 8 passed
+tests/test_onnx_provider.py: 17 passed, 1 skipped
+tests/test_provider_conformance.py: 9 passed
+full suite: 443 passed, 1 skipped
+compileall: passed
+git diff --check: passed
+```
+
+Sprint 1G is recorded as completed under the restricted authorization. The completed
+slice delivered deterministic local PGM P2 decoding, SHA-256 content-hash validation
+before preprocessing, fixed-shape preprocessing, deterministic normalization into
+the declared tensor contract, provider input derived from image bytes rather than
+metadata hashing, provider-boundary preservation with output remaining exactly
+`InspectionPrediction`, and no downstream domain changes.
+
 ### G.8 Standing Recommendation
 
 ```text
-Sprint 1G may proceed under restriction.
+Sprint 1G completed under restriction.
 Full ML Phase 2 implementation remains blocked.
 ```
 
