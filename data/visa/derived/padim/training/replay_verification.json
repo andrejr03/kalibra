@@ -1,0 +1,33 @@
+{
+  "comparisons": {
+    "covariance": true,
+    "covariance_inverse": true,
+    "covariance_inverse_hash": true,
+    "feature_indices": true,
+    "feature_tensors": true,
+    "mu": true,
+    "mu_hash": true
+  },
+  "complete_second_fit": true,
+  "hashes": {
+    "covariance_by_class": "17a372cfeb32dd1b02d93d45af3f4ec0b6a59c56351e0cf9534c7ece0b90b48d",
+    "covariance_inverse_by_class": "893af9e08d3543b5bd973ab913c1f2e8ed57d26a1bbb225b194d525cfc8df7b3",
+    "feature_indices": "1ca5583a7b498b4849e42717f24ebcf82d82a6c545b852814ada12b5c287cbe3",
+    "feature_tensors": {
+      "candle": "5be881ff287dc69140ebed15da8195a5c7296aab51c04d05a8a7167dc2f07823",
+      "capsules": "a021181cac7af5d139811c429b0533fcf2e0789f76be0fcc9c42a2b4b65d4548",
+      "cashew": "d3d290fa83edc24b6537d3b0f6cca18ee370d178c34cc795d0ffefbf0afd6964",
+      "chewinggum": "bc9e5fcf699cf798a870ae3d652e3ab09af5a97093532fe023ea948a4646a1c1",
+      "fryum": "a9449808743668580095019784b0cda09aed791dd59815eae5c800e85074315a",
+      "macaroni1": "f4080b6458c54d15ba06a2f6aaca050dd8c547c087243cfd5034046ebc60a0d4",
+      "macaroni2": "dc957a99966a715ac1bda0d86f1f1ae00977a7fe65bfbce6beafbe901ca2377e",
+      "pcb1": "dee0a8652f95621352c4f60c9187398eaa36284306689c9895818a1158f29c9e",
+      "pcb2": "50d101f1f1f95c71ff09e97dde396171ece308ba0485f0b648db85e710b55804",
+      "pcb3": "234f3c572b6d0bbaeb274ff52b5e4aa51aabf0c761deb2fc7b97ec8e330b5b3b",
+      "pcb4": "b1d8a009be274bac7af0063d00368e2810185d97b61ef1a200912e3b6d6b1345",
+      "pipe_fryum": "008018413b44714569546bf41456dc9c56525946b5fe4c1fc1a14f593df22afd"
+    },
+    "mu_by_class": "51568c211c324b9178837f0d862c01a9601dc3d3daa474c959bb32ef5758446b"
+  },
+  "status": "passed"
+}

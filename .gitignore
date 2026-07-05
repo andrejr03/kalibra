@@ -28,4 +28,15 @@ build/
 # Governed VisA acquisition local bytes
 data/visa/source/
 data/visa/extracted/
-data/visa/derived/
+
+# Governed VisA derived artifacts
+data/visa/derived/*
+!data/visa/derived/padim/
+data/visa/derived/padim/*
+!data/visa/derived/padim/training/
+!data/visa/derived/padim/training/**
+!data/visa/derived/padim/metadata/
+!data/visa/derived/padim/metadata/**
+data/visa/derived/padim/statistics/
+data/visa/derived/padim/covariance/
+data/visa/derived/padim/evidence/

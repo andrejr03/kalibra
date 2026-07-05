@@ -1,0 +1,29 @@
+{
+  "assertion": "only rows from Kalibra's immutable train.csv are parsed for training samples; upstream source_split is preserved only as provenance from the acquisition manifest",
+  "class_distribution": {
+    "candle": 400,
+    "capsules": 241,
+    "cashew": 200,
+    "chewinggum": 201,
+    "fryum": 200,
+    "macaroni1": 400,
+    "macaroni2": 400,
+    "pcb1": 401,
+    "pcb2": 401,
+    "pcb3": 403,
+    "pcb4": 402,
+    "pipe_fryum": 200
+  },
+  "labels": {
+    "normal": 3849
+  },
+  "sample_count": 3849,
+  "test_samples_loaded": 0,
+  "train_manifest": "data/visa/manifests/splits/train.csv",
+  "train_split_sha256": "9fa6abf23a487075bbe8f81becbfce471bbfc94e6e4ebc3f2cdf74db0abac736",
+  "upstream_source_split_distribution": {
+    "test": 360,
+    "train": 3489
+  },
+  "validation_samples_loaded": 0
+}

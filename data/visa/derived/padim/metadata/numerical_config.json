@@ -1,0 +1,13 @@
+{
+  "batching": {
+    "batch_order": "class then filename, both lexicographic",
+    "batch_size": 16
+  },
+  "covariance_estimator": "sample covariance, centered.T @ centered / (n - 1)",
+  "covariance_regularization": "covariance + epsilon * I",
+  "dtype": "float64",
+  "epsilon": 0.001,
+  "inverse": "numpy.linalg.inv on regularized covariance",
+  "numpy_version": "2.0.2",
+  "pillow_version": "11.3.0"
+}

@@ -1,0 +1,34 @@
+{
+  "array_artifacts": {
+    "covariance/covariance_by_class.npy": "17a372cfeb32dd1b02d93d45af3f4ec0b6a59c56351e0cf9534c7ece0b90b48d",
+    "covariance/covariance_inverse_by_class.npy": "893af9e08d3543b5bd973ab913c1f2e8ed57d26a1bbb225b194d525cfc8df7b3",
+    "statistics/feature_indices.npy": "1ca5583a7b498b4849e42717f24ebcf82d82a6c545b852814ada12b5c287cbe3",
+    "statistics/feature_statistics.json": "eeb79f61ca8a2e0669a52040fc08b5fc1a2c86b53ae52e8e16b2e7d6630d7024",
+    "statistics/feature_tensors/candle.npy": "5be881ff287dc69140ebed15da8195a5c7296aab51c04d05a8a7167dc2f07823",
+    "statistics/feature_tensors/capsules.npy": "a021181cac7af5d139811c429b0533fcf2e0789f76be0fcc9c42a2b4b65d4548",
+    "statistics/feature_tensors/cashew.npy": "d3d290fa83edc24b6537d3b0f6cca18ee370d178c34cc795d0ffefbf0afd6964",
+    "statistics/feature_tensors/chewinggum.npy": "bc9e5fcf699cf798a870ae3d652e3ab09af5a97093532fe023ea948a4646a1c1",
+    "statistics/feature_tensors/fryum.npy": "a9449808743668580095019784b0cda09aed791dd59815eae5c800e85074315a",
+    "statistics/feature_tensors/macaroni1.npy": "f4080b6458c54d15ba06a2f6aaca050dd8c547c087243cfd5034046ebc60a0d4",
+    "statistics/feature_tensors/macaroni2.npy": "dc957a99966a715ac1bda0d86f1f1ae00977a7fe65bfbce6beafbe901ca2377e",
+    "statistics/feature_tensors/pcb1.npy": "dee0a8652f95621352c4f60c9187398eaa36284306689c9895818a1158f29c9e",
+    "statistics/feature_tensors/pcb2.npy": "50d101f1f1f95c71ff09e97dde396171ece308ba0485f0b648db85e710b55804",
+    "statistics/feature_tensors/pcb3.npy": "234f3c572b6d0bbaeb274ff52b5e4aa51aabf0c761deb2fc7b97ec8e330b5b3b",
+    "statistics/feature_tensors/pcb4.npy": "b1d8a009be274bac7af0063d00368e2810185d97b61ef1a200912e3b6d6b1345",
+    "statistics/feature_tensors/pipe_fryum.npy": "008018413b44714569546bf41456dc9c56525946b5fe4c1fc1a14f593df22afd",
+    "statistics/mu_by_class.npy": "51568c211c324b9178837f0d862c01a9601dc3d3daa474c959bb32ef5758446b"
+  },
+  "metadata_artifacts": {
+    "metadata/backbone_metadata.json": "55780631c506a03f3a6c9605caf52aa64d693f675a4ab5a4d3aed9b99d8b79ca",
+    "metadata/dataset_identity.json": "a1c50e5b01333d48336000410a32e501e0120da576889765ba4f1e1ca0f9adb7",
+    "metadata/feature_indices.json": "064956f5ff6b70fe5e43525825dbf0b3d99d49a6b178cd1b499997e4af298dfe",
+    "metadata/numerical_config.json": "2a4963bf94458e861e3a535ea6a50efc5818cff8b4ba15577a0b05179abf90cb",
+    "metadata/preprocessing_contract.json": "b239f587b442e1a64f9ee3f9615b0a912b897f860864c6a58568cb24573794e7",
+    "metadata/train_split_use.json": "98df7a6e53db9f3a80bad7dda650f2f568aad1cddf970b05621dc8d726937d27"
+  },
+  "replay_verification": {
+    "path": "data/visa/derived/padim/training/replay_verification.json",
+    "sha256": "dc5f66ee17533518489c893358cb30b8dd622277b5f38e21c0a0dd6e67fdd55f"
+  },
+  "schema": "kalibra_padim_training_artifact_hashes_v1"
+}

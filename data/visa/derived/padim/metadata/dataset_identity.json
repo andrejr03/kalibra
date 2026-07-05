@@ -1,0 +1,15 @@
+{
+  "acquisition_label": "visa-acq-v1",
+  "archive_sha256": "2eb8690c803ab37de0324772964100169ec8ba1fa3f7e94291c9ca673f40f362",
+  "canonical_archive_url": "https://amazon-visual-anomaly.s3.us-west-2.amazonaws.com/VisA_20220922.tar",
+  "dataset": "VisA",
+  "files_manifest_sha256": "a01e02b043349d78b9dc958b12779fb48ccc30c0609719c739801a8dc503246c",
+  "provenance_sha256": "01933f8b335a520c5a22a0f9f38eb8544429343d580d3646855eae575de639d0",
+  "repository_commit": "2a692ab575001cbde74d402d897a7286086c6199",
+  "role": "governed proxy dataset",
+  "split_hashes": {
+    "test": "2d86ae7fa4cffe7f5f4aeb89f2c9c23351f44413da5d8aa0d5a3628a1c505510",
+    "train": "9fa6abf23a487075bbe8f81becbfce471bbfc94e6e4ebc3f2cdf74db0abac736",
+    "validation": "79e6e3bf99589146143927e1e7861bb2f2b9c4b2502f4da8d8ecc3a274769cc5"
+  }
+}
