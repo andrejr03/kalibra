@@ -606,8 +606,26 @@ Sprint 1H — Governed Model Output Mapping (Addendum H)
     evaluation metric, benchmark logic, threshold tuning, calibration change, Trust,
     Review, Evidence, Evaluation, CLI/UI, lifecycle/telemetry, scientific-claim, or
     product-claim path implied
-[ ] Sprint 1H validation evidence recorded on completion (Addendum H §H.7)
+[x] Sprint 1H validation evidence recorded on completion (Addendum H §H.7)
 ```
+
+Sprint 1H completion evidence recorded:
+
+```text
+tests/test_output_mapping.py: 12 passed
+tests/test_onnx_provider.py: 19 passed, 1 skipped
+tests/test_provider_conformance.py: 9 passed
+full suite: 457 passed, 1 skipped
+compileall: passed
+git diff --check: passed
+```
+
+Sprint 1H successfully delivered governed deterministic ONNX Runtime output
+mapping, output tensor count validation, output tensor shape validation, output
+tensor dtype validation, finite-value validation, output-range validation,
+provider output routed through the governed mapper, preservation of the provider
+boundary with output remaining exactly `InspectionPrediction`, and no downstream
+domain changes.
 
 An unchecked or breached Sprint 1H item voids only the Sprint 1H grant; it does not
 and cannot advance the full authorization, which remains governed by §3–§9 and §12.
