@@ -1,0 +1,132 @@
+{
+  "acquisition": {
+    "method": "Fetched only from the canonical S3 archive URL and adopted split CSVs only from the pinned official Amazon Science repository commit.",
+    "source": {
+      "aws_open_data_registry_url": "https://registry.opendata.aws/visa/",
+      "canonical_archive_url": "https://amazon-visual-anomaly.s3.us-west-2.amazonaws.com/VisA_20220922.tar",
+      "canonical_repository_url": "https://github.com/amazon-science/spot-diff",
+      "mirrors_used": [],
+      "repository_commit": "2a692ab575001cbde74d402d897a7286086c6199"
+    },
+    "timestamp_utc": "2026-07-05T15:28:11Z"
+  },
+  "archive": {
+    "aws_arn": "arn:aws:s3:::amazon-visual-anomaly/VisA_20220922.tar",
+    "filename": "VisA_20220922.tar",
+    "immutable": true,
+    "sha256": "2eb8690c803ab37de0324772964100169ec8ba1fa3f7e94291c9ca673f40f362",
+    "size_bytes": 1929840640,
+    "stored_at": "data/visa/source/VisA_20220922.tar",
+    "url": "https://amazon-visual-anomaly.s3.us-west-2.amazonaws.com/VisA_20220922.tar"
+  },
+  "archive_metadata": {
+    "accept_ranges": "bytes",
+    "content_length": 1929840640,
+    "content_type": "application/x-tar",
+    "etag": "\"05c830591a1172938cb714895c9e0cfb-113\"",
+    "last_modified": "Thu, 22 Sep 2022 19:23:39 GMT",
+    "storage_class": "INTELLIGENT_TIERING",
+    "url": "https://amazon-visual-anomaly.s3.us-west-2.amazonaws.com/VisA_20220922.tar"
+  },
+  "attribution": {
+    "authors": [
+      "Yang Zou",
+      "Jongheon Jeong",
+      "Latha Pemula",
+      "Dongqing Zhang",
+      "Onkar Dabeer"
+    ],
+    "copyright": "Amazon.com, Inc. or its affiliates",
+    "obligations": [
+      "credit the authors",
+      "reference the CC BY 4.0 dataset license",
+      "indicate changes for derived or redistributed artifacts",
+      "preserve applicable NOTICE information for utility code redistribution"
+    ],
+    "organizations": [
+      "AWS AI Labs",
+      "KAIST"
+    ],
+    "title": "SPot-the-Difference Self-Supervised Pre-training for Anomaly Detection and Segmentation",
+    "venue": "ECCV 2022 / Springer LNCS"
+  },
+  "dataset": {
+    "full_name": "Visual Anomaly",
+    "name": "VisA",
+    "role": "governed proxy dataset for the first Kalibra ML baseline",
+    "upstream_version": "VisA_20220922"
+  },
+  "licenses": {
+    "dataset": {
+      "name": "Creative Commons Attribution 4.0 International",
+      "spdx": "CC-BY-4.0",
+      "upstream_file": "LICENSE-DATASET"
+    },
+    "notice": {
+      "required": true,
+      "upstream_file": "NOTICE"
+    },
+    "utility_code": {
+      "name": "Apache License 2.0",
+      "spdx": "Apache-2.0",
+      "upstream_file": "LICENSE"
+    }
+  },
+  "local_governed_identity": {
+    "archive_sha256": "2eb8690c803ab37de0324772964100169ec8ba1fa3f7e94291c9ca673f40f362",
+    "files_manifest_sha256": "a01e02b043349d78b9dc958b12779fb48ccc30c0609719c739801a8dc503246c",
+    "label": "visa-acq-v1",
+    "layout": "data/visa/{source,extracted,manifests,manifests/splits,provenance,derived}",
+    "provenance_record": "data/visa/provenance/provenance.json",
+    "split_manifest_sha256": {
+      "test": "2d86ae7fa4cffe7f5f4aeb89f2c9c23351f44413da5d8aa0d5a3628a1c505510",
+      "train": "9fa6abf23a487075bbe8f81becbfce471bbfc94e6e4ebc3f2cdf74db0abac736",
+      "validation": "79e6e3bf99589146143927e1e7861bb2f2b9c4b2502f4da8d8ecc3a274769cc5"
+    }
+  },
+  "manifest_hashes": {
+    "archive_metadata": "52220b070ec6510e006960542912670ac4b917ef83a9ebb29e5eec92411ca56f",
+    "archive_sha256_record": "d07bb6eedd47ba7ae39a7be897971405978bf5292e348f7b944e4e9769b395ff",
+    "attribution_record": "1b09f03660d97ac5f2225a1a4f3cb37930bd55778ee1027826d6770bcf30af12",
+    "files_sha256": "a01e02b043349d78b9dc958b12779fb48ccc30c0609719c739801a8dc503246c",
+    "split_manifests": {
+      "test": "2d86ae7fa4cffe7f5f4aeb89f2c9c23351f44413da5d8aa0d5a3628a1c505510",
+      "train": "9fa6abf23a487075bbe8f81becbfce471bbfc94e6e4ebc3f2cdf74db0abac736",
+      "validation": "79e6e3bf99589146143927e1e7861bb2f2b9c4b2502f4da8d8ecc3a274769cc5"
+    },
+    "upstream_split_csvs": {
+      "1cls": "a48557e6033318cb90556f706196bc9d247a776a23ea51aecee5a80dd0332995",
+      "2cls_fewshot": "5ca490e84cd7664f9d93ba3d82399d991edb5a6cbcc41359452ad7ec24be354d",
+      "2cls_highshot": "c3331eede15f2da8a75b380d4fbfb24f75ee036ec9a25147eca898da6e972f09"
+    }
+  },
+  "schema": "kalibra_governed_visa_provenance_v1",
+  "scope_boundaries": {
+    "benchmark_generation": false,
+    "evaluation_execution": false,
+    "model_training": false,
+    "onnx_export": false,
+    "padim_fitting": false,
+    "preprocessing_change": false,
+    "provider_change": false,
+    "scientific_claim": false
+  },
+  "source_disagreement_note": "Secondary CC BY-NC-SA 4.0 license claims are superseded by the official Amazon Science repository and AWS Open Data records, which identify the dataset license as CC BY 4.0.",
+  "split_policy": {
+    "basis": "official upstream split CSVs at the pinned repository commit",
+    "claim_boundary": "This records immutable acquisition manifests only. It executes no training, no operating-point derivation, no evaluation, and no metric.",
+    "name": "kalibra_visa_acquisition_split_policy_v1",
+    "test": "rows marked test in upstream 2cls_highshot.csv",
+    "train": "normal images from upstream 1cls.csv not reserved by the validation or test memberships below",
+    "validation": "rows marked train in upstream 2cls_fewshot.csv"
+  },
+  "upstream_identifiers": {
+    "archive_filename": "VisA_20220922.tar",
+    "archive_name": "VisA_20220922",
+    "arxiv": "2207.14315",
+    "aws_arn": "arn:aws:s3:::amazon-visual-anomaly/VisA_20220922.tar",
+    "doi": "10.1007/978-3-031-20056-4_23",
+    "repository": "amazon-science/spot-diff",
+    "repository_commit": "2a692ab575001cbde74d402d897a7286086c6199"
+  }
+}

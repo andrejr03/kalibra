@@ -24,3 +24,8 @@ dist/
 build/
 
 .local/
+
+# Governed VisA acquisition local bytes
+data/visa/source/
+data/visa/extracted/
+data/visa/derived/

@@ -1,0 +1,9 @@
+{
+  "accept_ranges": "bytes",
+  "content_length": 1929840640,
+  "content_type": "application/x-tar",
+  "etag": "\"05c830591a1172938cb714895c9e0cfb-113\"",
+  "last_modified": "Thu, 22 Sep 2022 19:23:39 GMT",
+  "storage_class": "INTELLIGENT_TIERING",
+  "url": "https://amazon-visual-anomaly.s3.us-west-2.amazonaws.com/VisA_20220922.tar"
+}
