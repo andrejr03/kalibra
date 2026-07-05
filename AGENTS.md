@@ -170,6 +170,66 @@ be demonstrated.
 If implementation and documentation conflict, agents must stop and surface the
 conflict instead of silently changing the architecture.
 
+# Engineering Knowledge Persistence
+
+Important engineering knowledge must not exist only in chat history. Chat
+conversations are transient; repository documentation is Kalibra's canonical
+engineering memory. Important engineering reasoning that affects future work
+must be persisted as repository documentation.
+
+Agents must persist the following artifacts whenever they materially influence
+future work:
+
+- architecture checkpoints;
+- capability checkpoints;
+- scientific checkpoints;
+- governance checkpoints;
+- roadmap checkpoints;
+- engineering decision checkpoints;
+- implementation reviews;
+- significant plan reviews;
+- review conclusions that change repository direction.
+
+Minor implementation reviews and routine bug fixes do not require standalone
+checkpoints unless their conclusions materially change future architecture,
+governance, roadmap, evaluation, or implementation direction.
+
+The mandatory engineering-knowledge workflow is:
+
+```text
+Decision / Review
+        ↓
+Persist Checkpoint
+        ↓
+Review Persisted Checkpoint
+        ↓
+Update ADR / Strategy / Authorization (when applicable)
+        ↓
+Implementation
+        ↓
+Implementation Review
+        ↓
+Persist Completion Evidence
+```
+
+Normative documents record repository state. Checkpoint documents record the
+reasoning that produced that state. Neither replaces the other.
+
+New checkpoint documents should normally be stored under:
+
+```text
+docs/checkpoints/
+```
+
+unless another canonical location already exists.
+
+This workflow applies equally to Architecture, ML, Scientific, Dataset,
+Runtime, Governance, Security, Evaluation, Capability Engineering, and future
+project phases.
+
+Future agents should automatically follow this workflow. They should not require
+the repository owner to request persistence explicitly.
+
 # Coding Rules
 
 Agents must keep implementation minimal, explicit, and reproducible.
