@@ -7,9 +7,10 @@ machine-learning phase of Kalibra. It fixes the scientific requirements that **a
 future dataset must satisfy before it may support a Kalibra claim.
 
 It is **not** an implementation plan, and it is **not** a dataset acquisition
-document. It writes no code, downloads no data, selects no dataset, names no
-industrial domain, and fixes no train/validation/test numbers. It defines the
-**evidence requirements** a dataset must meet, not the act of obtaining one.
+document. It writes no code, downloads no data, generates no hashes or manifests,
+names no industrial domain, and performs no acquisition. It defines the **evidence
+requirements** a dataset must meet and now records the governed acquisition rules for
+the selected first proxy dataset, not the act of obtaining it.
 
 Throughout, **must**, **must not**, **owns**, and **does not own** express binding
 obligations, consistent with the normative language of
@@ -20,14 +21,16 @@ and
 [`docs/KALIBRA_ML_PHASE_2_FRAMEWORK_ADR_v1.0.md`](KALIBRA_ML_PHASE_2_FRAMEWORK_ADR_v1.0.md).
 
 This document continues the ML Phase 2 planning sequence. It follows the Scientific
-Architecture Plan (which fixed the scientific direction) and the Framework ADR
-(which fixed how a runtime would be evaluated and named this document as the next
-artifact), and it precedes the Evaluation Strategy (§13).
+Architecture Plan (which fixed the scientific direction), the Framework ADR (which
+fixed how a runtime would be evaluated and named this document as the next artifact),
+the Dataset Selection ADR (`SELECTED — VisA`), the Evaluation Strategy (first VisA +
+PaDiM protocol fixed), and the C-3 Governed VisA Acquisition Strategy Checkpoint.
 
-**Binding gate.** No dataset may be accepted for ML Phase 2, and no
+**Binding gate.** No dataset may be used for ML Phase 2 evidence, and no
 framework-backed implementation may begin, until the requirements in this document
-are approved by the repository owner and a candidate dataset is shown to satisfy
-them. Until then, the dataset remains unselected by design.
+are approved by the repository owner and the selected dataset is governed under the
+records this document requires. VisA is selected as the first governed proxy dataset,
+but it is not acquired by this document.
 
 ---
 
@@ -50,9 +53,11 @@ artifact. This document answers that requirement at the level of **requirements*
 not selection.
 
 Accordingly, this document defines **what any dataset must provide** before it can
-support a Kalibra claim. It does **not** acquire data, and it grants no authority to
-acquire, download, label, or select data. Dataset acquisition is a separate,
-owner-authorized activity gated by the approval criteria in §11.
+support a Kalibra claim. It also defines the governed acquisition process that a
+future VisA acquisition must follow. It does **not** acquire data, and it grants no
+authority to acquire, download, label, hash, manifest, train on, or evaluate data.
+Dataset acquisition is a separate, owner-authorized activity gated by the approval
+criteria in §11.
 
 The existing [`KALIBRA_DATASET_STRATEGY_v1.0.md`](KALIBRA_DATASET_STRATEGY_v1.0.md)
 remains the standing dataset philosophy and governance for Kalibra as a whole. This
@@ -90,6 +95,19 @@ item is already present and validated; none is re-opened here.
 - **Framework ADR.** The proposed runtime-evaluation decision process, which selects
   no framework, defers implementation, and requires this dataset strategy before
   framework fit can be finalized.
+- **Dataset Selection ADR.** The repository records `SELECTED — VisA`: VisA is the
+  governed proxy dataset and governance anchor for the first Kalibra ML baseline.
+  MPDD remains the domain anchor for future domain-specific evolution. No dataset has
+  been acquired by that ADR.
+- **Evaluation Strategy and C-2 checkpoint.** The first VisA + PaDiM evaluation
+  protocol is fixed, including frozen train/validation/test partition policy,
+  immutable split manifests, per-file SHA-256 requirements, and the prohibition on
+  benchmark, product, calibrated-confidence, and generalization claims.
+- **C-3 Governed VisA Acquisition Strategy Checkpoint.** The governed acquisition
+  source, archive identity, integrity policy, provenance record, local-governance
+  layout, versioning policy, and fail-closed behavior are now defined. The checkpoint
+  performs no acquisition, downloads no data, computes no hashes, and creates no
+  manifests.
 
 **Why fixtures suffice for boundary validation but not for scientific validation.**
 The deterministic fixtures were engineered to prove one thing: that the
@@ -253,9 +271,15 @@ Policy requirements:
 - **Frozen test sets.** The test partition must be frozen: defined once, recorded, and
   not revised in response to results. A test set that is adjusted after seeing
   outcomes is no longer honest evidence and **must not** be presented as such.
+- **Immutable manifests.** For the first VisA baseline, train/validation/test
+  membership must be recorded in immutable split manifests with per-file SHA-256
+  hashes, and each split manifest must itself be hashed. A split-manifest hash change
+  creates a new evaluation identity, never a silent re-run.
 
-The concrete split proportions and counts are a deferred decision (§12) and belong
-to the dataset selection and the Evaluation Strategy (§13), not to this document.
+The first VisA baseline adopts the split convention fixed by the C-2 Evaluation
+Protocol and the C-3 Governed VisA Acquisition Strategy. Future split proportions and
+counts for other datasets remain downstream decisions and must be fixed before the
+test partition is touched.
 
 ---
 
@@ -329,6 +353,200 @@ data auditable.
 
 Governance obligations apply for as long as any claim rests on the data (§3,
 long-term availability).
+
+### 8.1 Governed VisA Acquisition
+
+The first governed acquisition strategy is fixed for VisA by the
+[`C-3 Governed VisA Acquisition Strategy Checkpoint`](checkpoints/KALIBRA_C3_GOVERNED_VISA_ACQUISITION_STRATEGY_CHECKPOINT_v1.0.md).
+It is a strategy only: no archive is fetched, no hash is computed, and no manifest is
+created by this document.
+
+The canonical acquisition source is the official Amazon Science repository:
+
+```text
+https://github.com/amazon-science/spot-diff
+```
+
+The upstream repository commit used as the identity, license, and split authority is:
+
+```text
+2a692ab575001cbde74d402d897a7286086c6199
+```
+
+The canonical archive is:
+
+```text
+https://amazon-visual-anomaly.s3.us-west-2.amazonaws.com/VisA_20220922.tar
+```
+
+with AWS object identity:
+
+```text
+arn:aws:s3:::amazon-visual-anomaly/VisA_20220922.tar
+```
+
+The AWS Open Data Registry entry is corroborating evidence for the canonical object,
+license, and managed-by record. It does not replace the archive hash or the upstream
+repository commit as the governed identity anchors.
+
+Third-party mirrors are forbidden as primary acquisition sources. Kaggle,
+HuggingFace, tooling caches, academic re-hosts, repackaged archives, recompressed
+archives, cleaned datasets, resized datasets, or prepared redistributions must not
+define Kalibra's VisA identity. A mirror may be used only as a fallback recovery path
+and only if its bytes reproduce Kalibra's recorded archive SHA-256 exactly. A mirror
+never redefines identity, license, provenance, or splits.
+
+The governed acquisition sequence is mandatory:
+
+1. Pin the upstream repository commit as the identity, license, and split authority.
+2. Fetch the canonical archive from the S3 URL into an immutable source location.
+3. Compute the archive SHA-256 over the raw `.tar` bytes.
+4. Verify recorded upstream metadata as a coarse corroborating gate.
+5. Extract into a separate treated-as-immutable extracted dataset tree.
+6. Generate the per-file SHA-256 manifest over the extracted tree.
+7. Adopt the published split CSVs verbatim from the pinned commit and build immutable
+   train/validation/test split manifests with per-file hashes.
+8. Write the provenance manifest and attribution/license record.
+9. Freeze the acquisition only when archive hash, per-file manifest, split manifest,
+   provenance record, and attribution record all exist and cross-reference each other.
+
+The acquisition record is immutable once accepted. Any later change to source bytes,
+extracted bytes, manifests, splits, provenance, or attribution creates a new governed
+version.
+
+### 8.2 Dataset Identity
+
+A governed VisA acquisition must preserve all of the following identities:
+
+- **Upstream dataset identity:** VisA / Visual Anomaly, as defined by the official
+  Amazon Science repository and publication record.
+- **Archive identity:** `VisA_20220922.tar` from the canonical S3 object.
+- **Repository commit identity:** `spot-diff@2a692ab575001cbde74d402d897a7286086c6199`.
+- **Acquisition identity:** the local acquisition timestamp plus the archive SHA-256
+  produced during the governed acquisition.
+- **Governed local identity:** the tuple of archive SHA-256, per-file manifest hash,
+  split-manifest hash, provenance hash, and local governed layout identity.
+
+These identities must travel with every downstream scientific evidence record. A
+result that cannot identify the upstream dataset, archive, commit, acquisition, and
+governed local version is not accepted as Kalibra evidence.
+
+### 8.3 Integrity Policy
+
+SHA-256 is the integrity anchor for VisA. The future acquisition must record:
+
+- archive SHA-256 over the raw `VisA_20220922.tar` bytes;
+- per-file SHA-256 for every extracted image, mask, CSV, and label artifact;
+- immutable train/validation/test split manifests with per-file SHA-256 hashes;
+- split-manifest hashes;
+- deterministic integrity-verification procedure;
+- archive verification workflow.
+
+The upstream ETag, content length, last-modified timestamp, and content type are
+corroboration only. The VisA S3 ETag is a multipart object digest, not a content
+SHA-256. It may help detect obvious source mismatch, but it is never the integrity
+anchor.
+
+Archive verification must fail closed. Reuse or re-acquisition must recompute the
+archive SHA-256 and match the archive-of-record, recompute every per-file hash and
+match the manifest set exactly, and recompute every split-membership hash. Additions,
+removals, substitutions, or split drift create a mismatch and block downstream use.
+
+### 8.4 Provenance Policy
+
+The provenance record is mandatory and must include:
+
+- acquisition source;
+- acquisition timestamp in UTC;
+- canonical archive URL;
+- upstream identifiers, including archive name, repository commit, AWS ARN, DOI, and
+  arXiv identifier where recorded by C-3;
+- dataset license, utility-code license, and attribution obligations;
+- attribution text sufficient to satisfy CC BY 4.0;
+- upstream publication record;
+- local governed identity;
+- note that secondary CC BY-NC-SA 4.0 license claims are superseded by the official
+  CC BY 4.0 dataset license record.
+
+Provenance must always accompany future scientific evidence. No image, tensor,
+manifest, metric, report, or claim may be presented without a traceable path back to
+the provenance record.
+
+### 8.5 Local Dataset Governance
+
+The local governed dataset must preserve a strict source/derived boundary:
+
+- **Immutable source archive.** The raw canonical archive is stored read-only and is
+  never modified, rewritten, recompressed, deleted, or replaced in place.
+- **Immutable extracted dataset.** The extracted upstream tree is treated as
+  immutable source data.
+- **Immutable manifests.** Archive, per-file, split, and provenance hashes are
+  governed records and are not edited in place after acceptance.
+- **Provenance record.** Source, license, attribution, upstream identity, acquisition
+  identity, and local governed identity are preserved with the dataset.
+- **Derived artifacts separated from source.** Preprocessed tensors, PaDiM statistics,
+  model-fitting artifacts, exports, overlays, reports, or any other future artifacts
+  must live outside the source data boundary and be regenerable from governed source
+  records.
+
+Source data must never be modified. Any transformation of source data creates a
+derived artifact and must preserve lineage back to the immutable source and governed
+identity records.
+
+### 8.6 Versioning Policy
+
+VisA has no formal upstream release tag or upstream strong checksum. Kalibra
+therefore treats the dated archive `VisA_20220922` plus the pinned repository commit
+as the effective upstream version for the first governed baseline.
+
+The governed versioning model is:
+
+- **Upstream version:** `VisA_20220922` plus
+  `spot-diff@2a692ab575001cbde74d402d897a7286086c6199`.
+- **Acquisition version:** a Kalibra-owned governed acquisition label keyed to the
+  archive SHA-256; the hash, not the label, is the integrity identity.
+- **Governed version:** archive SHA-256, per-file manifest hash, split-manifest hash,
+  provenance hash, and local governed layout identity.
+
+New upstream releases, republished archives, new dated archives, new official
+versions, or changed archive bytes create new governed versions. They must be stored
+side-by-side and must never overwrite existing governed versions. Migration to a new
+governed version is a separate authorized decision; old evidence remains tied to the
+old governed version.
+
+### 8.7 Failure Policy
+
+Governed acquisition must fail closed:
+
+- **Archive hash mismatch:** hard stop. Reject the bytes; do not extract or use them.
+- **Missing files:** hard stop. A partial dataset is never promoted to governed
+  status.
+- **Split mismatch:** hard stop for evaluation. A changed split-manifest hash is a
+  new evaluation identity, never a silent re-run.
+- **Provenance mismatch:** hard stop. Missing or inconsistent source, license,
+  attribution, hash, or local identity information blocks use.
+- **Changed upstream archive:** treat as a new dataset/acquisition version. Do not
+  overwrite the existing governed version.
+
+No degraded-mode acquisition exists. Any unresolved integrity, completeness, split,
+or provenance defect blocks preprocessing, fitting, evaluation, evidence, and claims.
+
+### 8.8 Integration Boundary
+
+Governed acquisition supplies governed inputs only. It does not change ownership or
+architecture:
+
+- preprocessing ownership does not move;
+- provider ownership does not move;
+- loader ownership does not move;
+- evaluation ownership does not move;
+- evidence ownership does not move.
+
+The governed acquisition envelope supplies source bytes, integrity records, split
+records, provenance, attribution, and governed identity references. It must not alter
+the `InspectionInferenceProvider` seam, the `InspectionPrediction` boundary,
+`InspectionEngine.transform_prediction(...)`, model loading, preprocessing contracts,
+evaluation ownership, or Evidence-domain preservation.
 
 ---
 
@@ -407,6 +625,20 @@ Binding rules on dataset evidence:
 Any claim that cannot be traced to reproducible evidence under this policy is, by
 default, **not made**.
 
+For the first VisA governed-acquisition strategy, this document additionally records
+the following non-claims:
+
+- no acquisition has been performed;
+- no dataset has been downloaded;
+- no archive hash has been generated;
+- no per-file hash manifest has been generated;
+- no split manifest has been generated;
+- no implementation is authorized;
+- no training is authorized;
+- no evaluation is authorized;
+- no benchmark claim is authorized;
+- no product claim is authorized.
+
 ---
 
 ## 11. Dataset Approval Criteria
@@ -428,7 +660,13 @@ criteria are met and recorded. Each is verifiable; none is a matter of preferenc
 - **Synthetic data.** Any synthetic component conforms to §7, with its proportion and
   role documented, and no real-world claim rests on synthetic data alone.
 - **Governance.** Version IDs, hashes, metadata, lineage, provenance, and evidence
-  linkage (§8) are in place.
+  linkage (§8) are in place. For the first VisA baseline, the archive SHA-256,
+  per-file SHA-256 manifest, immutable split manifests, split-manifest hashes,
+  provenance record, attribution/license record, and governed local identity required
+  by §8.1–§8.8 must all exist and cross-reference each other before data use.
+- **Fail-closed behavior.** Archive hash mismatch, missing files, split mismatch,
+  provenance mismatch, or changed upstream archive behavior is handled according to
+  §8.7 before any preprocessing, fitting, evaluation, evidence, or claim proceeds.
 - **Risks.** The scientific risks of §9 have been assessed for this dataset,
   documented, and reflected in the scope of the claims it may support.
 - **Owner approval.** The repository owner explicitly approves the dataset against
@@ -445,52 +683,49 @@ Evaluation Strategy.
 
 ## 12. Open Decisions
 
-The following decisions are intentionally deferred. None is made by this document;
-each must be settled by an approved downstream decision before it can constrain
-implementation.
+The following decisions remain intentionally deferred. The first dataset is selected
+as VisA, and the governed VisA acquisition strategy is defined by §8 and the C-3
+checkpoint. The items below are outside that strategy or belong to later authorized
+work.
 
-- **First dataset.** Which specific dataset is accepted first for ML Phase 2.
 - **Labeling process.** The concrete process, standard, and reviewer arrangement by
   which ground truth is produced or verified.
 - **Annotation tooling.** The tools and workflow used to create, review, and record
   annotations and their agreement and uncertainty.
-- **Industrial domain.** The specific inspection setting or industrial domain the
-  first dataset represents.
-- **Acquisition strategy.** How data is obtained, under what terms, and with what
-  ownership and licensing arrangement.
-- **Split proportions and counts.** The concrete train/validation/test proportions
-  and sizes, which cannot be fixed before the dataset is known and belong to the
-  Evaluation Strategy.
-- **Localization depth.** How far localization is pursued as a secondary objective and
-  what localization ground truth supports it.
+- **Industrial domain of record.** VisA is a governed proxy, not Kalibra's domain of
+  record. Any future domain-of-record dataset remains a separate decision.
+- **Acquisition implementation.** The future sprint mechanics, local storage policy
+  for large bytes, and review procedure for the governed VisA acquisition. The
+  strategy is fixed; the acquisition has not been executed.
+- **Future split proportions and counts.** The first VisA split policy is fixed by
+  C-2/C-3; future datasets or future versions must fix their own splits before test
+  access.
+- **Future localization depth.** The first VisA protocol supports bounded
+  localization where pixel labels support it; later datasets or phases must define
+  their own localization depth.
 - **Synthetic proportion.** The concrete role and proportion of any synthetic data in
-  the first dataset.
+  future datasets.
 
 Deferred decisions remain deferred unless the repository owner authorizes them
 through an approved downstream document.
 
 ---
 
-## 13. Next Planning Artifact
+## 13. Next Dependency
 
-Recommended next planning artifact:
+Recommended next dependency:
 
 ```text
-KALIBRA_ML_PHASE_2_EVALUATION_STRATEGY_v1.0.md
+Governed VisA Acquisition implementation authorization
 ```
 
-Evaluation strategy must follow dataset strategy, and both must precede
-implementation. The reason is ordering by dependency: an evaluation is only
-meaningful with respect to the data it is computed on. Metrics, decision thresholds,
-statistical-validation procedure, and the definition of what counts as reproducible
-evidence all depend on the dataset's content, ground truth, splits, and risks. Fixing
-an evaluation procedure before the dataset requirements are approved would either
-bind the evaluation to assumptions the data may not satisfy, or invite an evaluation
-tuned to flatter a not-yet-chosen dataset — both of which the claim policy (§10)
-forbids.
+The Dataset Selection ADR selected VisA, the Evaluation Strategy incorporated the C-2
+protocol, and this document now incorporates the C-3 governed acquisition strategy.
+The next dependency is repository-owner review and authorization of the governed VisA
+acquisition implementation. That future work may fetch the archive and generate
+hashes/manifests only after authorization; this document does none of those things.
 
-The recommended decision order is therefore unchanged from the Scientific
-Architecture Plan roadmap:
+The current decision order is therefore:
 
 ```text
 Scientific Architecture   (approved)
@@ -499,10 +734,22 @@ Scientific Architecture   (approved)
 Framework ADR             (proposed; selection deferred)
         |
         v
-Dataset Strategy          (this document — approve before proceeding)
+Dataset Strategy          (requirements fixed)
         |
         v
-Evaluation Strategy       (metrics and procedure fixed for the approved dataset)
+Dataset Selection ADR     (SELECTED — VisA)
+        |
+        v
+Evaluation Strategy       (C-2 protocol fixed)
+        |
+        v
+C-3 Acquisition Strategy  (checkpoint incorporated here)
+        |
+        v
+Governed VisA Acquisition (future authorized implementation)
+        |
+        v
+Implementation Authorization / execution gates
         |
         v
 ML Phase 2 Implementation (framework-backed provider behind the existing seam)
@@ -515,20 +762,21 @@ ML Phase 2 Closure        (all exit criteria met; checkpoint recorded)
 ```
 
 Implementation **must not** begin before the Framework ADR selection, this Dataset
-Strategy, and the Evaluation Strategy are approved, and before a specific dataset is
-shown to satisfy the approval criteria in §11.
+Strategy, the Evaluation Strategy, governed VisA acquisition, and Implementation
+Authorization are approved. Training and evaluation execution also remain blocked
+until the C-2 and C-3 governed records exist.
 
 ---
 
 ## Closing Statement
 
 This document fixes the scientific requirements a dataset must meet before it can
-support any Kalibra claim. It selects no dataset, downloads none, names no industrial
-domain, and fixes no split numbers. It requires provenance, licensing, ownership,
-traceability, reproducibility, versioning, integrity verification, and long-term
-availability; it requires honest inspection content and diversity, trustworthy ground
-truth, leak-free frozen splits, a bounded synthetic-data policy, auditable
-governance, and explicit reasoning about scientific risk.
+support any Kalibra claim. It now also records the governed VisA acquisition
+strategy: canonical source and archive, mirror restrictions, identity preservation,
+SHA-256 integrity anchors, immutable manifests, provenance, local source/derived
+separation, versioning, fail-closed behavior, and integration boundaries. It
+downloads no data, generates no hashes or manifests, authorizes no implementation,
+and makes no scientific, benchmark, or product claim.
 
 Above all it preserves Kalibra's discipline: the provider abstraction is untouched,
 Inspection, Trust, Review, Evidence, and Evaluation each keep their ownership, and
