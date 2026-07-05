@@ -26,18 +26,21 @@ rests on an unverified permission or an assumed license.**
 **Decision status.**
 
 ```text
-DEFER DATASET SELECTION.
-No dataset selected. No dataset acquired. No implementation authorized.
+SELECTED — VisA.
+Selected as the governed proxy dataset for the first Kalibra ML baseline.
+MPDD remains the domain anchor for future domain-specific evolution.
+No dataset acquired. No implementation authorized.
 ```
 
 **Revision note (MPDD governance revision).** This revision incorporates the verified
 findings of the
 [`MPDD Licensing & Governance Investigation`](research/KALIBRA_MPDD_LICENSING_AND_GOVERNANCE_INVESTIGATION_v1.0.md)
 and records the repository owner's current project posture. Two facts change; the
-**decision does not**. (1) MPDD's license is now **verified CC BY-NC-SA 4.0**,
+original deferral record was narrowed. (1) MPDD's license is now **verified
+CC BY-NC-SA 4.0**,
 replacing the earlier "license type unconfirmed." (2) The project's commercial posture
-is recorded below. Neither fact makes any candidate governance-complete, so the ADR
-decision remains **DEFER DATASET SELECTION**, and MPDD remains **Deferred**.
+is recorded below. Neither fact selected MPDD for the first governed baseline. MPDD
+remains the **domain anchor** and is retained for future domain-specific evolution.
 
 **Revision note (VisA governance update).** This revision also incorporates the
 verified findings of the
@@ -45,10 +48,17 @@ verified findings of the
 VisA's dataset license is now verified as **CC BY 4.0**, and the repository utility
 code is verified as **Apache-2.0**. Official sources agree; the earlier CC BY-NC-SA
 statement came from a secondary tooling source and is not authoritative. Licensing is
-therefore **no longer a VisA governance blocker**. The decision still does **not**
-change, because VisA remains incomplete on non-licensing governance evidence
-(versioning, integrity, reproducibility, long-term availability, and annotation-process
-documentation), and it is not a domain match for Kalibra's target parts.
+therefore **no longer a VisA governance blocker**.
+
+**Revision note (C-1 Dataset Selection Closure).** This revision incorporates the
+recorded C-1 Dataset Selection Closure checkpoint. PaDiM is now the selected first
+model family, and its image-alignment preference favours VisA over MPDD for the first
+ML baseline. VisA is selected as a **governed proxy dataset**, not as Kalibra's final
+production domain and not as a domain-of-record dataset. The remaining VisA
+governance gaps are mostly self-closable by Kalibra's governed acquisition
+(Kalibra-side hashes, provenance manifest, acquisition record, and split manifest).
+Dataset acquisition is still incomplete, and this ADR authorizes no implementation,
+model training, evaluation result, benchmark claim, or product claim.
 
 **Project commercial posture (recorded).**
 
@@ -102,6 +112,11 @@ Dataset selection is considered against the completed ML Phase 2 planning sequen
   to the approved dataset.
 - **Implementation Authorization** — fixed the final governance gate; its status is
   Deferred, and it requires an approved dataset as one precondition.
+- **Scientific Model Family Selection Checkpoint** — selected **PaDiM** as the first
+  model family, adding an image-alignment criterion relevant to VisA and MPDD.
+- **C-1 Dataset Selection Closure Checkpoint** — closed the dataset-selection decision
+  by selecting **VisA** as the governed proxy dataset for the first Kalibra ML baseline
+  and retaining **MPDD** as the domain anchor.
 - **Industrial Dataset Landscape** — surveyed the public candidates, verified
   maintainers/sources/licensing where possible, and recorded that **no candidate is
   simultaneously clearly relevant to Kalibra's domain, clearly licensed, and free of
@@ -109,12 +124,13 @@ Dataset selection is considered against the completed ML Phase 2 planning sequen
 - **Focused governance investigations** — subsequently resolved the MPDD and VisA
   license records without completing either candidate's full governance evidence.
 
-**Why dataset selection is now possible.** The requirements and the field are both on
-the record: the Dataset Strategy fixed *what a dataset must provide*, and the
-Landscape fixed *what each candidate verifiably is*. With both in hand, a defensible
-decision — to select, or to defer with reasons — can finally be taken. "Possible to
-decide" does not mean "obliged to select": deferral with justification is a valid ADR
-outcome and, on the verified evidence, the correct one (§6).
+**Why dataset selection is now closed.** The requirements, candidate field, focused
+governance investigations, first model-family decision, and C-1 closure checkpoint are
+all now on the record. The Data Strategy Decision Memo named the explicit acceptance
+required for selecting VisA as a governed proxy; the C-1 checkpoint records that
+acceptance. This ADR therefore moves the repository dataset-selection state from
+`DEFER` to `SELECTED — VisA`, while keeping acquisition, implementation, metrics,
+training, evaluation, and claims governed by their own downstream gates.
 
 ---
 
@@ -146,8 +162,11 @@ reproducibility) is disqualifying regardless of scientific appeal.
 
 **Governance gate.** Licensing, provenance, and long-term availability are treated as
 **gating**: a candidate whose license is unconfirmed, contradictory, or incompatible,
-or whose long-term availability is constrained, **cannot** be selected — however
-strong its science — until the gate is cleared against the original source.
+or whose long-term availability cannot be governed in a durable local record, **cannot
+be used** — however strong its science — until the gate is cleared or consciously
+bounded. A bounded governed-proxy selection may be recorded only when remaining gaps
+are explicit, claim-limiting, and closable before execution by the governed-acquisition
+record.
 
 ---
 
@@ -209,17 +228,22 @@ for the first ML Phase 2 selection on its verified merits."
   came from a secondary tooling source and is not authoritative. Commercial use,
   redistribution, derivative works, and attribution obligations are resolved from the
   official license record. **Licensing is no longer a VisA blocker.**
-- **Governance readiness.** **Incomplete.** Licensing is **Satisfied**. Provenance,
-  ownership, versioning, integrity, reproducibility, and long-term availability are
-  **Partially satisfied**: official authorship, AWS hosting, a dated S3 archive, and
-  split files improve governance, but no DOI/release tag/formal version, published
-  strong checksum, full annotation-process record, or archival preservation guarantee
-  completes the Dataset Strategy gate.
+- **Governance readiness.** **Selected with governed-acquisition obligations.**
+  Licensing is **Satisfied**. Provenance, ownership, versioning, integrity,
+  reproducibility, and long-term availability are **Partially satisfied** before local
+  acquisition: official authorship, AWS hosting, a dated S3 archive, and split files
+  improve governance, but no DOI/release tag/formal version, published strong
+  checksum, full annotation-process record, or archival preservation guarantee
+  completes the record at source. The C-1 checkpoint records that the remaining
+  practical gaps are mostly self-closable by Kalibra's governed acquisition through
+  Kalibra-side hashing, provenance manifest, acquisition record, and split manifest.
 - **Suitability for Kalibra.** *(Observation.)* Attractive scale, anomaly-detection
-  structure, and annotation depth; useful as a governed proxy, not a cast-aluminium or
-  machined-component domain match.
-- **Decision:** `Deferred` — licensing is resolved, but governance remains incomplete
-  and the dataset is still domain-distant from Kalibra's target parts. Not selected.
+  structure, image and pixel labels, and image alignment; useful as a governed proxy,
+  not a cast-aluminium or machined-component domain match.
+- **Decision:** `Selected` — selected as the **governed proxy dataset** and
+  **governance anchor** for the first Kalibra ML baseline. Selection does not mean
+  acquisition is complete, and it authorizes no implementation, training, evaluation,
+  benchmark, production, or domain-of-record claim.
 
 ### 4.4 BTAD (BeanTech)
 
@@ -265,8 +289,9 @@ for the first ML Phase 2 selection on its verified merits."
   most directly relevant candidate, and now with a compatible, verified license;
   scientific suitability is **strong**, but governance readiness is **incomplete**.
 - **Decision:** `Deferred` — strongest domain fit and licensing now resolved, but held
-  by the four non-licensing governance blockers above. Not selected. It remains a
-  domain-relevant candidate to mature toward governance readiness.
+  by the four non-licensing governance blockers above and not selected for the first
+  governed baseline. MPDD remains the **domain anchor** and is retained for future
+  domain-specific evolution.
 
 ### 4.6 KolektorSDD
 
@@ -364,9 +389,10 @@ for the first ML Phase 2 selection on its verified merits."
   redistribution/long-term availability cannot be satisfied, this moves to Rejected on
   governance grounds.
 
-**Assessment summary.** Selected: **none.** Deferred: **MVTec AD, MVTec AD 2, VisA,
-BTAD, MPDD, KolektorSDD, KolektorSDD2, Magnetic Tile, Severstal.** Rejected (for first
-selection): **DAGM 2007, NEU.**
+**Assessment summary.** Selected: **VisA** (governed proxy dataset, first ML
+baseline, governance anchor). Deferred: **MVTec AD, MVTec AD 2, BTAD, MPDD,
+KolektorSDD, KolektorSDD2, Magnetic Tile, Severstal.** MPDD remains the **domain
+anchor** and is not rejected. Rejected (for first selection): **DAGM 2007, NEU.**
 
 ---
 
@@ -381,13 +407,13 @@ The principal trade-offs, stated qualitatively and without ranking:
   domain (MPDD, metal parts) now has a **verified, compatible license** but is held by
   non-licensing governance gaps (versioning, integrity, archival availability,
   source-level documentation). VisA now has the strongest verified licensing position
-  (CC BY 4.0 for the dataset; Apache-2.0 for utility code) and stronger public-hosting
-  evidence than MPDD, but it is also domain-distant and still incomplete on versioning,
-  integrity, annotation-process documentation, and archival preservation. MVTec and
-  Kolektor have verified non-commercial licenses compatible with the recorded posture
-  and comparatively mature institutional source records, but they are also proxies for
-  Kalibra's target domain. Governance *completeness* and domain match still do not
-  coincide in any single candidate.
+  (CC BY 4.0 for the dataset; Apache-2.0 for utility code), the strongest long-term
+  availability position, stronger public-hosting evidence than MPDD, and remaining
+  practical governance gaps that are mostly self-closable by Kalibra's governed
+  acquisition. MVTec and Kolektor have verified non-commercial licenses compatible
+  with the recorded posture and comparatively mature institutional source records, but
+  they are also proxies for Kalibra's target domain. Governance strength and domain
+  match still do not coincide in any single candidate.
 - **Anomaly detection.** The MVTec line, VisA, BTAD, MPDD, and the Kolektor datasets
   fit the sound-vs-defective framing; NEU (classification) fits it least.
 - **Localization.** Pixel/mask ground truth exists in MVTec AD, VisA, MPDD, KSDD/KSDD2,
@@ -411,212 +437,195 @@ The principal trade-offs, stated qualitatively and without ranking:
   synthetic DAGM as a primary basis), and strong published benchmark numbers cannot be
   imported as Kalibra evidence — they inform expectations, not claims.
 
-The comparison shows a field where **no candidate is both governance-complete on
-verified facts and a match for Kalibra's domain.** VisA's licensing evidence has
-materially improved and is now the strongest verified licensing position. MPDD's
-evidence has also materially improved and remains the closest scientific/domain match.
-Neither is governance-complete: VisA is held by non-license governance gaps and domain
-distance, while MPDD is held by versioning, integrity, archival availability, and
-source-level documentation gaps.
+The comparison shows a field where **no candidate is both the final Kalibra domain
+match and fully complete at source on every governance dimension.** C-1 therefore
+records a bounded selection rather than an expansive claim: **VisA** is selected as
+the governed proxy dataset and governance anchor for the first Kalibra ML baseline,
+because it combines verified CC BY 4.0 licensing, the strongest long-term availability
+position, image and pixel labels, and better PaDiM image-alignment fit. **MPDD**
+remains the domain anchor because it is the closest surveyed metal-parts candidate,
+but its governance and availability risks remain higher and it is not selected for
+the first governed baseline.
 
 ---
 
 ## 6. ADR Decision
 
 ```text
-DECISION: DEFER DATASET SELECTION.
+DECISION: SELECTED — VisA.
 ```
 
-**Exactly one outcome is recorded: dataset selection is deferred.** No dataset is
-selected.
+**Exactly one selection outcome is recorded: VisA is selected.** The selection is
+bounded: VisA is selected as the **governed proxy dataset** for the first Kalibra ML
+baseline, and as the current **governance anchor**. Dataset acquisition is not
+complete, and no implementation is authorized.
 
-**Why selection is deferred (and not made):**
+### 6.1 Selected Dataset
 
-- **The best domain match is not yet governance-complete.** MPDD's license is now
-  **verified CC BY-NC-SA 4.0** and **compatible** with the recorded non-commercial
-  posture, so licensing no longer blocks it. But it remains held by **non-licensing
-  governance gaps** — no official version identifier/DOI, no integrity hashes, fragile
-  (personal-SharePoint) hosting rather than archival availability, and no source-level
-  documentation of composition and annotation. The Dataset Strategy requires
-  versioning, integrity verification, and long-term availability, none of which is yet
-  established for MPDD.
-- **The strongest verified licensing position is not yet governance-complete.** VisA
-  is now verified CC BY 4.0 for the dataset and Apache-2.0 for repository utility
-  code; official sources agree, and licensing no longer blocks it. But VisA still
-  lacks a formal dataset version/DOI/release tag, a published strong checksum, complete
-  annotation-process documentation, and an archival preservation guarantee, and it is a
-  domain proxy rather than a metal-component match.
-- **Other mature-license candidates remain domain-distant proxies.** MVTec AD/AD 2
-  and KSDD/KSDD2 are compatible under the non-commercial posture and have clear source
-  records, but they are not closer to Kalibra's target parts than MPDD; selecting one
-  only because its governance is tidier would still import a domain-shift caveat.
-- **Some candidates still have unresolved terms.** BTAD/DAGM/NEU remain unconfirmed,
-  Magnetic Tile remains absent-license, and Severstal remains competition-gated.
-- **Scientific conservatism forbids selecting on convenience.** Selecting before the
-  closest match is governance-complete — or defaulting to a saturated benchmark to make
-  progress — would import exactly the risks the governance sequence exists to prevent.
+- **Dataset:** VisA.
+- **Role:** governed proxy dataset.
+- **Baseline:** first Kalibra ML baseline.
+- **Governance role:** governance anchor for the first governed baseline.
 
-Deferral is not inaction: it is the correct, evidence-respecting outcome given that no
-candidate is yet **governance-complete** on verified facts. The resolution of MPDD's
-license, the project's posture, and VisA's earlier licensing uncertainty all narrow
-the gap without closing it. The path from deferral to selection is defined in §9 and
-§11.
+The selected dataset is not Kalibra's final production domain, and it does not become
+the domain of record for Kalibra's long-term industrial inspection claims.
+
+### 6.2 MPDD Status
+
+MPDD remains the **domain anchor**. It is **not selected** for the first governed
+baseline, and it is **not rejected**. It is retained for future domain-specific
+evolution once its governance and availability risks can be reduced or bounded.
+
+### 6.3 Technical Rationale
+
+- **PaDiM selection favours VisA because of image alignment.** PaDiM is
+  position-sensitive; the recorded model-family checkpoint identifies MPDD pose
+  variation as a PaDiM degradation risk, while the C-1 closure records VisA as better
+  aligned for the first baseline.
+- **VisA has the strongest governance position among the active candidates.** Its
+  dataset license is verified **CC BY 4.0**, its repository utility code is verified
+  **Apache-2.0**, official sources agree, and the canonical AWS-hosted distribution
+  gives it the strongest long-term availability position in the surveyed field.
+- **VisA supports the needed evidence shape for C-2.** It provides image-level and
+  pixel-level labels, allowing the Evaluation Protocol to be fixed for both
+  anomaly-detection and bounded localization evidence without claiming results.
+- **Remaining VisA governance gaps are mostly self-closable by Kalibra governed
+  acquisition.** Kalibra can record a pinned acquisition, local sha256 integrity
+  manifest, provenance manifest, immutable split manifest, and attribution record.
+  Upstream limitations still remain documented: no DOI/formal release tag, no
+  published strong upstream checksum, incomplete annotation-process documentation, and
+  no archival preservation guarantee.
+- **MPDD governance and availability risks remain higher.** MPDD is the closer domain
+  fit, but its official distribution remains weaker for long-term availability,
+  versioning, integrity verification, and archival evidence. Those risks are less
+  self-closable from Kalibra's side.
+
+### 6.4 Accepted Limitations and Non-Claims
+
+- VisA is a **governed proxy**.
+- VisA is **not** the final production domain.
+- This ADR authorizes **no domain-of-record claim**.
+- This ADR authorizes **no defect-detection claim**.
+- This ADR authorizes **no benchmark claim**.
+- This ADR authorizes **no product claim**.
+- This ADR does **not** claim dataset acquisition is complete.
+- This ADR does **not** claim model training, evaluation, calibration, or production
+  readiness.
 
 ---
 
 ## 7. Consequences
 
-- **Implementation.** Unchanged and still blocked. The Implementation Authorization
-  gate requires an approved dataset; with selection deferred, that precondition remains
-  unmet and its status stays **Deferred**.
-- **Documentation.** This ADR becomes the record of the first dataset decision. It does
-  not modify the Dataset Strategy, Evaluation Strategy, or Implementation
-  Authorization; it applies them. Resolving a candidate's gating item will require a
-  superseding ADR version (§10) that records a selection.
-- **MPDD licensing (resolved).** Licensing type is **no longer an unresolved issue for
-  MPDD**: it is verified CC BY-NC-SA 4.0 and compatible with the recorded
-  non-commercial posture. This is recorded as fact, not as a selection.
-- **VisA licensing (resolved).** Licensing type is **no longer an unresolved issue for
-  VisA**: official sources verify CC BY 4.0 for the dataset and Apache-2.0 for the
-  repository utility code. The previous CC BY-NC-SA statement is recorded as a
-  secondary-source error, not a continuing conflict.
-- **Governance evidence (still incomplete).** MPDD's remaining governance evidence —
-  versioning/DOI, integrity hashes, archival availability, and source-level
-  composition/annotation documentation — is **not** yet established. VisA's remaining
-  governance evidence — formal versioning/DOI/release, a published strong checksum,
-  complete annotation-process documentation, and archival preservation guarantee — is
-  also **not** yet established. No candidate is governance-complete.
-- **Net effect on this ADR.** Because governance evidence remains incomplete, the
-  **Dataset Selection ADR remains deferred**; the MPDD and VisA findings advance the
-  record but do not change the decision.
-- **Framework choice.** Unchanged. The Framework ADR remains in "defer selection"
-  status; framework fit still cannot be finalized without an approved dataset, so
-  deferral here keeps the runtime decision correctly open.
-- **Evaluation.** Concrete metrics remain deferred, as the Evaluation Strategy fixed
-  them to the approved dataset; no metric may be chosen while no dataset is selected.
-- **Future datasets.** The verification and governance discipline applied here sets the
-  standard for every future candidate, including industrial-partner or Kalibra-owned
-  data; the Landscape's identified gaps (cast aluminium, CNC machining, multi-camera)
-  remain the direction of travel.
+- **C-1 Dataset Selection Closure is complete.** The repository dataset-selection
+  state moves from `DEFER` to `SELECTED — VisA`.
+- **C-2 may proceed.** The repository may proceed to:
+
+```text
+C-2 Evaluation Protocol Fixation
+```
+
+- **Execution remains dependent on governed acquisition.** C-2 protocol design may use
+  the recorded VisA structure, but execution on data requires governed VisA
+  acquisition, local integrity evidence, provenance record, and frozen split records.
+- **Implementation remains separately gated.** This ADR does not authorize runtime,
+  provider, preprocessing, output-mapping, loader, evaluation-harness, model-artifact,
+  training, or deployment changes.
+- **Framework ADR, Scientific Architecture, Evaluation Strategy, and Implementation
+  Authorization remain unmodified.** This ADR applies their governance posture; it
+  does not revise them.
+- **MPDD remains available for future evolution.** MPDD is retained as the domain
+  anchor for later domain-specific work, not rejected.
+- **Claim boundaries remain unchanged.** No scientific, benchmark, calibrated
+  confidence, production, or product-readiness claim may be made until reproducible
+  evidence exists under the appropriate downstream gates.
 
 ---
 
 ## 8. Risks
 
-- **Benchmark bias.** Selecting a saturated benchmark (e.g. MVTec AD) later could
-  produce numbers that reflect community tuning rather than capability; any future
-  selection must carry this caveat.
-- **Licensing uncertainty.** Reduced but not eliminated. It is **resolved** for VisA
-  (verified dataset CC BY 4.0; utility code Apache-2.0), MPDD (verified CC BY-NC-SA
-  4.0), MVTec, and Kolektor. MPDD, MVTec, and Kolektor remain admissible only under
-  the recorded non-commercial posture; any future shift to a commercial posture would
-  re-open their admissibility. Licensing uncertainty **remains** for BTAD, DAGM, NEU,
-  Magnetic Tile, and Severstal, where proceeding on an unverified, absent, or
-  competition-gated term would breach the Dataset Strategy.
-- **Domain mismatch.** Every verified-license candidate is a proxy for, not a match to,
-  Kalibra's cast-aluminium/machining target; any first selection inherits a
-  domain-shift caveat that must be disclosed and must bound the claims.
-- **Future migration.** A first dataset chosen as a proxy will likely be superseded by
+- **Proxy-domain risk.** VisA is not a cast-aluminium, CNC-machining, gearbox-housing,
+  or metal-parts dataset. Any evidence produced on it will be bounded to a governed
+  proxy baseline unless later domain-specific evidence supports stronger claims.
+- **Acquisition risk.** Selection is not acquisition. If governed acquisition cannot
+  pin the archive, record hashes, preserve provenance, and freeze splits, execution
+  must stop and the decision must be revisited.
+- **Annotation-process risk.** VisA's upstream annotation-process documentation remains
+  incomplete; any localization or label-dependent claim must disclose that limitation.
+- **Benchmark and product-claim risk.** VisA selection must not be allowed to imply a
+  benchmark result, defect-detection capability, calibrated confidence, or product
+  readiness before evaluation evidence exists.
+- **Future migration.** The first governed proxy baseline will likely be superseded by
   nearer-domain or Kalibra-owned data; comparability across that migration must be
   protected, per the Dataset Strategy's evolution policy.
-- **Scientific claims.** No scientific claim may be made until an approved dataset,
-  fixed splits, and reproducible evidence exist; deferral makes explicit that no such
-  claim is yet possible.
+- **MPDD maturity risk.** MPDD remains the domain anchor, but its long-term
+  availability, versioning, integrity, and archival evidence are still weaker than
+  VisA's and must not be glossed over.
 
 ---
 
 ## 9. Approval Conditions
 
-This ADR (recording the **deferral**) is considered approved when:
+This ADR (recording the **VisA selection**) is considered approved when:
 
-- The repository owner approves the deferral decision and its reasoning.
-- The decision status and the per-candidate assessments are recorded in the project
-  record.
-- The now-resolved items are recorded: the **project's non-commercial posture**,
-  **MPDD's verified CC BY-NC-SA 4.0 license**, and **VisA's verified CC BY 4.0 dataset
-  license / Apache-2.0 repository utility-code license**.
-- The open items blocking selection — MPDD's **non-licensing governance evidence**
-  (versioning/DOI, integrity hashes, archival availability, composition/annotation
-  documentation), VisA's **non-licensing governance evidence** (formal versioning/DOI
-  or release, strong checksum, annotation-process documentation, archival preservation
-  guarantee), and the **licensing confirmations** for BTAD, Magnetic Tile, DAGM, NEU,
-  and Severstal — are acknowledged as prerequisites to any future selection.
-
-For a **future selection** to be recorded (via a superseding ADR), all of the
-following must hold for the chosen candidate: verified provenance; a verified,
-explicit, Kalibra-compatible license; satisfiable governance (versioning, hashing,
-lineage, evidence linkage) and long-term availability; adequate anomaly-detection and
-(where claimed) localization ground truth; and conformance to the Dataset Strategy
-approval criteria. Selection remains subject to the Implementation Authorization gate
-before any framework-backed work begins.
+- The repository owner approves `SELECTED — VisA` as the C-1 Dataset Selection Closure
+  outcome.
+- The role is recorded precisely: **VisA is the governed proxy dataset** for the first
+  Kalibra ML baseline and the current **governance anchor**.
+- MPDD is recorded precisely: **MPDD remains the domain anchor**, is not selected for
+  the first governed baseline, and is retained for future domain-specific evolution.
+- The accepted limitations are recorded: no domain-of-record, defect-detection,
+  benchmark, product, acquisition-complete, training, evaluation, calibration, or
+  production-readiness claim.
+- The governed-acquisition obligations are acknowledged as prerequisites to using the
+  dataset: fixed acquisition record, local sha256 integrity manifest, provenance
+  manifest, attribution record, and immutable train/validation/test split record.
+- The downstream ordering is preserved: C-2 Evaluation Protocol Fixation may proceed,
+  but data execution and any scientific claim remain blocked until governed
+  acquisition and the appropriate downstream gates are complete.
 
 ---
 
 ## 10. Future Review
 
-This revision records two material improvements: **VisA governance evidence has
-materially improved** through verified licensing and AWS-hosted provenance evidence,
-and **MPDD governance evidence has materially improved** through verified licensing
-and a completed versioning/archival investigation. Neither improvement completes the
-Dataset Strategy gate.
+This revision records C-1 Dataset Selection Closure: **VisA is selected as governed
+proxy** and **MPDD remains the domain anchor**. Future review must preserve that
+distinction unless a later owner-approved ADR changes it.
 
 This ADR should be revisited only when one of the following occurs:
 
+- **Governed VisA acquisition fails.** If Kalibra cannot produce the required local
+  acquisition, hash, provenance, attribution, or split records, the selected dataset
+  cannot be used and the decision must be revisited.
 - **MPDD governance blockers are resolved.** MPDD's outstanding non-licensing evidence
   is established — an official version identifier/DOI or equivalent fixed release,
   integrity hashes, archival availability, and source-level composition/annotation
-  documentation — at which point the closest domain match could be reassessed against
-  the Dataset Strategy gate.
+  documentation — at which point the domain anchor could be reassessed for a future
+  domain-specific baseline.
 - **A candidate materially exceeds both current anchors.** A new public, partner, or
   Kalibra-owned candidate provides verified governance evidence that materially exceeds
   VisA's licensing/hosting maturity **and** scientific/domain relevance that materially
   exceeds MPDD's present domain fit.
+- **A domain-of-record or production claim is proposed.** Such a claim cannot rest on
+  the VisA proxy selection and would require a separate governed dataset decision and
+  supporting evidence.
 
-Any such event triggers a superseding ADR version; this v1.0 deferral remains the
-record until then.
+Any such event triggers a superseding ADR version. Until then, this ADR records the
+bounded `SELECTED — VisA` decision and its non-claims.
 
 ---
 
 ## 11. Final Recommendation
 
 ```text
-DEFER DATASET SELECTION.
+SELECTED — VisA.
 ```
 
-The evidence is insufficient to select a first dataset: **no candidate is yet
-governance-complete on verified facts** — the closest domain match (MPDD) now has a
-verified, compatible license but still lacks versioning, integrity verification,
-archival availability, and source-level documentation; the strongest verified
-licensing candidate (VisA) now has a permissive, official CC BY 4.0 dataset license
-but still lacks complete non-license governance evidence and remains domain-distant.
-The project's commercial posture is now **recorded (non-commercial)**, resolving that
-open question without, by itself, completing any candidate's governance.
+VisA is selected as the **governed proxy dataset** and **governance anchor** for the
+first Kalibra ML baseline. MPDD remains the **domain anchor**, is not selected for the
+first governed baseline, and is retained for future domain-specific evolution.
 
-**Why no competing candidate was selected:**
-
-- **MPDD** — closest domain match; license now **verified CC BY-NC-SA 4.0** and
-  compatible with the non-commercial posture, but held by non-licensing governance gaps
-  (versioning/DOI, integrity hashes, archival availability, composition/annotation
-  documentation). *Deferred.*
-- **VisA** — strongest verified licensing position (**CC BY 4.0** dataset;
-  **Apache-2.0** repository utility code) and canonical AWS Open Data/S3 distribution,
-  but governance remains incomplete on formal versioning/DOI or release, published
-  strong checksum, annotation-process documentation, and archival preservation; also a
-  proxy rather than Kalibra's metal-component domain. *Deferred.*
-- **MVTec AD, MVTec AD 2, KolektorSDD, KolektorSDD2** — verified **non-commercial**
-  licenses, now compatible with the recorded posture; domain-distant proxies and (for
-  MVTec AD) saturated, so not the closest match for a first selection. *Deferred.*
-- **BTAD** — license/provenance at observation level, unverified; small. *Deferred.*
-- **Magnetic Tile** — **no license located**. *Deferred (→ Rejected if none exists).*
-- **Severstal** — **competition-rule licensing** conflicts with redistribution and
-  long-term-availability governance. *Deferred (→ Rejected if unsatisfiable).*
-- **DAGM 2007** — **synthetic**; cannot carry a real-world detection claim as the first
-  evidence base; weak localization. *Rejected for first selection.*
-- **NEU** — primarily **classification**, outside ML Phase 2 scope; localization
-  insufficient. *Rejected for first selection.*
-
-The recommendation preserves the provider abstraction and every domain ownership
-(Inspection, Trust, Review, Evidence, Evaluation) by touching none of them, makes no
-benchmark claim, and holds implementation blocked. Selection may be recorded only by a
-superseding ADR once a candidate clears the governance gate on verified facts under
-§9.
+This decision closes C-1 Dataset Selection Closure and permits the repository to
+proceed to **C-2 Evaluation Protocol Fixation**. Execution remains dependent on
+governed VisA acquisition. No dataset acquisition, model training, evaluation result,
+benchmark, defect-detection capability, calibrated confidence, production readiness,
+or product claim is made by this ADR.
