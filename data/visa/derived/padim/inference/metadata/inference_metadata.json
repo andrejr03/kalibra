@@ -1,0 +1,138 @@
+{
+  "aggregation_identifier": "padim_anomaly_map_max_v1",
+  "aggregation_policy": "maximum finite Mahalanobis distance over anomaly map",
+  "artifact_identity": {
+    "backbone_identity": "kalibra-fixed-patch-feature-backbone-v1",
+    "class_order": [
+      "candle",
+      "capsules",
+      "cashew",
+      "chewinggum",
+      "fryum",
+      "macaroni1",
+      "macaroni2",
+      "pcb1",
+      "pcb2",
+      "pcb3",
+      "pcb4",
+      "pipe_fryum"
+    ],
+    "covariance_inverse_by_class_sha256": "893af9e08d3543b5bd973ab913c1f2e8ed57d26a1bbb225b194d525cfc8df7b3",
+    "dtype": "float64",
+    "feature_indices_sha256": "1ca5583a7b498b4849e42717f24ebcf82d82a6c545b852814ada12b5c287cbe3",
+    "mu_by_class_sha256": "51568c211c324b9178837f0d862c01a9601dc3d3daa474c959bb32ef5758446b",
+    "preprocessing_contract_id": "kalibra-padim-rgb64-bilinear-float64-patch8-v1",
+    "schema": "kalibra_governed_padim_artifact_identity_v1",
+    "selected_layer": "fixed_patch_statistics_64x64_patch8",
+    "training_artifact_hashes_sha256": "00c625060c6e50fe7ab1da76125e3891d8be7e52838c846eaba52813461eeb32",
+    "training_label": "visa-padim-baseline-fit-v1",
+    "training_metadata_sha256": "c0178d823d0c440102c768f75799340586bd4c428bfa309862e8fb658b0ffad9",
+    "training_record_sha256": "7d6171f3f05c30c4891969fa40451d0e960b4e5b8ac00b3d0e1d22f2ee9b8048",
+    "training_replay_verification_sha256": "dc5f66ee17533518489c893358cb30b8dd622277b5f38e21c0a0dd6e67fdd55f"
+  },
+  "backbone_identity": "kalibra-fixed-patch-feature-backbone-v1",
+  "batching": {
+    "batch_order": "split, class, filename, all lexicographic",
+    "batch_size": 16
+  },
+  "class_counts": {
+    "test": {
+      "candle": 440,
+      "capsules": 281,
+      "cashew": 240,
+      "chewinggum": 241,
+      "fryum": 240,
+      "macaroni1": 440,
+      "macaroni2": 440,
+      "pcb1": 442,
+      "pcb2": 440,
+      "pcb3": 442,
+      "pcb4": 442,
+      "pipe_fryum": 240
+    },
+    "validation": {
+      "candle": 220,
+      "capsules": 140,
+      "cashew": 120,
+      "chewinggum": 121,
+      "fryum": 120,
+      "macaroni1": 220,
+      "macaroni2": 220,
+      "pcb1": 221,
+      "pcb2": 220,
+      "pcb3": 221,
+      "pcb4": 221,
+      "pipe_fryum": 120
+    }
+  },
+  "consumed_splits": [
+    "validation",
+    "test"
+  ],
+  "dataset_identity": {
+    "acquisition_label": "visa-acq-v1",
+    "archive_sha256": "2eb8690c803ab37de0324772964100169ec8ba1fa3f7e94291c9ca673f40f362",
+    "canonical_archive_url": "https://amazon-visual-anomaly.s3.us-west-2.amazonaws.com/VisA_20220922.tar",
+    "dataset": "VisA",
+    "files_manifest_sha256": "a01e02b043349d78b9dc958b12779fb48ccc30c0609719c739801a8dc503246c",
+    "provenance_sha256": "01933f8b335a520c5a22a0f9f38eb8544429343d580d3646855eae575de639d0",
+    "repository_commit": "2a692ab575001cbde74d402d897a7286086c6199",
+    "role": "governed proxy dataset",
+    "split_hashes": {
+      "test": "2d86ae7fa4cffe7f5f4aeb89f2c9c23351f44413da5d8aa0d5a3628a1c505510",
+      "train": "9fa6abf23a487075bbe8f81becbfce471bbfc94e6e4ebc3f2cdf74db0abac736",
+      "validation": "79e6e3bf99589146143927e1e7861bb2f2b9c4b2502f4da8d8ecc3a274769cc5"
+    }
+  },
+  "dtype": "float64",
+  "feature_indices": [
+    0,
+    2,
+    5,
+    6,
+    7,
+    9,
+    12,
+    13
+  ],
+  "inference_label": "visa-padim-governed-inference-v1",
+  "inference_timestamp_utc": "2026-07-05T19:47:49Z",
+  "localization_identifier": "padim_raw_anomaly_map_argmax_region_v1",
+  "localization_policy": "bounding box covering pixels equal to maximum anomaly-map value",
+  "output_artifacts": {
+    "anomaly_maps/test_anomaly_maps.npy": "21a959c9891815ea73ee7e23a47a1b4c15be18047ad58e2b721a7c24cdc15a9d",
+    "anomaly_maps/validation_anomaly_maps.npy": "bdea53e85561e830ab1b45430f0df16e6769e9092124217fe5827ee30ac3d97d",
+    "predictions/test_predictions.jsonl": "35e2a8426a8e1bb59f8327f657eff79892dbbbad825acf19debee2a6436f8436",
+    "predictions/validation_predictions.jsonl": "ebef96fad1a665e9e2cd4c2e9855f93f238b8a71a41971c56efbabd3ba5314c4"
+  },
+  "prediction_judgement_policy": "contract_required_defect_for_raw_localization_no_threshold_v1",
+  "preprocessing_contract_id": "kalibra-padim-rgb64-bilinear-float64-patch8-v1",
+  "sample_count": 6492,
+  "schema": "kalibra_governed_padim_inference_metadata_v1",
+  "scope_boundaries": {
+    "benchmark_generated": false,
+    "calibration_performed": false,
+    "evaluation_executed": false,
+    "fitting_performed": false,
+    "metrics_generated": false,
+    "onnx_exported": false,
+    "operating_point_derived": false,
+    "product_claim": false,
+    "scientific_claim": false,
+    "threshold_derived": false
+  },
+  "selected_layer": "fixed_patch_statistics_64x64_patch8",
+  "split_counts": {
+    "test": 4328,
+    "validation": 2164
+  },
+  "split_identity": {
+    "inference_consumed_splits": [
+      "validation",
+      "test"
+    ],
+    "test_split_sha256": "2d86ae7fa4cffe7f5f4aeb89f2c9c23351f44413da5d8aa0d5a3628a1c505510",
+    "train_split_sha256": "9fa6abf23a487075bbe8f81becbfce471bbfc94e6e4ebc3f2cdf74db0abac736",
+    "validation_split_sha256": "79e6e3bf99589146143927e1e7861bb2f2b9c4b2502f4da8d8ecc3a274769cc5"
+  }
+}

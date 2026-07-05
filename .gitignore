@@ -37,6 +37,13 @@ data/visa/derived/padim/*
 !data/visa/derived/padim/training/**
 !data/visa/derived/padim/metadata/
 !data/visa/derived/padim/metadata/**
+!data/visa/derived/padim/inference/
+data/visa/derived/padim/inference/*
+!data/visa/derived/padim/inference/metadata/
+!data/visa/derived/padim/inference/metadata/**
+!data/visa/derived/padim/inference/replay/
+!data/visa/derived/padim/inference/replay/**
+!data/visa/derived/padim/inference/artifact_hashes.json
 data/visa/derived/padim/statistics/
 data/visa/derived/padim/covariance/
 data/visa/derived/padim/evidence/

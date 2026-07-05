@@ -1,0 +1,26 @@
+{
+  "config": {
+    "batch_size": 16,
+    "covariance_epsilon": 0.001,
+    "dtype": "float64",
+    "feature_subsample_seed": 271828,
+    "full_feature_dimension": 14,
+    "image_size": 64,
+    "patch_count": 64,
+    "patch_grid": [
+      8,
+      8
+    ],
+    "patch_size": 8,
+    "selected_feature_dimension": 8
+  },
+  "contract_id": "kalibra-padim-rgb64-bilinear-float64-patch8-v1",
+  "scope": "C-4 PaDiM training only; existing runtime preprocessing is unchanged",
+  "steps": [
+    "open governed train image bytes with Pillow",
+    "convert to RGB",
+    "resize to 64x64 using bilinear interpolation",
+    "convert to float64 in [0, 1]",
+    "derive deterministic patch statistics over 8x8 patches"
+  ]
+}

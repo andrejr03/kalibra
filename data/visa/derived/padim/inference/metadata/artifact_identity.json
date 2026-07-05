@@ -1,0 +1,29 @@
+{
+  "backbone_identity": "kalibra-fixed-patch-feature-backbone-v1",
+  "class_order": [
+    "candle",
+    "capsules",
+    "cashew",
+    "chewinggum",
+    "fryum",
+    "macaroni1",
+    "macaroni2",
+    "pcb1",
+    "pcb2",
+    "pcb3",
+    "pcb4",
+    "pipe_fryum"
+  ],
+  "covariance_inverse_by_class_sha256": "893af9e08d3543b5bd973ab913c1f2e8ed57d26a1bbb225b194d525cfc8df7b3",
+  "dtype": "float64",
+  "feature_indices_sha256": "1ca5583a7b498b4849e42717f24ebcf82d82a6c545b852814ada12b5c287cbe3",
+  "mu_by_class_sha256": "51568c211c324b9178837f0d862c01a9601dc3d3daa474c959bb32ef5758446b",
+  "preprocessing_contract_id": "kalibra-padim-rgb64-bilinear-float64-patch8-v1",
+  "schema": "kalibra_governed_padim_artifact_identity_v1",
+  "selected_layer": "fixed_patch_statistics_64x64_patch8",
+  "training_artifact_hashes_sha256": "00c625060c6e50fe7ab1da76125e3891d8be7e52838c846eaba52813461eeb32",
+  "training_label": "visa-padim-baseline-fit-v1",
+  "training_metadata_sha256": "c0178d823d0c440102c768f75799340586bd4c428bfa309862e8fb658b0ffad9",
+  "training_record_sha256": "7d6171f3f05c30c4891969fa40451d0e960b4e5b8ac00b3d0e1d22f2ee9b8048",
+  "training_replay_verification_sha256": "dc5f66ee17533518489c893358cb30b8dd622277b5f38e21c0a0dd6e67fdd55f"
+}

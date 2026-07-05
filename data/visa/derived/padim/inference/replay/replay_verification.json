@@ -1,0 +1,30 @@
+{
+  "comparisons": {
+    "anomaly_maps": true,
+    "feature_tensors": true,
+    "inspection_predictions": true,
+    "localizations": true,
+    "output_artifact_hashes": true,
+    "prediction_hashes": true,
+    "raw_anomaly_measures": true,
+    "sample_order": true
+  },
+  "complete_second_inference_run": true,
+  "first_run_output_artifact_hashes": {
+    "anomaly_maps/test_anomaly_maps.npy": "21a959c9891815ea73ee7e23a47a1b4c15be18047ad58e2b721a7c24cdc15a9d",
+    "anomaly_maps/validation_anomaly_maps.npy": "bdea53e85561e830ab1b45430f0df16e6769e9092124217fe5827ee30ac3d97d",
+    "predictions/test_predictions.jsonl": "35e2a8426a8e1bb59f8327f657eff79892dbbbad825acf19debee2a6436f8436",
+    "predictions/validation_predictions.jsonl": "ebef96fad1a665e9e2cd4c2e9855f93f238b8a71a41971c56efbabd3ba5314c4"
+  },
+  "first_run_sample_artifact_hashes_sha256": "726cbf6e2042cb21f44c172923bcaccddb78e807d22d46141670182917ee3ec2",
+  "sample_count": 6492,
+  "schema": "kalibra_governed_padim_inference_replay_v1",
+  "second_run_output_artifact_hashes": {
+    "anomaly_maps/test_anomaly_maps.npy": "21a959c9891815ea73ee7e23a47a1b4c15be18047ad58e2b721a7c24cdc15a9d",
+    "anomaly_maps/validation_anomaly_maps.npy": "bdea53e85561e830ab1b45430f0df16e6769e9092124217fe5827ee30ac3d97d",
+    "predictions/test_predictions.jsonl": "35e2a8426a8e1bb59f8327f657eff79892dbbbad825acf19debee2a6436f8436",
+    "predictions/validation_predictions.jsonl": "ebef96fad1a665e9e2cd4c2e9855f93f238b8a71a41971c56efbabd3ba5314c4"
+  },
+  "second_run_sample_artifact_hashes_sha256": "726cbf6e2042cb21f44c172923bcaccddb78e807d22d46141670182917ee3ec2",
+  "status": "passed"
+}

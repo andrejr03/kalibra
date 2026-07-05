@@ -1,0 +1,16 @@
+{
+  "full_feature_dimension": 14,
+  "ordering": "ascending after deterministic seed selection",
+  "seed": 271828,
+  "selected_feature_dimension": 8,
+  "selected_indices": [
+    0,
+    2,
+    5,
+    6,
+    7,
+    9,
+    12,
+    13
+  ]
+}

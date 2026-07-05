@@ -1,0 +1,22 @@
+{
+  "backbone_identity": "kalibra-fixed-patch-feature-backbone-v1",
+  "backbone_kind": "deterministic fixed local patch feature extractor",
+  "feature_components": [
+    "rgb_patch_mean_3",
+    "rgb_patch_std_3",
+    "grayscale_patch_mean_1",
+    "grayscale_patch_std_1",
+    "gradient_x_patch_mean_1",
+    "gradient_x_patch_std_1",
+    "gradient_y_patch_mean_1",
+    "gradient_y_patch_std_1",
+    "gradient_magnitude_patch_mean_1",
+    "gradient_magnitude_patch_std_1"
+  ],
+  "full_feature_dimension": 14,
+  "pretrained_external_weights": false,
+  "provenance": "Implemented as deterministic local feature extraction code in scripts/train_padim_baseline.py; no external model weights are used.",
+  "selected_layers": [
+    "fixed_patch_statistics_64x64_patch8"
+  ]
+}
