@@ -1,0 +1,19 @@
+{
+  "evaluation_label": "visa-padim-scientific-evaluation-v1",
+  "governed_evaluation_artifacts": {
+    "failure_analysis/failure_analysis.json": "10c7d1fb02cb2419ebd892c8c1ffdf62a235f12344b4131e7278eaccd40704b8",
+    "metadata/evaluation_metadata.json": "02ebf0ba9da0ab1c747cce4218d0685094a7c39908a4f21b5af2075f2110b1f9",
+    "metrics/diagnostic_metrics.json": "548516273e69ed288949f96f9f2f856682643ae95f16e96e0999140129192edf",
+    "metrics/official_metrics.json": "0279236bd140fcd60a84c5a0f3dd52c38cea44d731e79d174c8fd69e998e8a8c",
+    "operating_point/operating_point.json": "edc1f4d97c36aeb09517897ec2d7e97ba5dfe7f8da9a6d37f3fbc7751e5881f0",
+    "per_class/per_class_metrics.json": "74eaf486b90d8fe164e1dfe1826632fdf8601907013af52efb5ed5ff122a5b8c",
+    "replay/replay_verification.json": "aecb4f1b5450531b8e53127bbd13cde597646b6a836f63c684d5eb8cabea6286"
+  },
+  "hash_scope": "evaluation directory artifacts except artifact_hashes.json itself",
+  "local_large_outputs": [],
+  "replay_verification": {
+    "path": "data/visa/derived/padim/evaluation/replay/replay_verification.json",
+    "sha256": "aecb4f1b5450531b8e53127bbd13cde597646b6a836f63c684d5eb8cabea6286"
+  },
+  "schema": "kalibra_scientific_evaluation_artifact_hashes_v1"
+}

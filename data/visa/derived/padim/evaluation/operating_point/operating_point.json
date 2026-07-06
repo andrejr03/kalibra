@@ -1,0 +1,211 @@
+{
+  "application_split": "test",
+  "candidate_count": 2164,
+  "derivation_split": "validation",
+  "diagnostic_only": true,
+  "evaluation_label": "visa-padim-scientific-evaluation-v1",
+  "not_calibrated": true,
+  "not_product_threshold": true,
+  "prediction_rule": "anomaly if predicted_raw_anomaly_measure >= threshold",
+  "rule_id": "validation_balanced_fpr_fnr_v1",
+  "schema": "kalibra_scientific_evaluation_operating_point_v1",
+  "selection_rule": "Minimize absolute validation false-positive-rate / false-negative-rate gap; tie-break by lower maximum error rate, lower total error count, then higher threshold.",
+  "test_application": {
+    "per_class_confusion": [
+      {
+        "class_name": "candle",
+        "confusion": {
+          "false_negative": 17,
+          "false_positive": 79,
+          "true_negative": 321,
+          "true_positive": 23
+        },
+        "diagnostic_only": true,
+        "f1": 0.323943661971831,
+        "operating_point": 2.4455687342442243,
+        "precision": 0.22549019607843138,
+        "recall": 0.575
+      },
+      {
+        "class_name": "capsules",
+        "confusion": {
+          "false_negative": 2,
+          "false_positive": 219,
+          "true_negative": 22,
+          "true_positive": 38
+        },
+        "diagnostic_only": true,
+        "f1": 0.25589225589225595,
+        "operating_point": 2.4455687342442243,
+        "precision": 0.14785992217898833,
+        "recall": 0.95
+      },
+      {
+        "class_name": "cashew",
+        "confusion": {
+          "false_negative": 12,
+          "false_positive": 65,
+          "true_negative": 135,
+          "true_positive": 28
+        },
+        "diagnostic_only": true,
+        "f1": 0.4210526315789474,
+        "operating_point": 2.4455687342442243,
+        "precision": 0.3010752688172043,
+        "recall": 0.7
+      },
+      {
+        "class_name": "chewinggum",
+        "confusion": {
+          "false_negative": 23,
+          "false_positive": 42,
+          "true_negative": 159,
+          "true_positive": 17
+        },
+        "diagnostic_only": true,
+        "f1": 0.3434343434343435,
+        "operating_point": 2.4455687342442243,
+        "precision": 0.288135593220339,
+        "recall": 0.425
+      },
+      {
+        "class_name": "fryum",
+        "confusion": {
+          "false_negative": 10,
+          "false_positive": 58,
+          "true_negative": 142,
+          "true_positive": 30
+        },
+        "diagnostic_only": true,
+        "f1": 0.46875,
+        "operating_point": 2.4455687342442243,
+        "precision": 0.3409090909090909,
+        "recall": 0.75
+      },
+      {
+        "class_name": "macaroni1",
+        "confusion": {
+          "false_negative": 14,
+          "false_positive": 124,
+          "true_negative": 276,
+          "true_positive": 26
+        },
+        "diagnostic_only": true,
+        "f1": 0.2736842105263158,
+        "operating_point": 2.4455687342442243,
+        "precision": 0.17333333333333334,
+        "recall": 0.65
+      },
+      {
+        "class_name": "macaroni2",
+        "confusion": {
+          "false_negative": 1,
+          "false_positive": 377,
+          "true_negative": 23,
+          "true_positive": 39
+        },
+        "diagnostic_only": true,
+        "f1": 0.17105263157894735,
+        "operating_point": 2.4455687342442243,
+        "precision": 0.09375,
+        "recall": 0.975
+      },
+      {
+        "class_name": "pcb1",
+        "confusion": {
+          "false_negative": 8,
+          "false_positive": 96,
+          "true_negative": 306,
+          "true_positive": 32
+        },
+        "diagnostic_only": true,
+        "f1": 0.38095238095238093,
+        "operating_point": 2.4455687342442243,
+        "precision": 0.25,
+        "recall": 0.8
+      },
+      {
+        "class_name": "pcb2",
+        "confusion": {
+          "false_negative": 5,
+          "false_positive": 62,
+          "true_negative": 338,
+          "true_positive": 35
+        },
+        "diagnostic_only": true,
+        "f1": 0.510948905109489,
+        "operating_point": 2.4455687342442243,
+        "precision": 0.36082474226804123,
+        "recall": 0.875
+      },
+      {
+        "class_name": "pcb3",
+        "confusion": {
+          "false_negative": 19,
+          "false_positive": 84,
+          "true_negative": 318,
+          "true_positive": 21
+        },
+        "diagnostic_only": true,
+        "f1": 0.28965517241379307,
+        "operating_point": 2.4455687342442243,
+        "precision": 0.2,
+        "recall": 0.525
+      },
+      {
+        "class_name": "pcb4",
+        "confusion": {
+          "false_negative": 9,
+          "false_positive": 50,
+          "true_negative": 352,
+          "true_positive": 31
+        },
+        "diagnostic_only": true,
+        "f1": 0.512396694214876,
+        "operating_point": 2.4455687342442243,
+        "precision": 0.38271604938271603,
+        "recall": 0.775
+      },
+      {
+        "class_name": "pipe_fryum",
+        "confusion": {
+          "false_negative": 17,
+          "false_positive": 42,
+          "true_negative": 158,
+          "true_positive": 23
+        },
+        "diagnostic_only": true,
+        "f1": 0.43809523809523804,
+        "operating_point": 2.4455687342442243,
+        "precision": 0.35384615384615387,
+        "recall": 0.575
+      }
+    ],
+    "split": "test",
+    "total_confusion": {
+      "false_negative": 137,
+      "false_positive": 1298,
+      "true_negative": 2550,
+      "true_positive": 343
+    },
+    "total_diagnostic_metrics": {
+      "f1": 0.3234323432343234,
+      "precision": 0.20901889092017062,
+      "recall": 0.7145833333333333
+    }
+  },
+  "threshold_field": "predicted_raw_anomaly_measure",
+  "validation_confusion": {
+    "false_negative": 79,
+    "false_positive": 633,
+    "true_negative": 1291,
+    "true_positive": 161
+  },
+  "validation_derived_value": 2.4455687342442243,
+  "validation_rates": {
+    "false_negative_rate": 0.32916666666666666,
+    "false_positive_rate": 0.329002079002079,
+    "true_negative_rate": 0.670997920997921,
+    "true_positive_rate": 0.6708333333333333
+  }
+}

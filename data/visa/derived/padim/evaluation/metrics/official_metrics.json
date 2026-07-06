@@ -1,0 +1,144 @@
+{
+  "caveats": [
+    "Per-class results are primary; macro mean is reported only beside the full per-class table.",
+    "Pixel AUROC is reported with AUPRO because normal-background dominance can inflate Pixel AUROC.",
+    "Single-seed evaluation only; no multi-seed variance or confidence intervals are available."
+  ],
+  "evaluation_label": "visa-padim-scientific-evaluation-v1",
+  "official_metrics": {
+    "macro_mean": {
+      "aupro": 0.5557654725950721,
+      "image_auroc": 0.7578255785173372,
+      "pixel_auroc": 0.8651960470322608
+    },
+    "per_class": [
+      {
+        "anomaly_count": 40,
+        "aupro": 0.39039627072440447,
+        "class_name": "candle",
+        "defect_region_count": 63,
+        "image_auroc": 0.78575,
+        "normal_count": 400,
+        "pixel_auroc": 0.7626300228389711,
+        "sample_count": 440
+      },
+      {
+        "anomaly_count": 40,
+        "aupro": 0.3400642132745383,
+        "class_name": "capsules",
+        "defect_region_count": 44,
+        "image_auroc": 0.5096473029045643,
+        "normal_count": 241,
+        "pixel_auroc": 0.7658976308197267,
+        "sample_count": 281
+      },
+      {
+        "anomaly_count": 40,
+        "aupro": 0.6310198947241589,
+        "class_name": "cashew",
+        "defect_region_count": 56,
+        "image_auroc": 0.763375,
+        "normal_count": 200,
+        "pixel_auroc": 0.9492144401134447,
+        "sample_count": 240
+      },
+      {
+        "anomaly_count": 40,
+        "aupro": 0.3968284841741598,
+        "class_name": "chewinggum",
+        "defect_region_count": 61,
+        "image_auroc": 0.6356965174129353,
+        "normal_count": 201,
+        "pixel_auroc": 0.7820259119360038,
+        "sample_count": 241
+      },
+      {
+        "anomaly_count": 40,
+        "aupro": 0.5294134910161822,
+        "class_name": "fryum",
+        "defect_region_count": 69,
+        "image_auroc": 0.78475,
+        "normal_count": 200,
+        "pixel_auroc": 0.9058444496755639,
+        "sample_count": 240
+      },
+      {
+        "anomaly_count": 40,
+        "aupro": 0.4785720888745423,
+        "class_name": "macaroni1",
+        "defect_region_count": 43,
+        "image_auroc": 0.7305625,
+        "normal_count": 400,
+        "pixel_auroc": 0.7994830420186343,
+        "sample_count": 440
+      },
+      {
+        "anomaly_count": 40,
+        "aupro": 0.5067226059774215,
+        "class_name": "macaroni2",
+        "defect_region_count": 44,
+        "image_auroc": 0.6391875,
+        "normal_count": 400,
+        "pixel_auroc": 0.8430138705713678,
+        "sample_count": 440
+      },
+      {
+        "anomaly_count": 40,
+        "aupro": 0.6763970019148468,
+        "class_name": "pcb1",
+        "defect_region_count": 58,
+        "image_auroc": 0.8925995024875621,
+        "normal_count": 402,
+        "pixel_auroc": 0.9279666936340651,
+        "sample_count": 442
+      },
+      {
+        "anomaly_count": 40,
+        "aupro": 0.6883843356389133,
+        "class_name": "pcb2",
+        "defect_region_count": 61,
+        "image_auroc": 0.9399375,
+        "normal_count": 400,
+        "pixel_auroc": 0.9062001052837626,
+        "sample_count": 440
+      },
+      {
+        "anomaly_count": 40,
+        "aupro": 0.6735364116206315,
+        "class_name": "pcb3",
+        "defect_region_count": 61,
+        "image_auroc": 0.7599502487562189,
+        "normal_count": 402,
+        "pixel_auroc": 0.915235477240995,
+        "sample_count": 442
+      },
+      {
+        "anomaly_count": 40,
+        "aupro": 0.6782140160714324,
+        "class_name": "pcb4",
+        "defect_region_count": 80,
+        "image_auroc": 0.9098258706467661,
+        "normal_count": 402,
+        "pixel_auroc": 0.8771479063102642,
+        "sample_count": 442
+      },
+      {
+        "anomaly_count": 40,
+        "aupro": 0.679636857129634,
+        "class_name": "pipe_fryum",
+        "defect_region_count": 48,
+        "image_auroc": 0.742625,
+        "normal_count": 200,
+        "pixel_auroc": 0.9476930139443308,
+        "sample_count": 240
+      }
+    ],
+    "primary": "Image AUROC",
+    "secondary": [
+      "Pixel AUROC",
+      "AUPRO"
+    ]
+  },
+  "schema": "kalibra_scientific_evaluation_metrics_v1",
+  "split": "test"
+}

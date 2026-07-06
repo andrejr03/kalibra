@@ -1,0 +1,452 @@
+{
+  "class_order": [
+    "candle",
+    "capsules",
+    "cashew",
+    "chewinggum",
+    "fryum",
+    "macaroni1",
+    "macaroni2",
+    "pcb1",
+    "pcb2",
+    "pcb3",
+    "pcb4",
+    "pipe_fryum"
+  ],
+  "evaluation_label": "visa-padim-scientific-evaluation-v1",
+  "per_class": {
+    "candle": {
+      "boundary_case_count": 10,
+      "diagnostic_metrics": {
+        "class_name": "candle",
+        "confusion": {
+          "false_negative": 17,
+          "false_positive": 79,
+          "true_negative": 321,
+          "true_positive": 23
+        },
+        "diagnostic_only": true,
+        "f1": 0.323943661971831,
+        "operating_point": 2.4455687342442243,
+        "precision": 0.22549019607843138,
+        "recall": 0.575
+      },
+      "false_negative_count": 17,
+      "false_positive_count": 79,
+      "localization_failure_count": 17,
+      "official_metrics": {
+        "anomaly_count": 40,
+        "aupro": 0.39039627072440447,
+        "class_name": "candle",
+        "defect_region_count": 63,
+        "image_auroc": 0.78575,
+        "normal_count": 400,
+        "pixel_auroc": 0.7626300228389711,
+        "sample_count": 440
+      },
+      "score_summary": {
+        "max": 8.0405706878289,
+        "mean": 2.1161146425432626,
+        "median": 1.8695677569063582,
+        "min": 0.8377997477131973
+      }
+    },
+    "capsules": {
+      "boundary_case_count": 10,
+      "diagnostic_metrics": {
+        "class_name": "capsules",
+        "confusion": {
+          "false_negative": 2,
+          "false_positive": 219,
+          "true_negative": 22,
+          "true_positive": 38
+        },
+        "diagnostic_only": true,
+        "f1": 0.25589225589225595,
+        "operating_point": 2.4455687342442243,
+        "precision": 0.14785992217898833,
+        "recall": 0.95
+      },
+      "false_negative_count": 2,
+      "false_positive_count": 219,
+      "localization_failure_count": 35,
+      "official_metrics": {
+        "anomaly_count": 40,
+        "aupro": 0.3400642132745383,
+        "class_name": "capsules",
+        "defect_region_count": 44,
+        "image_auroc": 0.5096473029045643,
+        "normal_count": 241,
+        "pixel_auroc": 0.7658976308197267,
+        "sample_count": 281
+      },
+      "score_summary": {
+        "max": 13.17973641411532,
+        "mean": 3.3083451741531986,
+        "median": 3.037364007158753,
+        "min": 1.971297194129907
+      }
+    },
+    "cashew": {
+      "boundary_case_count": 10,
+      "diagnostic_metrics": {
+        "class_name": "cashew",
+        "confusion": {
+          "false_negative": 12,
+          "false_positive": 65,
+          "true_negative": 135,
+          "true_positive": 28
+        },
+        "diagnostic_only": true,
+        "f1": 0.4210526315789474,
+        "operating_point": 2.4455687342442243,
+        "precision": 0.3010752688172043,
+        "recall": 0.7
+      },
+      "false_negative_count": 12,
+      "false_positive_count": 65,
+      "localization_failure_count": 24,
+      "official_metrics": {
+        "anomaly_count": 40,
+        "aupro": 0.6310198947241589,
+        "class_name": "cashew",
+        "defect_region_count": 56,
+        "image_auroc": 0.763375,
+        "normal_count": 200,
+        "pixel_auroc": 0.9492144401134447,
+        "sample_count": 240
+      },
+      "score_summary": {
+        "max": 28.074841607892317,
+        "mean": 2.7403869290809895,
+        "median": 2.1485741810048355,
+        "min": 0.9055237835064789
+      }
+    },
+    "chewinggum": {
+      "boundary_case_count": 10,
+      "diagnostic_metrics": {
+        "class_name": "chewinggum",
+        "confusion": {
+          "false_negative": 23,
+          "false_positive": 42,
+          "true_negative": 159,
+          "true_positive": 17
+        },
+        "diagnostic_only": true,
+        "f1": 0.3434343434343435,
+        "operating_point": 2.4455687342442243,
+        "precision": 0.288135593220339,
+        "recall": 0.425
+      },
+      "false_negative_count": 23,
+      "false_positive_count": 42,
+      "localization_failure_count": 12,
+      "official_metrics": {
+        "anomaly_count": 40,
+        "aupro": 0.3968284841741598,
+        "class_name": "chewinggum",
+        "defect_region_count": 61,
+        "image_auroc": 0.6356965174129353,
+        "normal_count": 201,
+        "pixel_auroc": 0.7820259119360038,
+        "sample_count": 241
+      },
+      "score_summary": {
+        "max": 10.721944732102754,
+        "mean": 2.203419316941375,
+        "median": 1.769442707348226,
+        "min": 0.9536634891080921
+      }
+    },
+    "fryum": {
+      "boundary_case_count": 10,
+      "diagnostic_metrics": {
+        "class_name": "fryum",
+        "confusion": {
+          "false_negative": 10,
+          "false_positive": 58,
+          "true_negative": 142,
+          "true_positive": 30
+        },
+        "diagnostic_only": true,
+        "f1": 0.46875,
+        "operating_point": 2.4455687342442243,
+        "precision": 0.3409090909090909,
+        "recall": 0.75
+      },
+      "false_negative_count": 10,
+      "false_positive_count": 58,
+      "localization_failure_count": 13,
+      "official_metrics": {
+        "anomaly_count": 40,
+        "aupro": 0.5294134910161822,
+        "class_name": "fryum",
+        "defect_region_count": 69,
+        "image_auroc": 0.78475,
+        "normal_count": 200,
+        "pixel_auroc": 0.9058444496755639,
+        "sample_count": 240
+      },
+      "score_summary": {
+        "max": 8.647186921600523,
+        "mean": 2.3990091449846767,
+        "median": 2.2315697305008655,
+        "min": 1.0237377426465522
+      }
+    },
+    "macaroni1": {
+      "boundary_case_count": 10,
+      "diagnostic_metrics": {
+        "class_name": "macaroni1",
+        "confusion": {
+          "false_negative": 14,
+          "false_positive": 124,
+          "true_negative": 276,
+          "true_positive": 26
+        },
+        "diagnostic_only": true,
+        "f1": 0.2736842105263158,
+        "operating_point": 2.4455687342442243,
+        "precision": 0.17333333333333334,
+        "recall": 0.65
+      },
+      "false_negative_count": 14,
+      "false_positive_count": 124,
+      "localization_failure_count": 23,
+      "official_metrics": {
+        "anomaly_count": 40,
+        "aupro": 0.4785720888745423,
+        "class_name": "macaroni1",
+        "defect_region_count": 43,
+        "image_auroc": 0.7305625,
+        "normal_count": 400,
+        "pixel_auroc": 0.7994830420186343,
+        "sample_count": 440
+      },
+      "score_summary": {
+        "max": 7.780748964024064,
+        "mean": 2.296817456432408,
+        "median": 2.0514602336994052,
+        "min": 0.9216737880166642
+      }
+    },
+    "macaroni2": {
+      "boundary_case_count": 10,
+      "diagnostic_metrics": {
+        "class_name": "macaroni2",
+        "confusion": {
+          "false_negative": 1,
+          "false_positive": 377,
+          "true_negative": 23,
+          "true_positive": 39
+        },
+        "diagnostic_only": true,
+        "f1": 0.17105263157894735,
+        "operating_point": 2.4455687342442243,
+        "precision": 0.09375,
+        "recall": 0.975
+      },
+      "false_negative_count": 1,
+      "false_positive_count": 377,
+      "localization_failure_count": 33,
+      "official_metrics": {
+        "anomaly_count": 40,
+        "aupro": 0.5067226059774215,
+        "class_name": "macaroni2",
+        "defect_region_count": 44,
+        "image_auroc": 0.6391875,
+        "normal_count": 400,
+        "pixel_auroc": 0.8430138705713678,
+        "sample_count": 440
+      },
+      "score_summary": {
+        "max": 13.849030376078302,
+        "mean": 4.196080997102564,
+        "median": 3.7353203966215185,
+        "min": 2.0911924596295814
+      }
+    },
+    "pcb1": {
+      "boundary_case_count": 10,
+      "diagnostic_metrics": {
+        "class_name": "pcb1",
+        "confusion": {
+          "false_negative": 8,
+          "false_positive": 96,
+          "true_negative": 306,
+          "true_positive": 32
+        },
+        "diagnostic_only": true,
+        "f1": 0.38095238095238093,
+        "operating_point": 2.4455687342442243,
+        "precision": 0.25,
+        "recall": 0.8
+      },
+      "false_negative_count": 8,
+      "false_positive_count": 96,
+      "localization_failure_count": 21,
+      "official_metrics": {
+        "anomaly_count": 40,
+        "aupro": 0.6763970019148468,
+        "class_name": "pcb1",
+        "defect_region_count": 58,
+        "image_auroc": 0.8925995024875621,
+        "normal_count": 402,
+        "pixel_auroc": 0.9279666936340651,
+        "sample_count": 442
+      },
+      "score_summary": {
+        "max": 6.1534374127641,
+        "mean": 2.1693622862763573,
+        "median": 2.0506482300381315,
+        "min": 1.0849933301634191
+      }
+    },
+    "pcb2": {
+      "boundary_case_count": 10,
+      "diagnostic_metrics": {
+        "class_name": "pcb2",
+        "confusion": {
+          "false_negative": 5,
+          "false_positive": 62,
+          "true_negative": 338,
+          "true_positive": 35
+        },
+        "diagnostic_only": true,
+        "f1": 0.510948905109489,
+        "operating_point": 2.4455687342442243,
+        "precision": 0.36082474226804123,
+        "recall": 0.875
+      },
+      "false_negative_count": 5,
+      "false_positive_count": 62,
+      "localization_failure_count": 19,
+      "official_metrics": {
+        "anomaly_count": 40,
+        "aupro": 0.6883843356389133,
+        "class_name": "pcb2",
+        "defect_region_count": 61,
+        "image_auroc": 0.9399375,
+        "normal_count": 400,
+        "pixel_auroc": 0.9062001052837626,
+        "sample_count": 440
+      },
+      "score_summary": {
+        "max": 6.509258930023359,
+        "mean": 2.1364683461179967,
+        "median": 1.970021342418026,
+        "min": 1.1401570729859636
+      }
+    },
+    "pcb3": {
+      "boundary_case_count": 10,
+      "diagnostic_metrics": {
+        "class_name": "pcb3",
+        "confusion": {
+          "false_negative": 19,
+          "false_positive": 84,
+          "true_negative": 318,
+          "true_positive": 21
+        },
+        "diagnostic_only": true,
+        "f1": 0.28965517241379307,
+        "operating_point": 2.4455687342442243,
+        "precision": 0.2,
+        "recall": 0.525
+      },
+      "false_negative_count": 19,
+      "false_positive_count": 84,
+      "localization_failure_count": 13,
+      "official_metrics": {
+        "anomaly_count": 40,
+        "aupro": 0.6735364116206315,
+        "class_name": "pcb3",
+        "defect_region_count": 61,
+        "image_auroc": 0.7599502487562189,
+        "normal_count": 402,
+        "pixel_auroc": 0.915235477240995,
+        "sample_count": 442
+      },
+      "score_summary": {
+        "max": 9.175665691494235,
+        "mean": 2.0631541389640873,
+        "median": 1.823114771053814,
+        "min": 0.8134156011179768
+      }
+    },
+    "pcb4": {
+      "boundary_case_count": 10,
+      "diagnostic_metrics": {
+        "class_name": "pcb4",
+        "confusion": {
+          "false_negative": 9,
+          "false_positive": 50,
+          "true_negative": 352,
+          "true_positive": 31
+        },
+        "diagnostic_only": true,
+        "f1": 0.512396694214876,
+        "operating_point": 2.4455687342442243,
+        "precision": 0.38271604938271603,
+        "recall": 0.775
+      },
+      "false_negative_count": 9,
+      "false_positive_count": 50,
+      "localization_failure_count": 9,
+      "official_metrics": {
+        "anomaly_count": 40,
+        "aupro": 0.6782140160714324,
+        "class_name": "pcb4",
+        "defect_region_count": 80,
+        "image_auroc": 0.9098258706467661,
+        "normal_count": 402,
+        "pixel_auroc": 0.8771479063102642,
+        "sample_count": 442
+      },
+      "score_summary": {
+        "max": 6.730097610173034,
+        "mean": 1.9991466796010124,
+        "median": 1.790556027483405,
+        "min": 0.7942700268352657
+      }
+    },
+    "pipe_fryum": {
+      "boundary_case_count": 10,
+      "diagnostic_metrics": {
+        "class_name": "pipe_fryum",
+        "confusion": {
+          "false_negative": 17,
+          "false_positive": 42,
+          "true_negative": 158,
+          "true_positive": 23
+        },
+        "diagnostic_only": true,
+        "f1": 0.43809523809523804,
+        "operating_point": 2.4455687342442243,
+        "precision": 0.35384615384615387,
+        "recall": 0.575
+      },
+      "false_negative_count": 17,
+      "false_positive_count": 42,
+      "localization_failure_count": 18,
+      "official_metrics": {
+        "anomaly_count": 40,
+        "aupro": 0.679636857129634,
+        "class_name": "pipe_fryum",
+        "defect_region_count": 48,
+        "image_auroc": 0.742625,
+        "normal_count": 200,
+        "pixel_auroc": 0.9476930139443308,
+        "sample_count": 240
+      },
+      "score_summary": {
+        "max": 23.439623211416283,
+        "mean": 2.1933375517448264,
+        "median": 1.8785828426747173,
+        "min": 0.8815933675090407
+      }
+    }
+  },
+  "schema": "kalibra_scientific_evaluation_per_class_v1"
+}
