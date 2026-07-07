@@ -1,0 +1,75 @@
+{
+  "comparisons": {
+    "equivalence_hashes_record": true,
+    "equivalence_report_hash": true,
+    "equivalence_report_json": true,
+    "global_maxima": true,
+    "pass_fail_status": true,
+    "per_sample_deviations": true,
+    "per_split_maxima": true
+  },
+  "complete_second_equivalence_run": true,
+  "equivalence_hashes_record_basis": "equivalence_hashes.json is a deterministic function of the final equivalence_report.json and equivalence_replay.json canonical bytes; the report bytes are identical across runs and this replay record is written once as the second-run proof",
+  "equivalence_label": "visa-padim-onnx-export-equivalence-v1",
+  "first_run_global_maxima": {
+    "anomaly_map_absolute": 7.105427357601002e-15,
+    "anomaly_map_relative": 3.586867160478407e-15,
+    "argmax_region_absolute": 0.0,
+    "raw_measure_absolute": 7.105427357601002e-15,
+    "raw_measure_relative": 3.586867160478407e-15
+  },
+  "first_run_hashes": {
+    "equivalence_report.json": "9741a1c77a5d0696e8c1c5d2687aed82270d0b9791492b0b47032bf70c69275d",
+    "equivalence_run": "8d89e1ac67a61bc36adb4270619b7805067e22dc60cf7fd9d5c0b13d36fa2100"
+  },
+  "first_run_per_split_maxima": {
+    "test": {
+      "anomaly_map_absolute": 7.105427357601002e-15,
+      "anomaly_map_relative": 3.586867160478407e-15,
+      "argmax_region_absolute": 0.0,
+      "raw_measure_absolute": 7.105427357601002e-15,
+      "raw_measure_relative": 3.586867160478407e-15,
+      "sample_count": 4328
+    },
+    "validation": {
+      "anomaly_map_absolute": 7.105427357601002e-15,
+      "anomaly_map_relative": 3.334194659432464e-15,
+      "argmax_region_absolute": 0.0,
+      "raw_measure_absolute": 7.105427357601002e-15,
+      "raw_measure_relative": 3.334194659432464e-15,
+      "sample_count": 2164
+    }
+  },
+  "schema": "kalibra_padim_onnx_export_equivalence_replay_v1",
+  "scope": "deterministic offline export-equivalence replay only",
+  "second_run_global_maxima": {
+    "anomaly_map_absolute": 7.105427357601002e-15,
+    "anomaly_map_relative": 3.586867160478407e-15,
+    "argmax_region_absolute": 0.0,
+    "raw_measure_absolute": 7.105427357601002e-15,
+    "raw_measure_relative": 3.586867160478407e-15
+  },
+  "second_run_hashes": {
+    "equivalence_report.json": "9741a1c77a5d0696e8c1c5d2687aed82270d0b9791492b0b47032bf70c69275d",
+    "equivalence_run": "8d89e1ac67a61bc36adb4270619b7805067e22dc60cf7fd9d5c0b13d36fa2100"
+  },
+  "second_run_per_split_maxima": {
+    "test": {
+      "anomaly_map_absolute": 7.105427357601002e-15,
+      "anomaly_map_relative": 3.586867160478407e-15,
+      "argmax_region_absolute": 0.0,
+      "raw_measure_absolute": 7.105427357601002e-15,
+      "raw_measure_relative": 3.586867160478407e-15,
+      "sample_count": 4328
+    },
+    "validation": {
+      "anomaly_map_absolute": 7.105427357601002e-15,
+      "anomaly_map_relative": 3.334194659432464e-15,
+      "argmax_region_absolute": 0.0,
+      "raw_measure_absolute": 7.105427357601002e-15,
+      "raw_measure_relative": 3.334194659432464e-15,
+      "sample_count": 2164
+    }
+  },
+  "status": "passed"
+}

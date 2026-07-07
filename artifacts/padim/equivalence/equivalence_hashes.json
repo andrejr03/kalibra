@@ -1,0 +1,10 @@
+{
+  "equivalence_label": "visa-padim-onnx-export-equivalence-v1",
+  "governed_equivalence_artifacts": {
+    "equivalence_replay.json": "ef918b15edde5d07ae3f9889c014ef6647f8e2035d9f5e15fd876ef4e736a114",
+    "equivalence_report.json": "9741a1c77a5d0696e8c1c5d2687aed82270d0b9791492b0b47032bf70c69275d"
+  },
+  "hash_algorithm": "sha256",
+  "hash_scope": "artifacts/padim/equivalence/equivalence_report.json and artifacts/padim/equivalence/equivalence_replay.json; equivalence_hashes.json self-hash is recorded in evidence",
+  "schema": "kalibra_padim_onnx_export_equivalence_hashes_v1"
+}
