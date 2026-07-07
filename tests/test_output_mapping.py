@@ -18,6 +18,7 @@ from src.frameworks.output_mapping import (
 
 
 def test_valid_placeholder_output_maps_deterministically() -> None:
+    """Fixture-only placeholder output mapping (NON-CANONICAL)."""
     mapped = _map_output(75.0)
 
     assert type(mapped) is MappedModelOutput
@@ -229,6 +230,41 @@ def test_output_mapping_uses_no_runtime_session_or_inference() -> None:
     )
     for text in forbidden_text:
         assert text not in source
+
+
+def test_canonical_module_aliases_are_padim_only() -> None:
+    assert output_mapping.OUTPUT_MAPPING_CONTRACT_ID == (
+        output_mapping.PADIM_OUTPUT_MAPPING_CONTRACT_ID
+    )
+    assert output_mapping.EXPECTED_OUTPUT_COUNT == (
+        output_mapping.PADIM_EXPECTED_OUTPUT_COUNT
+    )
+    assert output_mapping.EXPECTED_OUTPUT_SHAPE == output_mapping.PADIM_RAW_MEASURE_SHAPE
+    assert output_mapping.EXPECTED_OUTPUT_DTYPE == output_mapping.PADIM_OUTPUT_DTYPE
+    assert output_mapping.RAW_MEASURE_SCALE == output_mapping.PADIM_RAW_MEASURE_SCALE
+    assert output_mapping.MAPPING_SEMANTICS == output_mapping.PADIM_MAPPING_SEMANTICS
+    assert output_mapping.LOCALIZATION_KIND == output_mapping.PADIM_LOCALIZATION_KIND
+
+
+def test_canonical_aliases_do_not_resolve_to_placeholder_values() -> None:
+    assert output_mapping.OUTPUT_MAPPING_CONTRACT_ID != (
+        output_mapping.PLACEHOLDER_OUTPUT_MAPPING_CONTRACT_ID
+    )
+    assert output_mapping.EXPECTED_OUTPUT_COUNT != (
+        output_mapping.PLACEHOLDER_EXPECTED_OUTPUT_COUNT
+    )
+    assert output_mapping.EXPECTED_OUTPUT_DTYPE != (
+        output_mapping.PLACEHOLDER_EXPECTED_OUTPUT_DTYPE
+    )
+    assert output_mapping.RAW_MEASURE_SCALE != (
+        output_mapping.PLACEHOLDER_RAW_MEASURE_SCALE
+    )
+    assert output_mapping.MAPPING_SEMANTICS != (
+        output_mapping.PLACEHOLDER_MAPPING_SEMANTICS
+    )
+    assert output_mapping.LOCALIZATION_KIND != (
+        output_mapping.PLACEHOLDER_LOCALIZATION_KIND
+    )
 
 
 def _map_output(value: float) -> MappedModelOutput:

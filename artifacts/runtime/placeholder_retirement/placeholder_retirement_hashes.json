@@ -1,0 +1,10 @@
+{
+  "governed_retirement_artifacts": {
+    "placeholder_retirement_metadata.json": "31846ea244ff7b2d297db0f0a101a114ca824b7267bb08c91b26c5fe419fbd48",
+    "placeholder_retirement_replay.json": "6cdd804b46f26fbe4743e12b501f2dca984233f5f271ed2771d1f44b5ae21450"
+  },
+  "hash_algorithm": "sha256",
+  "hash_scope": "artifacts/runtime/placeholder_retirement/placeholder_retirement_metadata.json and artifacts/runtime/placeholder_retirement/placeholder_retirement_replay.json",
+  "retirement_label": "kalibra-placeholder-retirement-v1",
+  "schema": "kalibra_runtime_placeholder_retirement_hashes_v1"
+}

@@ -1,0 +1,19 @@
+{
+  "comparisons": {
+    "canonical_reference_id": true,
+    "fail_closed_regression_passed": true,
+    "immutability_hashes_unchanged": true,
+    "metadata_hash_identical": true,
+    "metadata_json_identical": true,
+    "placeholder_rejected_from_canonical": true,
+    "placeholder_retained_as_fixture_only": true,
+    "status_identical": true
+  },
+  "complete_second_retirement_verification_run": true,
+  "first_run_hash": "31846ea244ff7b2d297db0f0a101a114ca824b7267bb08c91b26c5fe419fbd48",
+  "retirement_label": "kalibra-placeholder-retirement-v1",
+  "schema": "kalibra_runtime_placeholder_retirement_replay_v1",
+  "scope": "deterministic placeholder retirement replay only",
+  "second_run_hash": "31846ea244ff7b2d297db0f0a101a114ca824b7267bb08c91b26c5fe419fbd48",
+  "status": "passed"
+}

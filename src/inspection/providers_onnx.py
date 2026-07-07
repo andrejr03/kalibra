@@ -29,8 +29,14 @@ from .errors import InspectionExaminationFailure, MalformedInspectionInput
 
 
 ONNX_BOUNDARY_PROVIDER_ID = "onnx-inspection-inference-provider-boundary-v1"
-ONNX_PLACEHOLDER_MODEL_REFERENCE_ID = "onnx-placeholder-boundary-model-v1"
 PADIM_ONNX_MODEL_REFERENCE_ID = "kalibra-padim-onnx-export-v1"
+
+# Retired from the canonical runtime path in Phase 3 / Task 5. The placeholder
+# reference id is retained only as a fixture-only identifier so legacy tests can
+# still exercise the placeholder ONNX fixture through the explicit
+# ``fixture_only_placeholder_session_configuration`` seam. It is never reachable
+# from the canonical ``OnnxInspectionInferenceProvider`` path.
+ONNX_PLACEHOLDER_MODEL_REFERENCE_ID = "onnx-placeholder-boundary-model-v1"
 
 PADIM_MODEL_SHA256 = "0437ae28e172489387da07c4bd1f0c6b1ed95f3970ca3c7fa1dcd55935bd741a"
 PADIM_ARTIFACT_RECORD_SHA256 = "6d6768cbd13d0a26dbfb817e676fc5ccddbb878b72f18e443dc403b531052f4f"
@@ -61,7 +67,6 @@ PADIM_OUTPUT_RAW_MEASURE = "raw_anomaly_measure"
 PADIM_OUTPUT_ARGMAX_REGION = "argmax_region"
 
 _MODEL_KIND_PADIM = "padim"
-_MODEL_KIND_PLACEHOLDER = "placeholder"
 _REPO_ROOT = Path(__file__).resolve().parents[2]
 _PADIM_ARTIFACT_DIR = _REPO_ROOT / "artifacts" / "padim"
 _PADIM_MODEL_PATH = _PADIM_ARTIFACT_DIR / "model.onnx"
@@ -143,10 +148,6 @@ class OnnxInspectionInferenceProvider:
             artifact = _padim_model_artifact(configuration, records)
             model_kind = _MODEL_KIND_PADIM
             class_order = _padim_class_order(records)
-        elif reference_id == ONNX_PLACEHOLDER_MODEL_REFERENCE_ID:
-            artifact = _placeholder_model_artifact(configuration)
-            model_kind = _MODEL_KIND_PLACEHOLDER
-            class_order = ()
         else:
             raise InspectionExaminationFailure(
                 "ONNX provider model reference is not governed"
@@ -154,11 +155,8 @@ class OnnxInspectionInferenceProvider:
 
         loaded_model = _load_provider_model(artifact, configuration)
         session = loaded_model._session_for_provider()
+        _verify_padim_session_contract(session)
         input_name = None
-        if model_kind == _MODEL_KIND_PADIM:
-            _verify_padim_session_contract(session)
-        else:
-            input_name = _single_input_name(session)
 
         object.__setattr__(
             self,
@@ -199,9 +197,7 @@ class OnnxInspectionInferenceProvider:
             raise MalformedInspectionInput(
                 "ONNX provider requires StabilizedInspectionInput"
             )
-        if self._model_kind == _MODEL_KIND_PADIM:
-            return self._predict_padim(inspection_input)
-        return self._predict_placeholder(inspection_input)
+        return self._predict_padim(inspection_input)
 
     def _predict_padim(
         self,
@@ -261,13 +257,138 @@ class OnnxInspectionInferenceProvider:
             model_metadata=model_metadata,
         )
 
-    def _predict_placeholder(
+    def _base_model_metadata(self) -> dict[str, str]:
+        return {
+            "method": self.provider_id,
+            "version": "1",
+            "model_kind": self._model_kind,
+            "model_reference_id": self._requested_reference_id,
+            "loaded_model_identity": self._model_artifact_identity,
+            "model_sha256": self._model_content_sha256,
+            "model_artifact_fingerprint": self._model_artifact_fingerprint,
+            "configuration_hash": self._configuration_hash,
+            "loader": "model_loader.load_governed_model",
+            "provider_private_session": "ProviderPrivateInferenceSession",
+        }
+
+
+def governed_padim_session_configuration() -> onnx_session.OnnxSessionConfiguration:
+    return onnx_session.OnnxSessionConfiguration(
+        model_reference=onnx_session.OnnxModelReference(
+            reference_id=PADIM_ONNX_MODEL_REFERENCE_ID,
+            artifact_path=str(_PADIM_MODEL_PATH),
+            content_sha256=PADIM_MODEL_SHA256,
+        ),
+        execution_providers=(
+            onnx_session.OnnxExecutionProvider(
+                name=onnx_session.DEFAULT_EXECUTION_PROVIDER,
+            ),
+        ),
+        session_options=onnx_session.OnnxSessionOptions(
+            intra_op_num_threads=1,
+            inter_op_num_threads=1,
+            optimization_level=onnx_session.OPTIMIZATION_LEVEL_DISABLE_ALL,
+        ),
+        execution_provider_policy=(
+            onnx_session.EXECUTION_PROVIDER_POLICY_EXACT_ORDER
+        ),
+    )
+
+
+# ---------------------------------------------------------------------------
+# Fixture-only placeholder boundary (NON-CANONICAL)
+# ---------------------------------------------------------------------------
+#
+# Everything below this marker in this section is fixture-only and exists
+# solely so the placeholder ONNX fixture retained under
+# ``tests/fixtures/inspection/onnx_placeholder/`` can still be exercised by
+# legacy tests through an explicit, clearly-non-canonical seam. It is
+# impossible to reach from the canonical ``OnnxInspectionInferenceProvider``
+# path: the canonical provider rejects ``ONNX_PLACEHOLDER_MODEL_REFERENCE_ID``
+# in ``__post_init__`` and ``predict()`` dispatches only to ``_predict_padim``.
+
+_FIXTURE_ONLY_MODEL_KIND_PLACEHOLDER = "placeholder"
+
+PLACEHOLDER_FIXTURE_DIR = (
+    _REPO_ROOT / "tests" / "fixtures" / "inspection" / "onnx_placeholder"
+)
+PLACEHOLDER_FIXTURE_MODEL_PATH = PLACEHOLDER_FIXTURE_DIR / "placeholder_identity.onnx"
+
+
+@dataclass(frozen=True)
+class FixtureOnlyPlaceholderProvider:
+    """Fixture-only placeholder ONNX inference provider (NON-CANONICAL).
+
+    Retained solely to exercise the placeholder ONNX fixture. It is never
+    reachable from the canonical ``OnnxInspectionInferenceProvider`` path and
+    must never be used as a production inspection provider.
+    """
+
+    session_configuration: onnx_session.OnnxSessionConfiguration = field(
+        default_factory=lambda: fixture_only_placeholder_session_configuration()
+    )
+    provider_id: str = ONNX_BOUNDARY_PROVIDER_ID
+    defect_threshold: float = 50.0
+    _session: object = field(init=False, repr=False, compare=False)
+    _input_name: str = field(init=False, repr=False, compare=False)
+    _configuration_hash: str = field(init=False, repr=False, compare=False)
+    _model_artifact_identity: str = field(init=False, repr=False, compare=False)
+    _model_artifact_fingerprint: str = field(init=False, repr=False, compare=False)
+    _model_content_sha256: str = field(init=False, repr=False, compare=False)
+
+    def __post_init__(self) -> None:
+        configuration = onnx_session.validate_session_configuration(
+            self.session_configuration
+        )
+        if not isfinite(self.defect_threshold):
+            raise InspectionExaminationFailure(
+                "ONNX provider defect threshold must be finite"
+            )
+        reference_id = configuration.model_reference.reference_id
+        if reference_id != ONNX_PLACEHOLDER_MODEL_REFERENCE_ID:
+            raise InspectionExaminationFailure(
+                "fixture-only placeholder provider requires the placeholder "
+                "model reference; it must not be used with a canonical reference"
+            )
+        artifact = _placeholder_model_artifact(configuration)
+        loaded_model = _load_provider_model(artifact, configuration)
+        session = loaded_model._session_for_provider()
+        input_name = _single_input_name(session)
+        object.__setattr__(
+            self,
+            "session_configuration",
+            loaded_model.session_configuration,
+        )
+        object.__setattr__(
+            self,
+            "_configuration_hash",
+            loaded_model.session_configuration_hash,
+        )
+        object.__setattr__(self, "_session", session)
+        object.__setattr__(self, "_input_name", input_name)
+        object.__setattr__(
+            self,
+            "_model_artifact_identity",
+            model_artifact.model_artifact_identity(loaded_model.artifact),
+        )
+        object.__setattr__(
+            self,
+            "_model_artifact_fingerprint",
+            loaded_model.artifact_fingerprint,
+        )
+        object.__setattr__(
+            self,
+            "_model_content_sha256",
+            loaded_model.model_content_sha256,
+        )
+
+    def predict(
         self,
         inspection_input: StabilizedInspectionInput,
     ) -> InspectionPrediction:
-        if self._input_name is None:
-            raise InspectionExaminationFailure(
-                "ONNX placeholder provider input name is unavailable"
+        if not isinstance(inspection_input, StabilizedInspectionInput):
+            raise MalformedInspectionInput(
+                "ONNX provider requires StabilizedInspectionInput"
             )
         preprocessed = _preprocess_input(inspection_input)
         raw_input = _input_tensor(preprocessed)
@@ -314,8 +435,8 @@ class OnnxInspectionInferenceProvider:
         return {
             "method": self.provider_id,
             "version": "1",
-            "model_kind": self._model_kind,
-            "model_reference_id": self._requested_reference_id,
+            "model_kind": _FIXTURE_ONLY_MODEL_KIND_PLACEHOLDER,
+            "model_reference_id": ONNX_PLACEHOLDER_MODEL_REFERENCE_ID,
             "loaded_model_identity": self._model_artifact_identity,
             "model_sha256": self._model_content_sha256,
             "model_artifact_fingerprint": self._model_artifact_fingerprint,
@@ -325,26 +446,24 @@ class OnnxInspectionInferenceProvider:
         }
 
 
-def governed_padim_session_configuration() -> onnx_session.OnnxSessionConfiguration:
+def fixture_only_placeholder_session_configuration(
+    *,
+    model_path: Path = PLACEHOLDER_FIXTURE_MODEL_PATH,
+    content_sha256: str | None = None,
+) -> onnx_session.OnnxSessionConfiguration:
+    """Build a fixture-only placeholder session configuration (NON-CANONICAL)."""
+    if content_sha256 is None:
+        content_sha256 = _sha256_file(model_path)
     return onnx_session.OnnxSessionConfiguration(
         model_reference=onnx_session.OnnxModelReference(
-            reference_id=PADIM_ONNX_MODEL_REFERENCE_ID,
-            artifact_path=str(_PADIM_MODEL_PATH),
-            content_sha256=PADIM_MODEL_SHA256,
+            reference_id=ONNX_PLACEHOLDER_MODEL_REFERENCE_ID,
+            artifact_path=str(model_path),
+            content_sha256=content_sha256,
         ),
         execution_providers=(
-            onnx_session.OnnxExecutionProvider(
-                name=onnx_session.DEFAULT_EXECUTION_PROVIDER,
-            ),
+            onnx_session.OnnxExecutionProvider(name="CPUExecutionProvider"),
         ),
-        session_options=onnx_session.OnnxSessionOptions(
-            intra_op_num_threads=1,
-            inter_op_num_threads=1,
-            optimization_level=onnx_session.OPTIMIZATION_LEVEL_DISABLE_ALL,
-        ),
-        execution_provider_policy=(
-            onnx_session.EXECUTION_PROVIDER_POLICY_EXACT_ORDER
-        ),
+        session_options=onnx_session.OnnxSessionOptions(),
     )
 
 
@@ -411,6 +530,7 @@ def _padim_model_artifact(
 def _placeholder_model_artifact(
     configuration: onnx_session.OnnxSessionConfiguration,
 ) -> model_artifact.GovernedModelArtifact:
+    """Build the fixture-only placeholder model artifact (NON-CANONICAL)."""
     model_reference = configuration.model_reference
     if model_reference.reference_id != ONNX_PLACEHOLDER_MODEL_REFERENCE_ID:
         raise InspectionExaminationFailure(
@@ -738,6 +858,7 @@ def _validate_value_info(
 
 
 def _single_input_name(session: object) -> str:
+    """Resolve the single input name of a fixture-only placeholder session (NON-CANONICAL)."""
     get_inputs = getattr(session, "get_inputs", None)
     if not callable(get_inputs):
         raise InspectionExaminationFailure(
@@ -757,6 +878,7 @@ def _single_input_name(session: object) -> str:
 
 
 def _run_placeholder_session(session: object, input_name: str, raw_input: object) -> object:
+    """Run a fixture-only placeholder ONNX session (NON-CANONICAL)."""
     run = getattr(session, "run", None)
     if not callable(run):
         raise InspectionExaminationFailure("ONNX Runtime session cannot run")
@@ -868,6 +990,7 @@ def _map_placeholder_output(
     preprocessed: image_preprocessing.PreprocessedImageTensor,
     defect_threshold: float,
 ) -> output_mapping.MappedModelOutput:
+    """Map fixture-only placeholder ONNX outputs (NON-CANONICAL)."""
     try:
         return output_mapping.map_onnx_outputs(
             raw_outputs,
@@ -1007,5 +1130,9 @@ __all__ = [
     "ONNX_PLACEHOLDER_MODEL_REFERENCE_ID",
     "PADIM_ONNX_MODEL_REFERENCE_ID",
     "OnnxInspectionInferenceProvider",
+    "PLACEHOLDER_FIXTURE_DIR",
+    "PLACEHOLDER_FIXTURE_MODEL_PATH",
+    "FixtureOnlyPlaceholderProvider",
+    "fixture_only_placeholder_session_configuration",
     "governed_padim_session_configuration",
 ]

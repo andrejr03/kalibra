@@ -16,12 +16,20 @@ PADIM_ANOMALY_MAP_SHAPE = (1, 64, 64)
 PADIM_RAW_MEASURE_SHAPE = (1,)
 PADIM_ARGMAX_REGION_SHAPE = (1, 4)
 PADIM_OUTPUT_DTYPE = "float64"
+# Fixture-only placeholder output contract (NON-CANONICAL). Retained so the
+# placeholder ONNX fixture under tests/fixtures/inspection/onnx_placeholder/
+# can still be exercised by legacy tests through the explicit fixture-only
+# provider seam in src/inspection/providers_onnx.py.
 PLACEHOLDER_EXPECTED_OUTPUT_COUNT = 1
 PLACEHOLDER_EXPECTED_OUTPUT_SHAPE = (1,)
 PLACEHOLDER_EXPECTED_OUTPUT_DTYPE = "float32"
-EXPECTED_OUTPUT_COUNT = PLACEHOLDER_EXPECTED_OUTPUT_COUNT
-EXPECTED_OUTPUT_SHAPE = PLACEHOLDER_EXPECTED_OUTPUT_SHAPE
-EXPECTED_OUTPUT_DTYPE = PLACEHOLDER_EXPECTED_OUTPUT_DTYPE
+# Canonical module-level aliases. These resolve to the governed PaDiM output
+# mapping contract so the canonical surface is unambiguously PaDiM-only. The
+# placeholder ``map_onnx_outputs`` path uses the explicit ``PLACEHOLDER_*``
+# constants directly rather than these aliases.
+EXPECTED_OUTPUT_COUNT = PADIM_EXPECTED_OUTPUT_COUNT
+EXPECTED_OUTPUT_SHAPE = PADIM_RAW_MEASURE_SHAPE
+EXPECTED_OUTPUT_DTYPE = PADIM_OUTPUT_DTYPE
 ACCEPTED_RAW_MEASURE_RANGE = (0.0, 100.0)
 PADIM_RAW_MEASURE_SCALE = "padim_anomaly_map_max_v1"
 PLACEHOLDER_RAW_MEASURE_SCALE = "placeholder_output_raw_0_100"
@@ -112,6 +120,7 @@ def map_onnx_outputs(
     defect_threshold: float = DEFAULT_DEFECT_THRESHOLD,
     preprocessing_contract_id: str | None = None,
 ) -> MappedModelOutput:
+    """Map fixture-only placeholder ONNX outputs (NON-CANONICAL)."""
     raw_measure, output_dtype, output_shape = _raw_measure_from_outputs(outputs)
     if not isinstance(input_id, str) or not input_id.strip():
         raise OutputMappingError("mapping requires input_id")
@@ -203,10 +212,10 @@ def _raw_measure_from_outputs(
     output_values = _validate_output_count(outputs)
     array = _numpy().asarray(output_values[0])
     output_shape = tuple(int(dimension) for dimension in array.shape)
-    if output_shape != EXPECTED_OUTPUT_SHAPE:
+    if output_shape != PLACEHOLDER_EXPECTED_OUTPUT_SHAPE:
         raise OutputMappingError("output tensor shape is incompatible")
     output_dtype = str(array.dtype)
-    if output_dtype != EXPECTED_OUTPUT_DTYPE:
+    if output_dtype != PLACEHOLDER_EXPECTED_OUTPUT_DTYPE:
         raise OutputMappingError("output tensor dtype is incompatible")
 
     raw_measure = float(array.reshape(-1)[0])
@@ -223,7 +232,7 @@ def _validate_output_count(outputs: object) -> Sequence[object]:
         outputs, Sequence
     ):
         raise OutputMappingError("output container is incompatible")
-    if len(outputs) != EXPECTED_OUTPUT_COUNT:
+    if len(outputs) != PLACEHOLDER_EXPECTED_OUTPUT_COUNT:
         raise OutputMappingError("output count is incompatible")
     return outputs
 

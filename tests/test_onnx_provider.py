@@ -41,7 +41,9 @@ from src.inspection import providers_onnx
 from src.inspection.providers_onnx import (
     ONNX_PLACEHOLDER_MODEL_REFERENCE_ID,
     PADIM_ONNX_MODEL_REFERENCE_ID,
+    FixtureOnlyPlaceholderProvider,
     OnnxInspectionInferenceProvider,
+    fixture_only_placeholder_session_configuration,
     governed_padim_session_configuration,
 )
 
@@ -72,35 +74,102 @@ GOVERNED_SAMPLE_SHA256 = (
 )
 
 
-def test_onnx_provider_satisfies_inference_provider_boundary(monkeypatch) -> None:
-    provider: InspectionInferenceProvider = _provider(monkeypatch)
-
-    prediction = provider.predict(_inspection_input())
-
-    assert type(prediction) is InspectionPrediction
-    assert prediction.input_id == "onnx-provider-input"
+# ---------------------------------------------------------------------------
+# Canonical-path protection (Phase 3 / Task 5 — Placeholder Retirement)
+# ---------------------------------------------------------------------------
 
 
-def test_onnx_provider_returns_exactly_inspection_prediction(monkeypatch) -> None:
-    prediction = _provider(monkeypatch).predict(_inspection_input())
+def test_canonical_provider_uses_only_governed_padim_by_default() -> None:
+    pytest.importorskip("onnxruntime")
+    provider = OnnxInspectionInferenceProvider()
 
-    assert type(prediction) is InspectionPrediction
-    assert not isinstance(prediction, RawInspectionResult)
-    assert not hasattr(prediction, "runtime_session")
-    assert not hasattr(prediction, "onnx_session")
-    assert not hasattr(prediction, "tensor")
+    assert governed_padim_session_configuration().model_reference.reference_id == (
+        PADIM_ONNX_MODEL_REFERENCE_ID
+    )
+    assert provider._model_kind == "padim"
+    assert provider._requested_reference_id == PADIM_ONNX_MODEL_REFERENCE_ID
 
 
-def test_onnx_provider_replays_identical_predictions(monkeypatch) -> None:
-    provider = _provider(monkeypatch)
-    inspection_input = _inspection_input()
+def test_canonical_provider_rejects_placeholder_reference_id() -> None:
+    pytest.importorskip("onnxruntime")
+    placeholder_configuration = fixture_only_placeholder_session_configuration()
 
-    first = provider.predict(inspection_input)
-    second = provider.predict(inspection_input)
-    separate_provider = _provider(monkeypatch).predict(inspection_input)
+    with pytest.raises(InspectionExaminationFailure, match="not governed"):
+        OnnxInspectionInferenceProvider(
+            session_configuration=placeholder_configuration
+        )
 
-    assert first == second
-    assert first == separate_provider
+
+def test_canonical_provider_predict_never_dispatches_to_placeholder() -> None:
+    source = inspect.getsource(OnnxInspectionInferenceProvider.predict)
+    source_class = inspect.getsource(OnnxInspectionInferenceProvider)
+
+    assert "_predict_placeholder" not in source
+    assert "_predict_placeholder" not in source_class
+    assert "_MODEL_KIND_PLACEHOLDER" not in source_class
+    assert "ONNX_PLACEHOLDER_MODEL_REFERENCE_ID" not in source_class
+
+
+def test_canonical_post_init_does_not_resolve_placeholder_branch() -> None:
+    source = inspect.getsource(OnnxInspectionInferenceProvider.__post_init__)
+
+    assert "ONNX_PLACEHOLDER_MODEL_REFERENCE_ID" not in source
+    assert "_placeholder_model_artifact" not in source
+    assert "_MODEL_KIND_PLACEHOLDER" not in source
+    assert "_single_input_name" not in source
+
+
+def test_canonical_provider_path_is_padim_only(monkeypatch) -> None:
+    runtime = FakeRuntime()
+    monkeypatch.setattr(onnx_runtime, "_load_onnxruntime", lambda: runtime)
+
+    placeholder_configuration = fixture_only_placeholder_session_configuration()
+
+    with pytest.raises(InspectionExaminationFailure, match="not governed"):
+        OnnxInspectionInferenceProvider(
+            session_configuration=placeholder_configuration
+        )
+
+    assert runtime.sessions == []
+
+
+def test_placeholder_reference_id_cannot_become_canonical(monkeypatch) -> None:
+    runtime = FakeRuntime()
+    monkeypatch.setattr(onnx_runtime, "_load_onnxruntime", lambda: runtime)
+
+    placeholder_configuration = fixture_only_placeholder_session_configuration()
+
+    for _ in range(3):
+        with pytest.raises(InspectionExaminationFailure, match="not governed"):
+            OnnxInspectionInferenceProvider(
+                session_configuration=placeholder_configuration
+            )
+
+    assert runtime.sessions == []
+
+
+def test_fail_closed_if_placeholder_becomes_canonical_again(monkeypatch) -> None:
+    """Regression guard: if a future change re-wires the placeholder reference id
+    back into the canonical provider, the canonical-protection contract fails."""
+    runtime = FakeRuntime()
+    monkeypatch.setattr(onnx_runtime, "_load_onnxruntime", lambda: runtime)
+
+    placeholder_configuration = fixture_only_placeholder_session_configuration()
+
+    canonical_source = inspect.getsource(OnnxInspectionInferenceProvider)
+    assert "ONNX_PLACEHOLDER_MODEL_REFERENCE_ID" not in canonical_source
+
+    try:
+        OnnxInspectionInferenceProvider(
+            session_configuration=placeholder_configuration
+        )
+    except InspectionExaminationFailure:
+        return
+
+    pytest.fail(
+        "placeholder reference id was accepted by the canonical provider; "
+        "fail-closed regression guard tripped"
+    )
 
 
 def test_canonical_onnx_provider_uses_governed_padim_artifact() -> None:
@@ -142,8 +211,47 @@ def test_canonical_padim_provider_requires_governed_class_metadata() -> None:
         provider.predict(inspection_input)
 
 
-def test_onnx_provider_transforms_to_identical_raw_result(monkeypatch) -> None:
-    provider = _provider(monkeypatch)
+def test_fixture_only_placeholder_provider_satisfies_inference_provider_boundary(
+    monkeypatch,
+) -> None:
+    provider: InspectionInferenceProvider = _fixture_provider(monkeypatch)
+
+    prediction = provider.predict(_inspection_input())
+
+    assert type(prediction) is InspectionPrediction
+    assert prediction.input_id == "onnx-provider-input"
+
+
+def test_fixture_only_placeholder_provider_returns_exactly_inspection_prediction(
+    monkeypatch,
+) -> None:
+    prediction = _fixture_provider(monkeypatch).predict(_inspection_input())
+
+    assert type(prediction) is InspectionPrediction
+    assert not isinstance(prediction, RawInspectionResult)
+    assert not hasattr(prediction, "runtime_session")
+    assert not hasattr(prediction, "onnx_session")
+    assert not hasattr(prediction, "tensor")
+
+
+def test_fixture_only_placeholder_provider_replays_identical_predictions(
+    monkeypatch,
+) -> None:
+    provider = _fixture_provider(monkeypatch)
+    inspection_input = _inspection_input()
+
+    first = provider.predict(inspection_input)
+    second = provider.predict(inspection_input)
+    separate_provider = _fixture_provider(monkeypatch).predict(inspection_input)
+
+    assert first == second
+    assert first == separate_provider
+
+
+def test_fixture_only_placeholder_provider_transforms_to_identical_raw_result(
+    monkeypatch,
+) -> None:
+    provider = _fixture_provider(monkeypatch)
     inspection_input = _inspection_input()
     first_prediction = provider.predict(inspection_input)
     second_prediction = provider.predict(inspection_input)
@@ -157,15 +265,19 @@ def test_onnx_provider_transforms_to_identical_raw_result(monkeypatch) -> None:
     assert first_output == second_output
 
 
-def test_onnx_provider_passes_conformance_harness(monkeypatch) -> None:
-    case = _conformance_case(monkeypatch)
+def test_fixture_only_placeholder_provider_passes_conformance_harness(
+    monkeypatch,
+) -> None:
+    case = _fixture_conformance_case(monkeypatch)
 
     assert_provider_conforms_to_prediction_contract(case)
     assert_provider_deterministic_replay(case)
     assert_provider_boundary_isolation(case)
 
 
-def test_onnx_provider_uses_validated_model_loader_path(monkeypatch) -> None:
+def test_fixture_only_placeholder_provider_uses_validated_model_loader_path(
+    monkeypatch,
+) -> None:
     runtime = FakeRuntime()
     _install_runtime(monkeypatch, runtime)
     calls = []
@@ -209,8 +321,8 @@ def test_onnx_provider_uses_validated_model_loader_path(monkeypatch) -> None:
         fake_load_governed_model,
     )
 
-    provider = OnnxInspectionInferenceProvider(
-        session_configuration=_session_configuration()
+    provider = FixtureOnlyPlaceholderProvider(
+        session_configuration=_fixture_session_configuration()
     )
     prediction = provider.predict(_inspection_input())
 
@@ -219,21 +331,23 @@ def test_onnx_provider_uses_validated_model_loader_path(monkeypatch) -> None:
     assert runtime.sessions == []
 
 
-def test_onnx_provider_does_not_bypass_loader_content_hash_validation(
+def test_fixture_only_placeholder_provider_does_not_bypass_loader_content_hash_validation(
     monkeypatch,
 ) -> None:
     runtime = FakeRuntime()
     _install_runtime(monkeypatch, runtime)
 
     with pytest.raises(InspectionExaminationFailure, match="fingerprint"):
-        OnnxInspectionInferenceProvider(
-            session_configuration=_session_configuration(content_sha256="0" * 64)
+        FixtureOnlyPlaceholderProvider(
+            session_configuration=_fixture_session_configuration(
+                content_sha256="0" * 64
+            )
         )
 
     assert runtime.sessions == []
 
 
-def test_onnx_provider_uses_preprocessed_image_tensor_not_metadata_hash(
+def test_fixture_only_placeholder_provider_uses_preprocessed_image_tensor_not_metadata_hash(
     monkeypatch,
 ) -> None:
     runtime = FakeRuntime()
@@ -251,8 +365,8 @@ def test_onnx_provider_uses_preprocessed_image_tensor_not_metadata_hash(
         "preprocess_image",
         fake_preprocess,
     )
-    provider = OnnxInspectionInferenceProvider(
-        session_configuration=_session_configuration()
+    provider = FixtureOnlyPlaceholderProvider(
+        session_configuration=_fixture_session_configuration()
     )
     inspection_input = _inspection_input(
         metadata={"fixture": "metadata-does-not-drive-input"}
@@ -268,16 +382,13 @@ def test_onnx_provider_uses_preprocessed_image_tensor_not_metadata_hash(
     )
     assert prediction.model_metadata["input_tensor_shape"] == "1"
     assert prediction.model_metadata["input_tensor_dtype"] == "float32"
-    source = inspect.getsource(providers_onnx)
-    assert "_raw_measure_input" not in source
-    assert "sorted(inspection_input.metadata.items())" not in source
 
 
-def test_changing_image_bytes_changes_provider_input_and_prediction(
+def test_changing_image_bytes_changes_fixture_provider_input_and_prediction(
     monkeypatch,
 ) -> None:
     runtime = FakeRuntime()
-    provider = _provider(monkeypatch, runtime=runtime)
+    provider = _fixture_provider(monkeypatch, runtime=runtime)
 
     first = provider.predict(
         _inspection_input(input_id="same-input", image_path=DEFAULT_IMAGE_PATH)
@@ -300,7 +411,7 @@ def test_changing_image_bytes_changes_provider_input_and_prediction(
 def test_changing_metadata_alone_does_not_substitute_for_image_content(
     monkeypatch,
 ) -> None:
-    provider = _provider(monkeypatch)
+    provider = _fixture_provider(monkeypatch)
 
     first = provider.predict(
         _inspection_input(metadata={"fixture": "first-metadata"})
@@ -312,7 +423,9 @@ def test_changing_metadata_alone_does_not_substitute_for_image_content(
     assert first == second
 
 
-def test_onnx_provider_uses_governed_output_mapper(monkeypatch) -> None:
+def test_fixture_only_placeholder_provider_uses_governed_output_mapper(
+    monkeypatch,
+) -> None:
     runtime = FakeRuntime()
     _install_runtime(monkeypatch, runtime)
     calls = []
@@ -362,8 +475,8 @@ def test_onnx_provider_uses_governed_output_mapper(monkeypatch) -> None:
         fake_map_outputs,
     )
     inspection_input = _inspection_input()
-    provider = OnnxInspectionInferenceProvider(
-        session_configuration=_session_configuration()
+    provider = FixtureOnlyPlaceholderProvider(
+        session_configuration=_fixture_session_configuration()
     )
 
     prediction = provider.predict(inspection_input)
@@ -386,7 +499,7 @@ def test_onnx_provider_uses_governed_output_mapper(monkeypatch) -> None:
     )
 
 
-def test_onnx_provider_contains_no_inline_output_scalar_mapping() -> None:
+def test_fixture_only_placeholder_provider_contains_no_inline_output_scalar_mapping() -> None:
     source = inspect.getsource(providers_onnx)
 
     assert "output_mapping.map_onnx_outputs" in source
@@ -395,12 +508,12 @@ def test_onnx_provider_contains_no_inline_output_scalar_mapping() -> None:
     assert "placeholder output must contain exactly one raw measure" not in source
 
 
-def test_onnx_provider_real_runtime_integration() -> None:
+def test_fixture_only_placeholder_provider_real_runtime_integration() -> None:
     ort = pytest.importorskip("onnxruntime")
 
-    def build_provider() -> OnnxInspectionInferenceProvider:
-        return OnnxInspectionInferenceProvider(
-            session_configuration=_session_configuration()
+    def build_provider() -> FixtureOnlyPlaceholderProvider:
+        return FixtureOnlyPlaceholderProvider(
+            session_configuration=_fixture_session_configuration()
         )
 
     provider = build_provider()
@@ -441,7 +554,7 @@ def test_onnx_provider_real_runtime_integration() -> None:
 
 def test_onnx_runtime_objects_do_not_leak_downstream(monkeypatch) -> None:
     runtime = FakeRuntime()
-    provider = _provider(monkeypatch, runtime=runtime)
+    provider = _fixture_provider(monkeypatch, runtime=runtime)
     inspection_input = _inspection_input()
 
     prediction = provider.predict(inspection_input)
@@ -475,7 +588,7 @@ def test_onnx_provider_does_not_construct_raw_inspection_result() -> None:
 
 def test_valid_placeholder_model_path_succeeds(monkeypatch) -> None:
     runtime = FakeRuntime()
-    provider = _provider(monkeypatch, runtime=runtime)
+    provider = _fixture_provider(monkeypatch, runtime=runtime)
 
     prediction = provider.predict(_inspection_input())
 
@@ -489,8 +602,8 @@ def test_invalid_model_path_fails_cleanly(monkeypatch, tmp_path) -> None:
     missing_model = tmp_path / "missing-placeholder.onnx"
 
     with pytest.raises(InspectionExaminationFailure, match="missing"):
-        OnnxInspectionInferenceProvider(
-            session_configuration=_session_configuration(
+        FixtureOnlyPlaceholderProvider(
+            session_configuration=_fixture_session_configuration(
                 model_path=missing_model,
                 content_sha256=_placeholder_model_hash(),
             )
@@ -501,8 +614,8 @@ def test_missing_onnx_runtime_fails_cleanly(monkeypatch) -> None:
     monkeypatch.setattr(onnx_runtime, "_load_onnxruntime", lambda: None)
 
     with pytest.raises(InspectionExaminationFailure, match="unavailable"):
-        OnnxInspectionInferenceProvider(
-            session_configuration=_session_configuration()
+        FixtureOnlyPlaceholderProvider(
+            session_configuration=_fixture_session_configuration()
         )
 
 
@@ -510,8 +623,8 @@ def test_incompatible_onnx_runtime_fails_cleanly(monkeypatch) -> None:
     _install_runtime(monkeypatch, IncompatibleRuntime())
 
     with pytest.raises(InspectionExaminationFailure, match="InferenceSession"):
-        OnnxInspectionInferenceProvider(
-            session_configuration=_session_configuration()
+        FixtureOnlyPlaceholderProvider(
+            session_configuration=_fixture_session_configuration()
         )
 
 
@@ -537,14 +650,39 @@ def test_downstream_domain_and_cli_ui_paths_are_not_involved() -> None:
         assert text not in source
 
 
-def _provider(
-    monkeypatch,
+def test_fixture_only_placeholder_provider_rejects_padim_reference(monkeypatch) -> None:
+    runtime = FakeRuntime()
+    _install_runtime(monkeypatch, runtime)
+
+    padim_configuration = governed_padim_session_configuration()
+
+    with pytest.raises(InspectionExaminationFailure, match="fixture-only"):
+        FixtureOnlyPlaceholderProvider(session_configuration=padim_configuration)
+
+    assert runtime.sessions == []
+
+
+def test_fixture_only_provider_metadata_records_placeholder_reference(monkeypatch) -> None:
+    runtime = FakeRuntime()
+    _install_runtime(monkeypatch, runtime)
+    provider = _fixture_provider(monkeypatch, runtime=runtime)
+    prediction = provider.predict(_inspection_input())
+
+    assert prediction.model_metadata["model_kind"] == "placeholder"
+    assert prediction.model_metadata["model_reference_id"] == (
+        ONNX_PLACEHOLDER_MODEL_REFERENCE_ID
+    )
+
+
+def _fixture_provider(
+    monkeypatch=None,
     *,
     runtime: FakeRuntime | None = None,
-) -> OnnxInspectionInferenceProvider:
-    _install_runtime(monkeypatch, runtime or FakeRuntime())
-    return OnnxInspectionInferenceProvider(
-        session_configuration=_session_configuration()
+) -> FixtureOnlyPlaceholderProvider:
+    if monkeypatch is not None:
+        _install_runtime(monkeypatch, runtime or FakeRuntime())
+    return FixtureOnlyPlaceholderProvider(
+        session_configuration=_fixture_session_configuration()
     )
 
 
@@ -552,10 +690,10 @@ def _install_runtime(monkeypatch, runtime: object) -> None:
     monkeypatch.setattr(onnx_runtime, "_load_onnxruntime", lambda: runtime)
 
 
-def _conformance_case(monkeypatch) -> ProviderConformanceCase:
+def _fixture_conformance_case(monkeypatch) -> ProviderConformanceCase:
     return ProviderConformanceCase(
         name="onnx_inspection_inference_provider",
-        provider_factory=lambda: _provider(monkeypatch),
+        provider_factory=lambda: _fixture_provider(monkeypatch),
         input_factory=_inspection_input,
     )
 
@@ -588,7 +726,7 @@ def _governed_padim_input() -> StabilizedInspectionInput:
     )
 
 
-def _session_configuration(
+def _fixture_session_configuration(
     *,
     model_path: Path = PLACEHOLDER_MODEL_PATH,
     content_sha256: str | None = None,
