@@ -1,0 +1,214 @@
+{
+  "consumed_governed_inputs": {
+    "c5_reference": {
+      "aggregation_identifier": "padim_anomaly_map_max_v1",
+      "inference_artifact_hashes_sha256": "c39dc13d4eccff0846253528d2fa3af4bb12349ca80fb9b90e631ef1fbdeb9bf",
+      "inference_label": "visa-padim-governed-inference-v1",
+      "inference_metadata_sha256": "78e8408534863096315a07f21da33265f970e44f369a9fa3e35743f2adea372f",
+      "inference_replay_sha256": "e6e59b0e72750992d97fd39788a7a8a3b9f40a52a7783becdfa4f30dd779936c",
+      "localization_identifier": "padim_raw_anomaly_map_argmax_region_v1",
+      "reference_output_artifacts": {
+        "anomaly_maps/test_anomaly_maps.npy": "21a959c9891815ea73ee7e23a47a1b4c15be18047ad58e2b721a7c24cdc15a9d",
+        "anomaly_maps/validation_anomaly_maps.npy": "bdea53e85561e830ab1b45430f0df16e6769e9092124217fe5827ee30ac3d97d",
+        "predictions/test_predictions.jsonl": "35e2a8426a8e1bb59f8327f657eff79892dbbbad825acf19debee2a6436f8436",
+        "predictions/validation_predictions.jsonl": "ebef96fad1a665e9e2cd4c2e9855f93f238b8a71a41971c56efbabd3ba5314c4"
+      }
+    },
+    "mandatory_c4_inputs": {
+      "covariance/covariance_inverse_by_class.npy": "893af9e08d3543b5bd973ab913c1f2e8ed57d26a1bbb225b194d525cfc8df7b3",
+      "metadata/backbone_metadata.json": "55780631c506a03f3a6c9605caf52aa64d693f675a4ab5a4d3aed9b99d8b79ca",
+      "metadata/feature_indices.json": "064956f5ff6b70fe5e43525825dbf0b3d99d49a6b178cd1b499997e4af298dfe",
+      "metadata/numerical_config.json": "2a4963bf94458e861e3a535ea6a50efc5818cff8b4ba15577a0b05179abf90cb",
+      "metadata/preprocessing_contract.json": "b239f587b442e1a64f9ee3f9615b0a912b897f860864c6a58568cb24573794e7",
+      "metadata/training_metadata.json": "c0178d823d0c440102c768f75799340586bd4c428bfa309862e8fb658b0ffad9",
+      "statistics/feature_indices.npy": "1ca5583a7b498b4849e42717f24ebcf82d82a6c545b852814ada12b5c287cbe3",
+      "statistics/mu_by_class.npy": "51568c211c324b9178837f0d862c01a9601dc3d3daa474c959bb32ef5758446b",
+      "training/artifact_hashes.json": "00c625060c6e50fe7ab1da76125e3891d8be7e52838c846eaba52813461eeb32",
+      "training/training_record.json": "7d6171f3f05c30c4891969fa40451d0e960b4e5b8ac00b3d0e1d22f2ee9b8048"
+    }
+  },
+  "dtype_policy": {
+    "dtype_source": "float64",
+    "expected_fidelity_tolerance": {
+      "absolute": 1e-12,
+      "bbox_absolute": 0.0,
+      "relative": 1e-12
+    },
+    "float32_transition": false,
+    "onnx_dtype": "float64",
+    "precision_policy": "preserve the C-4 float64 numerical contract in ONNX DOUBLE tensors; no float32 execution transition is introduced by export",
+    "reason": "ONNX Runtime CPUExecutionProvider supports the arithmetic used by this export with DOUBLE tensors, so the governed C-4 dtype can be preserved."
+  },
+  "export_configuration": {
+    "constant_embedding": "mu, covariance_inverse, and feature_indices are ONNX initializers",
+    "graph_generation": "deterministic onnx.helper graph construction",
+    "model_loader_change": "not performed",
+    "output_mapping_change": "not performed",
+    "preprocessing_change": "not performed",
+    "provider_change": "not performed",
+    "runtime_integration": "not performed",
+    "source": "governed C-4 fitted PaDiM artifacts only"
+  },
+  "export_fidelity_verification": {
+    "max_anomaly_map_abs_deviation": 7.105427357601002e-15,
+    "max_anomaly_map_relative_deviation": 3.586867160478407e-15,
+    "max_argmax_region_abs_deviation": 0.0,
+    "max_raw_measure_abs_deviation": 7.105427357601002e-15,
+    "max_raw_measure_relative_deviation": 3.586867160478407e-15,
+    "onnx_execution": {
+      "direct_onnxruntime_session_only": true,
+      "provider": "CPUExecutionProvider",
+      "runtime_provider_loaded": false
+    },
+    "per_split": {
+      "test": {
+        "max_anomaly_map_abs_deviation": 7.105427357601002e-15,
+        "max_argmax_region_abs_deviation": 0.0,
+        "max_raw_measure_abs_deviation": 7.105427357601002e-15,
+        "sample_count": 4328
+      },
+      "validation": {
+        "max_anomaly_map_abs_deviation": 7.105427357601002e-15,
+        "max_argmax_region_abs_deviation": 0.0,
+        "max_raw_measure_abs_deviation": 7.105427357601002e-15,
+        "sample_count": 2164
+      }
+    },
+    "reference": "governed C-5 inference outputs",
+    "sample_count": 6492,
+    "scope": "export fidelity verification only; not runtime integration and not evaluation",
+    "status": "passed",
+    "tolerance": {
+      "absolute": 1e-12,
+      "bbox_absolute": 0.0,
+      "relative": 1e-12
+    }
+  },
+  "export_label": "visa-padim-governed-onnx-export-v1",
+  "export_timestamp_utc": "2026-07-06T23:38:12Z",
+  "graph": {
+    "encoded_components": [
+      "selected feature indices",
+      "mu_by_class",
+      "covariance_inverse_by_class",
+      "per-patch Mahalanobis distance",
+      "padim_anomaly_map_max_v1 raw-measure aggregation",
+      "padim_raw_anomaly_map_argmax_region_v1 localization"
+    ],
+    "graph_name": "kalibra_governed_padim_scorer_v1",
+    "input_contract": {
+      "class_index": {
+        "dtype": "int64",
+        "semantics": "index into the governed C-4 class_order recorded in artifact.json",
+        "shape": [
+          1
+        ]
+      },
+      "full_patch_features": {
+        "dtype": "float64",
+        "semantics": "C-4 deterministic full patch feature tensor before governed feature subsampling; preprocessing contract remains kalibra-padim-rgb64-bilinear-float64-patch8-v1",
+        "shape": [
+          1,
+          64,
+          14
+        ]
+      }
+    },
+    "ir_version": 10,
+    "localization_represented_in_onnx": true,
+    "opset_version": 18,
+    "output_contract": {
+      "anomaly_map": {
+        "aggregation_source": "padim_anomaly_map_max_v1",
+        "dtype": "float64",
+        "semantics": "8x8 patch distances repeated over 8x8 pixel cells",
+        "shape": [
+          1,
+          64,
+          64
+        ]
+      },
+      "argmax_region": {
+        "dtype": "float64",
+        "identifier": "padim_raw_anomaly_map_argmax_region_v1",
+        "order": [
+          "x_min",
+          "y_min",
+          "x_max",
+          "y_max"
+        ],
+        "semantics": "bounding box covering pixels equal to maximum anomaly-map value",
+        "shape": [
+          1,
+          4
+        ]
+      },
+      "patch_mahalanobis_distances": {
+        "dtype": "float64",
+        "semantics": "per-patch Mahalanobis distance after governed feature selection",
+        "shape": [
+          1,
+          64
+        ]
+      },
+      "raw_anomaly_measure": {
+        "dtype": "float64",
+        "identifier": "padim_anomaly_map_max_v1",
+        "semantics": "maximum finite Mahalanobis distance over anomaly map",
+        "shape": [
+          1
+        ]
+      }
+    },
+    "preprocessing_reimplemented_in_onnx": false
+  },
+  "graph_verification": {
+    "covariance_inverse_unchanged": true,
+    "feature_indices_unchanged": true,
+    "model_input_names": [
+      "full_patch_features",
+      "class_index"
+    ],
+    "model_output_names": [
+      "patch_mahalanobis_distances",
+      "anomaly_map",
+      "raw_anomaly_measure",
+      "argmax_region"
+    ],
+    "mu_unchanged": true,
+    "output_contract_matches_metadata": true
+  },
+  "onnx": {
+    "ir_version": 10,
+    "opset_version": 18,
+    "producer_name": "kalibra-governed-padim-onnx-export",
+    "producer_version": "1.0.0"
+  },
+  "schema": "kalibra_governed_padim_onnx_export_metadata_v1",
+  "scope_boundaries": {
+    "benchmark_generated": false,
+    "calibration_performed": false,
+    "evaluation_executed": false,
+    "inference_capability_added": false,
+    "inspection_domain_changed": false,
+    "inspection_transform_prediction_changed": false,
+    "metrics_generated": false,
+    "model_loader_changed": false,
+    "onnx_runtime_changed": false,
+    "onnx_session_changed": false,
+    "output_mapping_changed": false,
+    "preprocessing_changed": false,
+    "product_claim": false,
+    "provider_changed": false,
+    "refit_performed": false,
+    "runtime_integration_performed": false,
+    "runtime_provider_loaded": false,
+    "scientific_claim": false
+  },
+  "toolchain": {
+    "numpy": "2.0.2",
+    "onnx": "1.16.2",
+    "onnxruntime": "1.19.2",
+    "python": "3.9.6"
+  }
+}

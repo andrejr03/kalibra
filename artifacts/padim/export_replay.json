@@ -1,0 +1,29 @@
+{
+  "comparisons": {
+    "artifact_hashes_json": true,
+    "artifact_json": true,
+    "export_replay_json": true,
+    "metadata_json": true,
+    "model_onnx_bytes": true,
+    "model_sha256": true
+  },
+  "complete_second_export": true,
+  "export_label": "visa-padim-governed-onnx-export-v1",
+  "first_run_hashes": {
+    "artifact.json": "6d6768cbd13d0a26dbfb817e676fc5ccddbb878b72f18e443dc403b531052f4f",
+    "metadata.json": "3dd299292c32a7d6616171ce26dd6d07a3d1c313dfc4dd00ea583dbca313f00d",
+    "model.onnx": "0437ae28e172489387da07c4bd1f0c6b1ed95f3970ca3c7fa1dcd55935bd741a"
+  },
+  "schema": "kalibra_governed_padim_onnx_export_replay_v1",
+  "scope": "deterministic export replay only; no runtime integration and no evaluation",
+  "second_run_hashes": {
+    "artifact.json": "6d6768cbd13d0a26dbfb817e676fc5ccddbb878b72f18e443dc403b531052f4f",
+    "metadata.json": "3dd299292c32a7d6616171ce26dd6d07a3d1c313dfc4dd00ea583dbca313f00d",
+    "model.onnx": "0437ae28e172489387da07c4bd1f0c6b1ed95f3970ca3c7fa1dcd55935bd741a"
+  },
+  "stable_fields": {
+    "evidence_date": "2026-07-06",
+    "export_timestamp_utc": "2026-07-06T23:38:12Z"
+  },
+  "status": "passed"
+}
