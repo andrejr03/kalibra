@@ -1,0 +1,309 @@
+{
+  "comparisons": {
+    "artifact_identity": true,
+    "inspection_predictions": true,
+    "localization": true,
+    "raw_anomaly_measures": true,
+    "run_hash": true,
+    "session_configuration": true,
+    "session_configuration_hash": true
+  },
+  "complete_second_load_and_execution": true,
+  "first_run": {
+    "artifact_identity": {
+      "loaded_model_identity": "kalibra/inspection/padim-onnx-export@1.0.0#sha256:0437ae28e172489387da07c4bd1f0c6b1ed95f3970ca3c7fa1dcd55935bd741a",
+      "model_artifact_fingerprint": "34d0d517d3dad7b276f09fa2b64c4982ced3cc428c44aef59ecc64126d3d9346",
+      "model_reference_id": "kalibra-padim-onnx-export-v1",
+      "model_sha256": "0437ae28e172489387da07c4bd1f0c6b1ed95f3970ca3c7fa1dcd55935bd741a"
+    },
+    "predictions": [
+      {
+        "input_id": "visa-inference-input-8ddbf63dbe194bfd91ebe271",
+        "model_metadata": {
+          "anomaly_map_shape": "1x64x64",
+          "argmax_region_shape": "4",
+          "class_index": "0",
+          "class_name": "candle",
+          "configuration_hash": "2893fd1fc592cb831bfccd9d53c3e784a5aba4ffdfbb58ad4de32eb512c4a2e4",
+          "feature_extraction_contract_id": "kalibra-padim-rgb64-bilinear-float64-patch8-v1",
+          "feature_extraction_source": "scripts/train_padim_baseline.py:extract_features",
+          "full_patch_features_sha256": "afc0ae1f0b847f62d26900c67025c6d98e20aff67ef02c759e0bcf8a5efe5cfc",
+          "loaded_model_identity": "kalibra/inspection/padim-onnx-export@1.0.0#sha256:0437ae28e172489387da07c4bd1f0c6b1ed95f3970ca3c7fa1dcd55935bd741a",
+          "loader": "model_loader.load_governed_model",
+          "localization_kind": "padim_raw_anomaly_map_argmax_region_v1",
+          "mapping_semantics": "padim_float64_raw_measure_and_argmax_region_to_raw_localized_prediction",
+          "method": "onnx-inspection-inference-provider-boundary-v1",
+          "model_artifact_fingerprint": "34d0d517d3dad7b276f09fa2b64c4982ced3cc428c44aef59ecc64126d3d9346",
+          "model_kind": "padim",
+          "model_reference_id": "kalibra-padim-onnx-export-v1",
+          "model_sha256": "0437ae28e172489387da07c4bd1f0c6b1ed95f3970ca3c7fa1dcd55935bd741a",
+          "output_count": "4",
+          "output_dtype": "float64",
+          "output_mapping_contract_id": "kalibra-padim-onnx-output-mapping-v1",
+          "output_mapping_version": "1",
+          "patch_mahalanobis_distances_shape": "1x64",
+          "prediction_judgement_policy": "contract_required_defect_for_raw_localization_no_threshold_v1",
+          "provider_private_session": "ProviderPrivateInferenceSession",
+          "raw_measure_scale": "padim_anomaly_map_max_v1",
+          "raw_measure_shape": "1",
+          "version": "1"
+        },
+        "predicted_judgement": "defect",
+        "predicted_localization": {
+          "label": "raw_anomaly_maximum",
+          "localization_kind": "padim_raw_anomaly_map_argmax_region_v1",
+          "region": {
+            "x_max": 0.875,
+            "x_min": 0.75,
+            "y_max": 0.25,
+            "y_min": 0.125
+          }
+        },
+        "predicted_raw_anomaly_measure": 6.58218981397823,
+        "prediction_id": "padim-onnx-runtime-prediction:6d3c22627c11779f8731f05e320519bd",
+        "prediction_kind": "inspection_prediction",
+        "prediction_sha256": "bb1108435fa627e1aefa3d9cf2a188556d5674eeddcd6d596631be4493731982",
+        "raw_measure_kind": "raw_anomaly_measure",
+        "raw_measure_scale": "padim_anomaly_map_max_v1"
+      },
+      {
+        "input_id": "visa-inference-input-4016f830f89425cd0ac90494",
+        "model_metadata": {
+          "anomaly_map_shape": "1x64x64",
+          "argmax_region_shape": "4",
+          "class_index": "0",
+          "class_name": "candle",
+          "configuration_hash": "2893fd1fc592cb831bfccd9d53c3e784a5aba4ffdfbb58ad4de32eb512c4a2e4",
+          "feature_extraction_contract_id": "kalibra-padim-rgb64-bilinear-float64-patch8-v1",
+          "feature_extraction_source": "scripts/train_padim_baseline.py:extract_features",
+          "full_patch_features_sha256": "806d4f65435fe18ca1c53e8fbd77b6a374e6f3439d6efd2fb4c2098ebf60726f",
+          "loaded_model_identity": "kalibra/inspection/padim-onnx-export@1.0.0#sha256:0437ae28e172489387da07c4bd1f0c6b1ed95f3970ca3c7fa1dcd55935bd741a",
+          "loader": "model_loader.load_governed_model",
+          "localization_kind": "padim_raw_anomaly_map_argmax_region_v1",
+          "mapping_semantics": "padim_float64_raw_measure_and_argmax_region_to_raw_localized_prediction",
+          "method": "onnx-inspection-inference-provider-boundary-v1",
+          "model_artifact_fingerprint": "34d0d517d3dad7b276f09fa2b64c4982ced3cc428c44aef59ecc64126d3d9346",
+          "model_kind": "padim",
+          "model_reference_id": "kalibra-padim-onnx-export-v1",
+          "model_sha256": "0437ae28e172489387da07c4bd1f0c6b1ed95f3970ca3c7fa1dcd55935bd741a",
+          "output_count": "4",
+          "output_dtype": "float64",
+          "output_mapping_contract_id": "kalibra-padim-onnx-output-mapping-v1",
+          "output_mapping_version": "1",
+          "patch_mahalanobis_distances_shape": "1x64",
+          "prediction_judgement_policy": "contract_required_defect_for_raw_localization_no_threshold_v1",
+          "provider_private_session": "ProviderPrivateInferenceSession",
+          "raw_measure_scale": "padim_anomaly_map_max_v1",
+          "raw_measure_shape": "1",
+          "version": "1"
+        },
+        "predicted_judgement": "defect",
+        "predicted_localization": {
+          "label": "raw_anomaly_maximum",
+          "localization_kind": "padim_raw_anomaly_map_argmax_region_v1",
+          "region": {
+            "x_max": 0.875,
+            "x_min": 0.75,
+            "y_max": 0.25,
+            "y_min": 0.125
+          }
+        },
+        "predicted_raw_anomaly_measure": 2.6643765342144605,
+        "prediction_id": "padim-onnx-runtime-prediction:a35362289ba8ab4ccfe6c69217aed909",
+        "prediction_kind": "inspection_prediction",
+        "prediction_sha256": "faab585ca9abcfa5b8a37af2590279552cacd070ea5d4880805a8216cfdbcbc3",
+        "raw_measure_kind": "raw_anomaly_measure",
+        "raw_measure_scale": "padim_anomaly_map_max_v1"
+      }
+    ],
+    "provider_configuration": {
+      "loader": "model_loader.load_governed_model",
+      "method": "onnx-inspection-inference-provider-boundary-v1",
+      "model_kind": "padim",
+      "provider_id": "onnx-inspection-inference-provider-boundary-v1",
+      "provider_private_session": "ProviderPrivateInferenceSession"
+    },
+    "session_configuration": {
+      "configuration_kind": "onnx_session_configuration_v1",
+      "execution_provider_policy": "exact_order",
+      "execution_providers": [
+        {
+          "name": "CPUExecutionProvider",
+          "provider_options": []
+        }
+      ],
+      "model_reference": {
+        "artifact_path": "/Users/agentisstudio/Documents/kalibra/artifacts/padim/model.onnx",
+        "content_sha256": "0437ae28e172489387da07c4bd1f0c6b1ed95f3970ca3c7fa1dcd55935bd741a",
+        "reference_id": "kalibra/inspection/padim-onnx-export@1.0.0#sha256:0437ae28e172489387da07c4bd1f0c6b1ed95f3970ca3c7fa1dcd55935bd741a"
+      },
+      "session_options": {
+        "inter_op_num_threads": 1,
+        "intra_op_num_threads": 1,
+        "optimization_level": "disable_all"
+      }
+    },
+    "session_configuration_hash": "2893fd1fc592cb831bfccd9d53c3e784a5aba4ffdfbb58ad4de32eb512c4a2e4"
+  },
+  "first_run_hash": "866319274ecb400d17c023c7b028f1b5eee2feac08546015dab41d4d673bbe00",
+  "integration_label": "kalibra-runtime-provider-integration-v1",
+  "representative_inputs": [
+    {
+      "artifact_uri": "/Users/agentisstudio/Documents/kalibra/data/visa/extracted/candle/Data/Images/Anomaly/004.JPG",
+      "class_name": "candle",
+      "content_hash": "a78ee870594f161f86073b5983ae1f05be178009d819b4a73997f7cbc99a5ab2",
+      "input_id": "visa-inference-input-8ddbf63dbe194bfd91ebe271",
+      "sample_filename": "candle/Data/Images/Anomaly/004.JPG",
+      "split": "validation"
+    },
+    {
+      "artifact_uri": "/Users/agentisstudio/Documents/kalibra/data/visa/extracted/candle/Data/Images/Anomaly/000.JPG",
+      "class_name": "candle",
+      "content_hash": "c004dbc05698f01cf415e07d2a8cf8fef48aa19516eece6600e13f92f1f788b7",
+      "input_id": "visa-inference-input-4016f830f89425cd0ac90494",
+      "sample_filename": "candle/Data/Images/Anomaly/000.JPG",
+      "split": "test"
+    }
+  ],
+  "runtime_equivalence_verification_performed": false,
+  "schema": "kalibra_runtime_provider_integration_replay_v1",
+  "scope": "runtime provider integration replay only; no comparison against C-5 or C-6 reference outputs",
+  "second_run": {
+    "artifact_identity": {
+      "loaded_model_identity": "kalibra/inspection/padim-onnx-export@1.0.0#sha256:0437ae28e172489387da07c4bd1f0c6b1ed95f3970ca3c7fa1dcd55935bd741a",
+      "model_artifact_fingerprint": "34d0d517d3dad7b276f09fa2b64c4982ced3cc428c44aef59ecc64126d3d9346",
+      "model_reference_id": "kalibra-padim-onnx-export-v1",
+      "model_sha256": "0437ae28e172489387da07c4bd1f0c6b1ed95f3970ca3c7fa1dcd55935bd741a"
+    },
+    "predictions": [
+      {
+        "input_id": "visa-inference-input-8ddbf63dbe194bfd91ebe271",
+        "model_metadata": {
+          "anomaly_map_shape": "1x64x64",
+          "argmax_region_shape": "4",
+          "class_index": "0",
+          "class_name": "candle",
+          "configuration_hash": "2893fd1fc592cb831bfccd9d53c3e784a5aba4ffdfbb58ad4de32eb512c4a2e4",
+          "feature_extraction_contract_id": "kalibra-padim-rgb64-bilinear-float64-patch8-v1",
+          "feature_extraction_source": "scripts/train_padim_baseline.py:extract_features",
+          "full_patch_features_sha256": "afc0ae1f0b847f62d26900c67025c6d98e20aff67ef02c759e0bcf8a5efe5cfc",
+          "loaded_model_identity": "kalibra/inspection/padim-onnx-export@1.0.0#sha256:0437ae28e172489387da07c4bd1f0c6b1ed95f3970ca3c7fa1dcd55935bd741a",
+          "loader": "model_loader.load_governed_model",
+          "localization_kind": "padim_raw_anomaly_map_argmax_region_v1",
+          "mapping_semantics": "padim_float64_raw_measure_and_argmax_region_to_raw_localized_prediction",
+          "method": "onnx-inspection-inference-provider-boundary-v1",
+          "model_artifact_fingerprint": "34d0d517d3dad7b276f09fa2b64c4982ced3cc428c44aef59ecc64126d3d9346",
+          "model_kind": "padim",
+          "model_reference_id": "kalibra-padim-onnx-export-v1",
+          "model_sha256": "0437ae28e172489387da07c4bd1f0c6b1ed95f3970ca3c7fa1dcd55935bd741a",
+          "output_count": "4",
+          "output_dtype": "float64",
+          "output_mapping_contract_id": "kalibra-padim-onnx-output-mapping-v1",
+          "output_mapping_version": "1",
+          "patch_mahalanobis_distances_shape": "1x64",
+          "prediction_judgement_policy": "contract_required_defect_for_raw_localization_no_threshold_v1",
+          "provider_private_session": "ProviderPrivateInferenceSession",
+          "raw_measure_scale": "padim_anomaly_map_max_v1",
+          "raw_measure_shape": "1",
+          "version": "1"
+        },
+        "predicted_judgement": "defect",
+        "predicted_localization": {
+          "label": "raw_anomaly_maximum",
+          "localization_kind": "padim_raw_anomaly_map_argmax_region_v1",
+          "region": {
+            "x_max": 0.875,
+            "x_min": 0.75,
+            "y_max": 0.25,
+            "y_min": 0.125
+          }
+        },
+        "predicted_raw_anomaly_measure": 6.58218981397823,
+        "prediction_id": "padim-onnx-runtime-prediction:6d3c22627c11779f8731f05e320519bd",
+        "prediction_kind": "inspection_prediction",
+        "prediction_sha256": "bb1108435fa627e1aefa3d9cf2a188556d5674eeddcd6d596631be4493731982",
+        "raw_measure_kind": "raw_anomaly_measure",
+        "raw_measure_scale": "padim_anomaly_map_max_v1"
+      },
+      {
+        "input_id": "visa-inference-input-4016f830f89425cd0ac90494",
+        "model_metadata": {
+          "anomaly_map_shape": "1x64x64",
+          "argmax_region_shape": "4",
+          "class_index": "0",
+          "class_name": "candle",
+          "configuration_hash": "2893fd1fc592cb831bfccd9d53c3e784a5aba4ffdfbb58ad4de32eb512c4a2e4",
+          "feature_extraction_contract_id": "kalibra-padim-rgb64-bilinear-float64-patch8-v1",
+          "feature_extraction_source": "scripts/train_padim_baseline.py:extract_features",
+          "full_patch_features_sha256": "806d4f65435fe18ca1c53e8fbd77b6a374e6f3439d6efd2fb4c2098ebf60726f",
+          "loaded_model_identity": "kalibra/inspection/padim-onnx-export@1.0.0#sha256:0437ae28e172489387da07c4bd1f0c6b1ed95f3970ca3c7fa1dcd55935bd741a",
+          "loader": "model_loader.load_governed_model",
+          "localization_kind": "padim_raw_anomaly_map_argmax_region_v1",
+          "mapping_semantics": "padim_float64_raw_measure_and_argmax_region_to_raw_localized_prediction",
+          "method": "onnx-inspection-inference-provider-boundary-v1",
+          "model_artifact_fingerprint": "34d0d517d3dad7b276f09fa2b64c4982ced3cc428c44aef59ecc64126d3d9346",
+          "model_kind": "padim",
+          "model_reference_id": "kalibra-padim-onnx-export-v1",
+          "model_sha256": "0437ae28e172489387da07c4bd1f0c6b1ed95f3970ca3c7fa1dcd55935bd741a",
+          "output_count": "4",
+          "output_dtype": "float64",
+          "output_mapping_contract_id": "kalibra-padim-onnx-output-mapping-v1",
+          "output_mapping_version": "1",
+          "patch_mahalanobis_distances_shape": "1x64",
+          "prediction_judgement_policy": "contract_required_defect_for_raw_localization_no_threshold_v1",
+          "provider_private_session": "ProviderPrivateInferenceSession",
+          "raw_measure_scale": "padim_anomaly_map_max_v1",
+          "raw_measure_shape": "1",
+          "version": "1"
+        },
+        "predicted_judgement": "defect",
+        "predicted_localization": {
+          "label": "raw_anomaly_maximum",
+          "localization_kind": "padim_raw_anomaly_map_argmax_region_v1",
+          "region": {
+            "x_max": 0.875,
+            "x_min": 0.75,
+            "y_max": 0.25,
+            "y_min": 0.125
+          }
+        },
+        "predicted_raw_anomaly_measure": 2.6643765342144605,
+        "prediction_id": "padim-onnx-runtime-prediction:a35362289ba8ab4ccfe6c69217aed909",
+        "prediction_kind": "inspection_prediction",
+        "prediction_sha256": "faab585ca9abcfa5b8a37af2590279552cacd070ea5d4880805a8216cfdbcbc3",
+        "raw_measure_kind": "raw_anomaly_measure",
+        "raw_measure_scale": "padim_anomaly_map_max_v1"
+      }
+    ],
+    "provider_configuration": {
+      "loader": "model_loader.load_governed_model",
+      "method": "onnx-inspection-inference-provider-boundary-v1",
+      "model_kind": "padim",
+      "provider_id": "onnx-inspection-inference-provider-boundary-v1",
+      "provider_private_session": "ProviderPrivateInferenceSession"
+    },
+    "session_configuration": {
+      "configuration_kind": "onnx_session_configuration_v1",
+      "execution_provider_policy": "exact_order",
+      "execution_providers": [
+        {
+          "name": "CPUExecutionProvider",
+          "provider_options": []
+        }
+      ],
+      "model_reference": {
+        "artifact_path": "/Users/agentisstudio/Documents/kalibra/artifacts/padim/model.onnx",
+        "content_sha256": "0437ae28e172489387da07c4bd1f0c6b1ed95f3970ca3c7fa1dcd55935bd741a",
+        "reference_id": "kalibra/inspection/padim-onnx-export@1.0.0#sha256:0437ae28e172489387da07c4bd1f0c6b1ed95f3970ca3c7fa1dcd55935bd741a"
+      },
+      "session_options": {
+        "inter_op_num_threads": 1,
+        "intra_op_num_threads": 1,
+        "optimization_level": "disable_all"
+      }
+    },
+    "session_configuration_hash": "2893fd1fc592cb831bfccd9d53c3e784a5aba4ffdfbb58ad4de32eb512c4a2e4"
+  },
+  "second_run_hash": "866319274ecb400d17c023c7b028f1b5eee2feac08546015dab41d4d673bbe00",
+  "status": "passed"
+}

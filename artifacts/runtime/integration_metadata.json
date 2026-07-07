@@ -1,0 +1,140 @@
+{
+  "consumed_governed_records": {
+    "artifact_hashes_sha256": "d2e36f0ed4b6bd71c15fb4ce49c2481b5f1af4edc7b0ee034dc76386deed38c6",
+    "artifact_json_sha256": "6d6768cbd13d0a26dbfb817e676fc5ccddbb878b72f18e443dc403b531052f4f",
+    "equivalence_hashes_sha256": "fec7ea31a3c5969d708820394c74f5a7b9b306b5287624508f40bf0bef63ffaa",
+    "equivalence_replay_sha256": "ef918b15edde5d07ae3f9889c014ef6647f8e2035d9f5e15fd876ef4e736a114",
+    "equivalence_report_sha256": "9741a1c77a5d0696e8c1c5d2687aed82270d0b9791492b0b47032bf70c69275d",
+    "export_replay_sha256": "e2d7f28ed2412a509e384ad50509fc8e73d4f1347349683e4f89a4071be27093",
+    "metadata_json_sha256": "3dd299292c32a7d6616171ce26dd6d07a3d1c313dfc4dd00ea583dbca313f00d"
+  },
+  "governed_equivalence_identity": {
+    "equivalence_hashes": {
+      "equivalence_replay.json": "ef918b15edde5d07ae3f9889c014ef6647f8e2035d9f5e15fd876ef4e736a114",
+      "equivalence_report.json": "9741a1c77a5d0696e8c1c5d2687aed82270d0b9791492b0b47032bf70c69275d"
+    },
+    "equivalence_label": "visa-padim-onnx-export-equivalence-v1",
+    "export_equivalence_verified_before_runtime_integration": true
+  },
+  "integration_label": "kalibra-runtime-provider-integration-v1",
+  "loader_configuration": {
+    "compatibility_validation": true,
+    "expected_artifact_fingerprint_enforced": true,
+    "expected_identity_enforced": true,
+    "expected_version_enforced": true,
+    "loader_path": "model_loader.load_governed_model",
+    "provider_private_session_type": "ProviderPrivateInferenceSession"
+  },
+  "model_artifact_identity": {
+    "artifact_metadata_schema": "kalibra_governed_padim_onnx_export_metadata_v1",
+    "graph_ir_version": 10,
+    "graph_opset_version": 18,
+    "model_path": "artifacts/padim/model.onnx",
+    "model_reference_id": "kalibra-padim-onnx-export-v1",
+    "model_sha256": "0437ae28e172489387da07c4bd1f0c6b1ed95f3970ca3c7fa1dcd55935bd741a"
+  },
+  "provider_configuration": {
+    "canonical_model_reference_id": "kalibra-padim-onnx-export-v1",
+    "placeholder_model_reference_id": "onnx-placeholder-boundary-model-v1",
+    "placeholder_used_on_canonical_runtime_path": false,
+    "provider_id": "onnx-inspection-inference-provider-boundary-v1",
+    "provider_seam": "InspectionInferenceProvider.predict(...) -> InspectionPrediction"
+  },
+  "representative_input_count": 2,
+  "representative_inputs": [
+    {
+      "artifact_uri": "/Users/agentisstudio/Documents/kalibra/data/visa/extracted/candle/Data/Images/Anomaly/004.JPG",
+      "class_name": "candle",
+      "content_hash": "a78ee870594f161f86073b5983ae1f05be178009d819b4a73997f7cbc99a5ab2",
+      "input_id": "visa-inference-input-8ddbf63dbe194bfd91ebe271",
+      "sample_filename": "candle/Data/Images/Anomaly/004.JPG",
+      "split": "validation"
+    },
+    {
+      "artifact_uri": "/Users/agentisstudio/Documents/kalibra/data/visa/extracted/candle/Data/Images/Anomaly/000.JPG",
+      "class_name": "candle",
+      "content_hash": "c004dbc05698f01cf415e07d2a8cf8fef48aa19516eece6600e13f92f1f788b7",
+      "input_id": "visa-inference-input-4016f830f89425cd0ac90494",
+      "sample_filename": "candle/Data/Images/Anomaly/000.JPG",
+      "split": "test"
+    }
+  ],
+  "runtime_artifact_hash": "0437ae28e172489387da07c4bd1f0c6b1ed95f3970ca3c7fa1dcd55935bd741a",
+  "runtime_replay": {
+    "comparisons": {
+      "artifact_identity": true,
+      "inspection_predictions": true,
+      "localization": true,
+      "raw_anomaly_measures": true,
+      "run_hash": true,
+      "session_configuration": true,
+      "session_configuration_hash": true
+    },
+    "runtime_replay_path": "artifacts/runtime/runtime_replay.json",
+    "status": "passed"
+  },
+  "schema": "kalibra_runtime_provider_integration_metadata_v1",
+  "scope_boundaries": {
+    "benchmark_generated": false,
+    "c5_inference_rerun": false,
+    "calibration_performed": false,
+    "evaluation_domain_modified": false,
+    "evaluation_executed": false,
+    "evidence_domain_modified": false,
+    "feature_extraction_semantics_changed": false,
+    "human_review_modified": false,
+    "inspection_prediction_contract_changed": false,
+    "inspection_transform_prediction_changed": false,
+    "metrics_generated": false,
+    "onnx_reexported": false,
+    "padim_refit_performed": false,
+    "placeholder_used_on_canonical_runtime_path": false,
+    "preprocessing_contract_changed": false,
+    "product_claim": false,
+    "prototype_ui_modified": false,
+    "review_domain_modified": false,
+    "runtime_equivalence_verification_performed": false,
+    "runtime_integration_completed": true,
+    "runtime_provider_loaded": true,
+    "runtime_replay_performed": true,
+    "scientific_claim": false,
+    "scientific_evaluation_performed": false,
+    "trust_domain_modified": false
+  },
+  "session_configuration": {
+    "configuration_kind": "onnx_session_configuration_v1",
+    "execution_provider_policy": "exact_order",
+    "execution_providers": [
+      {
+        "name": "CPUExecutionProvider",
+        "provider_options": []
+      }
+    ],
+    "model_reference": {
+      "artifact_path": "/Users/agentisstudio/Documents/kalibra/artifacts/padim/model.onnx",
+      "content_sha256": "0437ae28e172489387da07c4bd1f0c6b1ed95f3970ca3c7fa1dcd55935bd741a",
+      "reference_id": "kalibra/inspection/padim-onnx-export@1.0.0#sha256:0437ae28e172489387da07c4bd1f0c6b1ed95f3970ca3c7fa1dcd55935bd741a"
+    },
+    "session_options": {
+      "inter_op_num_threads": 1,
+      "intra_op_num_threads": 1,
+      "optimization_level": "disable_all"
+    }
+  },
+  "session_configuration_hash": "2893fd1fc592cb831bfccd9d53c3e784a5aba4ffdfbb58ad4de32eb512c4a2e4",
+  "session_configuration_runtime": {
+    "execution_provider_policy": "exact_order",
+    "execution_providers": [
+      "CPUExecutionProvider"
+    ],
+    "graph_optimization_level": "ORT_DISABLE_ALL",
+    "inter_op_num_threads": 1,
+    "intra_op_num_threads": 1
+  },
+  "status": "passed",
+  "toolchain": {
+    "numpy": "2.0.2",
+    "onnxruntime": "1.19.2",
+    "python": "3.9.6"
+  }
+}

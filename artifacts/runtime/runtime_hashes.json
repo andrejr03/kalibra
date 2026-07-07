@@ -1,0 +1,10 @@
+{
+  "governed_runtime_artifacts": {
+    "integration_metadata.json": "5e885feb6ada4585a0c295b3935a0d1c73ce2753dd7a1227adad63953fae2757",
+    "runtime_replay.json": "0a7969eb6da592ff7de73c2853b460d5b50acb8c80892054532c03889b36b579"
+  },
+  "hash_algorithm": "sha256",
+  "hash_scope": "artifacts/runtime/integration_metadata.json and artifacts/runtime/runtime_replay.json",
+  "integration_label": "kalibra-runtime-provider-integration-v1",
+  "schema": "kalibra_runtime_provider_integration_hashes_v1"
+}

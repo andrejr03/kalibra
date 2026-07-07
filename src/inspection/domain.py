@@ -28,6 +28,7 @@ PLACEHOLDER_EXAMINATION_KIND = "deterministic_placeholder_examination"
 INSPECTION_EVIDENCE_KIND = "inspection_raw_result"
 INSPECTION_PREDICTION_KIND = "inspection_prediction"
 PREDICTION_RAW_MEASURE_SCALE = "model_raw_anomaly_measure"
+PADIM_RAW_MEASURE_SCALE = "padim_anomaly_map_max_v1"
 IMAGE_BASELINE_EXAMINATION_KIND = "deterministic_local_image_baseline_v1"
 IMAGE_BASELINE_RAW_SCALE = "local_contrast_raw_0_100"
 VALID_EXAMINATION_KINDS = frozenset(
@@ -48,6 +49,7 @@ _VALID_RAW_RESULT_RAW_MEASURE_SCALES = frozenset(
         RAW_MEASURE_SCALE,
         IMAGE_BASELINE_RAW_SCALE,
         PREDICTION_RAW_MEASURE_SCALE,
+        PADIM_RAW_MEASURE_SCALE,
     }
 )
 

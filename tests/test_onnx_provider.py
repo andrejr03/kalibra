@@ -40,7 +40,9 @@ from src.inspection.errors import InspectionExaminationFailure
 from src.inspection import providers_onnx
 from src.inspection.providers_onnx import (
     ONNX_PLACEHOLDER_MODEL_REFERENCE_ID,
+    PADIM_ONNX_MODEL_REFERENCE_ID,
     OnnxInspectionInferenceProvider,
+    governed_padim_session_configuration,
 )
 
 
@@ -54,6 +56,20 @@ IMAGE_FIXTURE_DIR = Path(__file__).resolve().parent / "fixtures" / "inspection"
 PLACEHOLDER_MODEL_PATH = FIXTURE_DIR / "placeholder_identity.onnx"
 DEFAULT_IMAGE_PATH = IMAGE_FIXTURE_DIR / "blob_defect.pgm"
 SHIFTED_IMAGE_PATH = IMAGE_FIXTURE_DIR / "blob_defect_shifted.pgm"
+GOVERNED_SAMPLE_PATH = (
+    Path(__file__).resolve().parents[1]
+    / "data"
+    / "visa"
+    / "extracted"
+    / "candle"
+    / "Data"
+    / "Images"
+    / "Anomaly"
+    / "004.JPG"
+)
+GOVERNED_SAMPLE_SHA256 = (
+    "a78ee870594f161f86073b5983ae1f05be178009d819b4a73997f7cbc99a5ab2"
+)
 
 
 def test_onnx_provider_satisfies_inference_provider_boundary(monkeypatch) -> None:
@@ -85,6 +101,45 @@ def test_onnx_provider_replays_identical_predictions(monkeypatch) -> None:
 
     assert first == second
     assert first == separate_provider
+
+
+def test_canonical_onnx_provider_uses_governed_padim_artifact() -> None:
+    pytest.importorskip("onnxruntime")
+    provider = OnnxInspectionInferenceProvider()
+    inspection_input = _governed_padim_input()
+
+    prediction = provider.predict(inspection_input)
+
+    assert type(prediction) is InspectionPrediction
+    assert prediction.model_metadata["model_reference_id"] == (
+        PADIM_ONNX_MODEL_REFERENCE_ID
+    )
+    assert prediction.model_metadata["model_kind"] == "padim"
+    assert prediction.raw_measure_scale == "padim_anomaly_map_max_v1"
+    assert prediction.predicted_localization is not None
+    assert prediction.predicted_localization.localization_kind == (
+        "padim_raw_anomaly_map_argmax_region_v1"
+    )
+    assert provider.session_configuration.model_reference.reference_id != (
+        ONNX_PLACEHOLDER_MODEL_REFERENCE_ID
+    )
+    assert governed_padim_session_configuration().model_reference.reference_id == (
+        PADIM_ONNX_MODEL_REFERENCE_ID
+    )
+
+
+def test_canonical_padim_provider_requires_governed_class_metadata() -> None:
+    pytest.importorskip("onnxruntime")
+    provider = OnnxInspectionInferenceProvider()
+    inspection_input = StabilizedInspectionInput(
+        input_id="visa-inference-input-8ddbf63dbe194bfd91ebe271",
+        artifact_uri=str(GOVERNED_SAMPLE_PATH),
+        content_hash=GOVERNED_SAMPLE_SHA256,
+        metadata={"sample_filename": "candle/Data/Images/Anomaly/004.JPG"},
+    )
+
+    with pytest.raises(InspectionExaminationFailure, match="class_name"):
+        provider.predict(inspection_input)
 
 
 def test_onnx_provider_transforms_to_identical_raw_result(monkeypatch) -> None:
@@ -141,8 +196,12 @@ def test_onnx_provider_uses_validated_model_loader_path(monkeypatch) -> None:
         assert session_configuration.model_reference.content_sha256 == (
             _placeholder_model_hash()
         )
-        assert kwargs == {}
-        return FakeLoadedModel(session_configuration)
+        assert kwargs == {
+            "expected_identity": artifact.identity,
+            "expected_version": artifact.version,
+            "expected_compatibility": artifact.metadata.compatibility,
+        }
+        return FakeLoadedModel(session_configuration, artifact)
 
     monkeypatch.setattr(
         model_loader,
@@ -288,12 +347,12 @@ def test_onnx_provider_uses_governed_output_mapper(monkeypatch) -> None:
             localization_kind="mapped_placeholder_region",
             model_metadata={
                 "output_mapping_contract_id": (
-                    output_mapping.OUTPUT_MAPPING_CONTRACT_ID
+                    output_mapping.PLACEHOLDER_OUTPUT_MAPPING_CONTRACT_ID
                 ),
                 "output_mapping_version": output_mapping.MAPPING_VERSION,
                 "output_shape": "1",
                 "output_dtype": "float32",
-                "raw_measure_scale": output_mapping.RAW_MEASURE_SCALE,
+                "raw_measure_scale": output_mapping.PLACEHOLDER_RAW_MEASURE_SCALE,
             },
         )
 
@@ -323,7 +382,7 @@ def test_onnx_provider_uses_governed_output_mapper(monkeypatch) -> None:
         "mapped_placeholder_region"
     )
     assert prediction.model_metadata["output_mapping_contract_id"] == (
-        output_mapping.OUTPUT_MAPPING_CONTRACT_ID
+        output_mapping.PLACEHOLDER_OUTPUT_MAPPING_CONTRACT_ID
     )
 
 
@@ -516,6 +575,19 @@ def _inspection_input(
     )
 
 
+def _governed_padim_input() -> StabilizedInspectionInput:
+    return StabilizedInspectionInput(
+        input_id="visa-inference-input-8ddbf63dbe194bfd91ebe271",
+        artifact_uri=str(GOVERNED_SAMPLE_PATH),
+        content_hash=GOVERNED_SAMPLE_SHA256,
+        metadata={
+            "class_name": "candle",
+            "split": "validation",
+            "sample_filename": "candle/Data/Images/Anomaly/004.JPG",
+        },
+    )
+
+
 def _session_configuration(
     *,
     model_path: Path = PLACEHOLDER_MODEL_PATH,
@@ -626,11 +698,33 @@ class FakeRuntime:
 
 
 class FakeLoadedModel:
-    def __init__(self, configuration: OnnxSessionConfiguration) -> None:
+    def __init__(
+        self,
+        configuration: OnnxSessionConfiguration,
+        artifact: model_artifact.GovernedModelArtifact | None = None,
+    ) -> None:
+        self.artifact = artifact or model_artifact.canonical_model_artifact(
+            identity="kalibra/inspection/onnx-placeholder-boundary-model",
+            version="1.0.0",
+            content_hash=_placeholder_model_hash(),
+            artifact_path=str(PLACEHOLDER_MODEL_PATH),
+            artifact_format=model_artifact.MODEL_ARTIFACT_FORMAT_ONNX,
+            producer="Kalibra deterministic ONNX provider fixture",
+            provenance="Deterministic placeholder ONNX model for provider boundary proof",
+            lineage=(("source", "test"),),
+            framework_name=model_artifact.MODEL_FRAMEWORK_ONNX_RUNTIME,
+            framework_version="1.17.3",
+            onnx_opset=17,
+            compatibility_declaration="CPU baseline compatibility only",
+        )
         self.session_configuration = configuration
         self.session_configuration_hash = onnx_session.session_configuration_hash(
             configuration
         )
+        self.artifact_fingerprint = model_artifact.model_artifact_fingerprint(
+            self.artifact
+        )
+        self.model_content_sha256 = self.artifact.content_hash.content_sha256
         self.session = FakeInferenceSession(
             str(PLACEHOLDER_MODEL_PATH.resolve()),
             sess_options=FakeSessionOptions(),

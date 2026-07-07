@@ -24,9 +24,9 @@ def test_valid_placeholder_output_maps_deterministically() -> None:
     assert mapped.predicted_status == output_mapping.PREDICTED_STATUS_DEFECT
     assert mapped.raw_anomaly_measure == 75.0
     assert mapped.localization is not None
-    assert mapped.localization_kind == output_mapping.LOCALIZATION_KIND
+    assert mapped.localization_kind == output_mapping.PLACEHOLDER_LOCALIZATION_KIND
     assert mapped.model_metadata["output_mapping_contract_id"] == (
-        output_mapping.OUTPUT_MAPPING_CONTRACT_ID
+        output_mapping.PLACEHOLDER_OUTPUT_MAPPING_CONTRACT_ID
     )
     assert mapped.model_metadata["output_mapping_version"] == (
         output_mapping.MAPPING_VERSION
@@ -35,7 +35,7 @@ def test_valid_placeholder_output_maps_deterministically() -> None:
     assert mapped.model_metadata["output_shape"] == "1"
     assert mapped.model_metadata["output_dtype"] == "float32"
     assert mapped.model_metadata["raw_measure_scale"] == (
-        output_mapping.RAW_MEASURE_SCALE
+        output_mapping.PLACEHOLDER_RAW_MEASURE_SCALE
     )
     assert mapped.model_metadata["preprocessing_contract_id"] == (
         "preprocessing-contract-v1"
@@ -50,6 +50,51 @@ def test_identical_output_tensors_produce_identical_mapped_output() -> None:
     assert first.predicted_status == output_mapping.PREDICTED_STATUS_OK
     assert first.localization is None
     assert first.localization_kind is None
+
+
+def test_padim_outputs_map_raw_measure_and_argmax_region() -> None:
+    outputs = _padim_outputs(raw_measure=123.456)
+
+    mapped = output_mapping.map_padim_onnx_outputs(
+        outputs,
+        input_id="input-1",
+        content_hash="hash-1",
+        feature_extraction_contract_id=(
+            "kalibra-padim-rgb64-bilinear-float64-patch8-v1"
+        ),
+    )
+
+    assert mapped.predicted_status == output_mapping.PREDICTED_STATUS_DEFECT
+    assert mapped.raw_anomaly_measure == 123.456
+    assert mapped.localization is not None
+    assert mapped.localization.localization_kind == (
+        output_mapping.PADIM_LOCALIZATION_KIND
+    )
+    assert mapped.localization.x_min == 0.125
+    assert mapped.localization.y_min == 0.25
+    assert mapped.localization.x_max == 0.375
+    assert mapped.localization.y_max == 0.5
+    assert mapped.model_metadata["output_mapping_contract_id"] == (
+        output_mapping.PADIM_OUTPUT_MAPPING_CONTRACT_ID
+    )
+    assert mapped.model_metadata["raw_measure_scale"] == (
+        output_mapping.PADIM_RAW_MEASURE_SCALE
+    )
+
+
+def test_padim_output_contract_drift_fails_closed() -> None:
+    bad_outputs = list(_padim_outputs())
+    bad_outputs[2] = numpy.array([1.0], dtype="float32")
+
+    with pytest.raises(OutputMappingError, match="dtype"):
+        output_mapping.map_padim_onnx_outputs(
+            bad_outputs,
+            input_id="input-1",
+            content_hash="hash-1",
+            feature_extraction_contract_id=(
+                "kalibra-padim-rgb64-bilinear-float64-patch8-v1"
+            ),
+        )
 
 
 def test_incompatible_output_count_fails_closed() -> None:
@@ -197,6 +242,15 @@ def _map_output(value: float) -> MappedModelOutput:
 
 def _tensor(value: float):
     return numpy.array([value], dtype="float32")
+
+
+def _padim_outputs(raw_measure: float = 5.0):
+    return [
+        numpy.zeros((1, 64), dtype="float64"),
+        numpy.zeros((1, 64, 64), dtype="float64"),
+        numpy.array([raw_measure], dtype="float64"),
+        numpy.array([[0.125, 0.25, 0.375, 0.5]], dtype="float64"),
+    ]
 
 
 class FakeRuntime:
