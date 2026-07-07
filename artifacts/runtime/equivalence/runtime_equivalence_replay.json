@@ -1,0 +1,75 @@
+{
+  "comparisons": {
+    "global_maxima": true,
+    "pass_fail_status": true,
+    "per_sample_deviations": true,
+    "per_split_maxima": true,
+    "runtime_equivalence_hashes_record": true,
+    "runtime_equivalence_report_hash": true,
+    "runtime_equivalence_report_json": true
+  },
+  "complete_second_canonical_runtime_load_and_execution": true,
+  "complete_second_runtime_equivalence_run": true,
+  "first_run_global_maxima": {
+    "anomaly_map_absolute": 7.105427357601002e-15,
+    "anomaly_map_relative": 3.586867160478407e-15,
+    "localization_region_absolute": 0.0,
+    "raw_measure_absolute": 7.105427357601002e-15,
+    "raw_measure_relative": 3.586867160478407e-15
+  },
+  "first_run_hashes": {
+    "runtime_equivalence_report.json": "637098d4ba73070f2ea734ac76c6f212572d1b66da8df72e622f1376c238523d",
+    "runtime_equivalence_run": "be4ce22db7bb1cb48f2e14dd0a9cd411bf7ec434abcfadac9346c89ddac2033a"
+  },
+  "first_run_per_split_maxima": {
+    "test": {
+      "anomaly_map_absolute": 7.105427357601002e-15,
+      "anomaly_map_relative": 3.586867160478407e-15,
+      "localization_region_absolute": 0.0,
+      "raw_measure_absolute": 7.105427357601002e-15,
+      "raw_measure_relative": 3.586867160478407e-15,
+      "sample_count": 4328
+    },
+    "validation": {
+      "anomaly_map_absolute": 7.105427357601002e-15,
+      "anomaly_map_relative": 3.334194659432464e-15,
+      "localization_region_absolute": 0.0,
+      "raw_measure_absolute": 7.105427357601002e-15,
+      "raw_measure_relative": 3.334194659432464e-15,
+      "sample_count": 2164
+    }
+  },
+  "runtime_equivalence_label": "kalibra-runtime-equivalence-verification-v1",
+  "schema": "kalibra_runtime_equivalence_replay_v1",
+  "scope": "deterministic canonical runtime-equivalence replay only",
+  "second_run_global_maxima": {
+    "anomaly_map_absolute": 7.105427357601002e-15,
+    "anomaly_map_relative": 3.586867160478407e-15,
+    "localization_region_absolute": 0.0,
+    "raw_measure_absolute": 7.105427357601002e-15,
+    "raw_measure_relative": 3.586867160478407e-15
+  },
+  "second_run_hashes": {
+    "runtime_equivalence_report.json": "637098d4ba73070f2ea734ac76c6f212572d1b66da8df72e622f1376c238523d",
+    "runtime_equivalence_run": "be4ce22db7bb1cb48f2e14dd0a9cd411bf7ec434abcfadac9346c89ddac2033a"
+  },
+  "second_run_per_split_maxima": {
+    "test": {
+      "anomaly_map_absolute": 7.105427357601002e-15,
+      "anomaly_map_relative": 3.586867160478407e-15,
+      "localization_region_absolute": 0.0,
+      "raw_measure_absolute": 7.105427357601002e-15,
+      "raw_measure_relative": 3.586867160478407e-15,
+      "sample_count": 4328
+    },
+    "validation": {
+      "anomaly_map_absolute": 7.105427357601002e-15,
+      "anomaly_map_relative": 3.334194659432464e-15,
+      "localization_region_absolute": 0.0,
+      "raw_measure_absolute": 7.105427357601002e-15,
+      "raw_measure_relative": 3.334194659432464e-15,
+      "sample_count": 2164
+    }
+  },
+  "status": "passed"
+}
