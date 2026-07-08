@@ -1,0 +1,34 @@
+{
+  "next": "Trust qualification — calibration, routing, abstention, drift, human review. Designed, not yet evidenced.",
+  "next_label": "Next",
+  "next_status": "Designed, not yet evidenced.",
+  "phases": [
+    {
+      "id": "P1",
+      "items": [
+        "Offline, batch, locally reproducible system boundary defined.",
+        "Five engineering domains established as architectural boundaries.",
+        "SHA-256 governance introduced across every artifact."
+      ],
+      "open": false,
+      "subtitle": "Governed foundation, five-domain architecture, reproducible offline boundary.",
+      "title": "Engineering substrate"
+    },
+    {
+      "id": "P2",
+      "labels": [
+        "visa-acq-v1",
+        "visa-padim-baseline-fit-v1"
+      ],
+      "open": true,
+      "subtitle": "Governed VisA acquisition, PaDiM baseline, C-6 scientific evaluation.",
+      "title": "Offline science"
+    },
+    {
+      "id": "P3",
+      "open": true,
+      "subtitle": "ONNX export, export- & runtime-equivalence, replay, placeholder retirement.",
+      "title": "Runtime integration"
+    }
+  ]
+}

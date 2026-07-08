@@ -1,0 +1,54 @@
+{
+  "carried": [
+    {
+      "name": "Learned PaDiM signal, end to end",
+      "status": "real"
+    },
+    {
+      "name": "Governed model artifact",
+      "status": "hash-anchored"
+    },
+    {
+      "name": "Deterministic replay",
+      "status": "byte-identical"
+    },
+    {
+      "name": "Placeholder on canonical path",
+      "source_field": "placeholder_used_on_canonical_runtime_path: false",
+      "status": "retired · false"
+    }
+  ],
+  "determinism": "single-thread · ORT_DISABLE_ALL · CPU EP",
+  "feature_contract": "…rgb64-bilinear-float64-patch8-v1",
+  "input": {
+    "class_name": "candle",
+    "content_hash_short": "8b719296…0da45e",
+    "fixture": "4×4 PGM",
+    "fixture_tag": "INPUT · 4×4 PGM fixture",
+    "name": "blob_defect.pgm",
+    "projection_label": "Local-provider projection"
+  },
+  "integration_status": "passed",
+  "localization": {
+    "display_label": "LOCALIZATION · x 0.25–0.75, y 0.25–0.75",
+    "x": "0.25–0.75",
+    "y": "0.25–0.75"
+  },
+  "model_identity": "kalibra-padim-onnx-export-v1",
+  "model_sha256_short": "0437ae28…741a",
+  "precomputed_note": "Precomputed from a governed offline run. Kalibra does not run inference in your browser — this is a projection of a recorded local-provider result.",
+  "raw_anomaly_measure": "75.00",
+  "raw_bar_percent": "75",
+  "raw_scale_max": "100",
+  "session_config_hash_short": "2893fd1f…a2e4",
+  "toolchain": "onnxruntime 1.19.2 · numpy 2.0.2 · python 3.9.6",
+  "trust": {
+    "absent": [
+      "Calibrated confidence",
+      "Outcome routing",
+      "Drift"
+    ],
+    "state": "not_yet_demonstrated"
+  },
+  "verdict": "DEFECT"
+}

@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kalibra — Portfolio Experience</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ============ HEADER ============ -->
+<header class="top">
+  <div class="brandchip">
+    <svg width="20" height="23" viewBox="0 0 34 38" aria-hidden="true"><polygon points="17,2 32,10.5 32,27.5 17,36 2,27.5 2,10.5" fill="none" stroke="#e6a23c" stroke-width="2.4"></polygon><circle cx="17" cy="19" r="3.6" fill="#e6a23c"></circle></svg>
+    <span>WORKBENCH</span>
+  </div>
+  <div class="wordmark">
+    <div class="row">
+      <svg width="30" height="34" viewBox="0 0 34 38" aria-hidden="true"><polygon points="17,2 32,10.5 32,27.5 17,36 2,27.5 2,10.5" fill="none" stroke="#e6a23c" stroke-width="2"></polygon><polygon points="17,9 26,14 26,24 17,29 8,24 8,14" fill="none" stroke="#e6a23c" stroke-width="1.4" opacity="0.6"></polygon><circle cx="17" cy="19" r="2.4" fill="#e6a23c"></circle></svg>
+      <span class="name">KALIBRA</span>
+    </div>
+    <span class="tag">TRUSTWORTHY VISUAL INSPECTION</span>
+  </div>
+  <div class="head-right">
+    <div class="chip" title="Offline, batch, locally reproducible"><span class="dot g"></span><span class="lbl" data-bind="meta.offline_mode" data-format="offline-mode">OFFLINE MODE</span></div>
+    <div class="hashrow" onclick="kcopy(this,'0437ae28…741a')" title="model.onnx SHA-256 — click to copy" data-copy-bind="meta.model_sha256" data-copy="0437ae28e172489387da07c4bd1f0c6b1ed95f3970ca3c7fa1dcd55935bd741a">
+      <span class="h" data-bind="meta.model_sha256_short" data-prefix="model.onnx&nbsp;&nbsp;">model.onnx  0437ae28…741a</span>
+      <span class="k-copy"><span class="k-copy-label">copy</span></span>
+    </div>
+  </div>
+</header>
+
+<div class="shell">
+
+  <!-- ============ NAV RAIL ============ -->
+  <nav class="rail" id="rail">
+    <a class="navitem active" data-target="hero"><span class="n">00</span><span>Overview</span></a>
+    <a class="navitem" data-target="inspection"><span class="n">01</span><span>Inspection</span></a>
+    <a class="navitem" data-target="evidence"><span class="n">02</span><span>Evidence Chain</span></a>
+    <a class="navitem" data-target="equivalence"><span class="n">03</span><span>Equivalence</span></a>
+    <a class="navitem" data-target="architecture"><span class="n">04</span><span>Architecture</span></a>
+    <a class="navitem" data-target="trust"><span class="n">05</span><span>Why Trust?</span></a>
+    <a class="navitem" data-target="boundaries"><span class="n">06</span><span>Boundaries</span></a>
+    <a class="navitem" data-target="timeline"><span class="n">07</span><span>Timeline</span></a>
+    <a class="navitem" data-target="repository"><span class="n">08</span><span>Verify</span></a>
+    <div class="railfoot">
+      <div class="blk"><div class="k">MODE</div><div class="v">Offline · Batch · Reproducible</div></div>
+      <div class="blk"><div class="k">EVIDENCE BASIS</div><div class="v" data-bind="meta.evidence_basis">Single-seed · VisA-proxy</div></div>
+      <div class="blk"><div class="k">REVIEW HEAD</div><div class="v mn" data-bind="meta.review_head">6cd5d5e</div></div>
+    </div>
+  </nav>
+
+  <!-- ============ MAIN ============ -->
+  <main>
+
+    <!-- ===== 00 · HERO ===== -->
+    <section class="stn" id="hero">
+      <div class="hero-wrap hero">
+        <span class="stn-num">STATION 00 / OVERVIEW</span>
+        <h1 style="margin-top:18px">Kalibra inspects — and decides <b>whether its own inspection can be trusted.</b></h1>
+        <p class="sub">An offline, reproducible visual-inspection runtime for industrial quality control. Every result on this page is backed by a governed, inspectable artifact — and everything not yet demonstrated is labeled as such.</p>
+
+        <div class="identity-strip">
+          <div class="idcell">
+            <span class="k">Governed model artifact</span>
+            <div class="hashrow" onclick="kcopy(this,'0437ae28…741a')" title="Click to copy SHA-256 prefix" data-copy-bind="meta.model_sha256" data-copy="0437ae28e172489387da07c4bd1f0c6b1ed95f3970ca3c7fa1dcd55935bd741a">
+              <span class="h" data-bind="meta.model_sha256_short" data-prefix="sha256:">sha256:0437ae28…741a</span>
+              <span class="k-copy"><span class="k-copy-label">copy</span></span>
+            </div>
+          </div>
+          <div class="verdict-badge">
+            <div class="seal">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="#45c46a" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div>
+              <div class="vt" data-bind="meta.hero_proof_title">RUNTIME EQUIVALENCE: VERIFIED · REPLAY: PASSED</div>
+              <div class="vs"><span data-bind="equivalence.samples_compared">6,492</span> samples · max deviation <span data-bind="equivalence.max_abs_deviation_short">7.1e-15</span> · <span data-bind="equivalence.replay.short_claim">byte-identical second run</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="cta-row">
+          <a class="cta primary" data-scroll="inspection">Follow a governed decision
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#161009" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <a class="cta ghost" data-scroll="evidence">Verify the evidence</a>
+        </div>
+
+        <div class="honest-line">
+          <span class="sq"></span>
+          <span><span data-bind="meta.evidence_basis_sentence">Single-seed, VisA-proxy evidence.</span> <b style="color:var(--slate)" data-bind="boundaries.primary_absence">Calibrated confidence — not yet demonstrated.</b> This page never claims trust it has not proven.</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 01 · RUNTIME INSPECTION ===== -->
+    <section class="stn" id="inspection" data-screen-label="Inspection">
+      <div class="stn-head">
+        <div>
+          <span class="kick">Inspection · The runtime, followed end to end</span>
+          <div class="stn-title">A real governed decision</div>
+        </div>
+        <p class="lede">The runtime reaches a defect judgement and locates it. It does <b>not</b> decide whether that judgement can be trusted — the raw anomaly measure and calibrated confidence are never blurred.</p>
+      </div>
+
+      <div class="insp-grid">
+        <!-- left: the decision -->
+        <div class="card">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
+            <span class="mono" style="font-size:15px;color:var(--ink2)" data-bind="runtime.input.name">blob_defect.pgm</span>
+            <span class="st amber"><span class="sd"></span><span data-bind="runtime.input.projection_label">Local-provider projection</span></span>
+          </div>
+
+          <div style="display:flex;gap:16px">
+            <div style="flex:1;min-width:0">
+              <div class="frame">
+                <img alt="Governed inspection input, rendered from the local-provider projection" src="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%204%204%22%20shape-rendering=%22crispEdges%22%3E%3Crect%20width=%22100%25%22%20height=%22100%25%22%20fill=%22%23070a0e%22/%3E%3Crect%20x=%221%22%20y=%221%22%20width=%221%22%20height=%221%22%20fill=%22rgb%28255,255,255%29%22/%3E%3Crect%20x=%222%22%20y=%221%22%20width=%221%22%20height=%221%22%20fill=%22rgb%28255,255,255%29%22/%3E%3Crect%20x=%221%22%20y=%222%22%20width=%221%22%20height=%221%22%20fill=%22rgb%28255,255,255%29%22/%3E%3Crect%20x=%222%22%20y=%222%22%20width=%221%22%20height=%221%22%20fill=%22rgb%28255,255,255%29%22/%3E%3C/svg%3E">
+                <div class="tag" data-bind="runtime.input.fixture_tag">INPUT · 4×4 PGM fixture</div>
+              </div>
+            </div>
+            <div style="flex:1;min-width:0">
+              <div class="frame">
+                <img alt="Defect localization overlay" src="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%204%204%22%20shape-rendering=%22crispEdges%22%3E%3Crect%20width=%22100%25%22%20height=%22100%25%22%20fill=%22%23070a0e%22/%3E%3Crect%20x=%221%22%20y=%221%22%20width=%221%22%20height=%221%22%20fill=%22rgb%28255,255,255%29%22/%3E%3Crect%20x=%222%22%20y=%221%22%20width=%221%22%20height=%221%22%20fill=%22rgb%28255,255,255%29%22/%3E%3Crect%20x=%221%22%20y=%222%22%20width=%221%22%20height=%221%22%20fill=%22rgb%28255,255,255%29%22/%3E%3Crect%20x=%222%22%20y=%222%22%20width=%221%22%20height=%221%22%20fill=%22rgb%28255,255,255%29%22/%3E%3Crect%20x=%221%22%20y=%221%22%20width=%222%22%20height=%222%22%20fill=%22%23e5514e%22%20fill-opacity=%220.24%22%20stroke=%22%23e5514e%22%20stroke-width=%220.08%22/%3E%3C/svg%3E">
+                <div class="tag" data-bind="runtime.localization.display_label">LOCALIZATION · x 0.25–0.75, y 0.25–0.75</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="height:1px;background:var(--line);margin:20px 0 18px"></div>
+
+          <div style="display:grid;grid-template-columns:0.8fr 1.2fr;gap:28px;align-items:start">
+            <div>
+              <div class="card-k">Inspection result</div>
+              <div style="display:inline-flex;align-items:center;gap:9px;background:rgba(229,81,78,0.12);border:1px solid rgba(229,81,78,0.4);border-radius:8px;padding:10px 16px">
+                <svg width="16" height="18" viewBox="0 0 34 38"><polygon points="17,2 32,10.5 32,27.5 17,36 2,27.5 2,10.5" fill="none" stroke="#e5514e" stroke-width="3"></polygon></svg>
+                <span style="font:600 16px var(--disp);letter-spacing:.08em;color:var(--red)" data-bind="runtime.verdict">DEFECT</span>
+              </div>
+              <p style="font:400 12px var(--body);color:var(--mut4);margin-top:12px;line-height:1.55">Judgement only — &ldquo;is this defective, and where?&rdquo;</p>
+            </div>
+            <div>
+              <div class="card-k">Raw anomaly measure</div>
+              <div style="display:flex;align-items:center;gap:18px">
+                <span class="metric-big" data-bind="runtime.raw_anomaly_measure">75.00</span>
+                <div style="flex:1">
+                  <div class="bar"><i style="width:75%"></i></div>
+                  <div style="display:flex;justify-content:space-between;margin-top:6px"><span class="mono" style="font-size:11px;color:var(--mut4)">0</span><span class="mono" style="font-size:11px;color:var(--mut4)" data-bind="runtime.raw_scale_max" data-suffix=" · model raw scale">100 · model raw scale</span></div>
+                </div>
+              </div>
+              <p style="font:400 12px var(--body);color:var(--mut4);margin-top:10px;line-height:1.55">A standalone measure of how unusual the input is — <span style="color:var(--mut2)">not a probability of being correct, and not calibrated confidence.</span></p>
+            </div>
+          </div>
+
+          <div class="precomp">
+            <span class="sq"></span>
+            <span data-bind="runtime.precomputed_note">Precomputed from a governed offline run. Kalibra does not run inference in your browser — this is a projection of a recorded local-provider result.</span>
+          </div>
+
+          <details class="disclose">
+            <summary><span class="caret">▸</span> Walk the decision · governed identity</summary>
+            <div style="margin-top:14px">
+              <div class="kv"><span class="k">Model identity</span><span class="v" data-bind="runtime.model_identity">kalibra-padim-onnx-export-v1</span></div>
+              <div class="kv"><span class="k">Model artifact</span><span class="v" data-bind="runtime.model_sha256_short" data-prefix="sha256:">sha256:0437ae28…741a</span></div>
+              <div class="kv"><span class="k">Input content hash</span><span class="v" data-bind="runtime.input.content_hash_short">8b719296…0da45e</span></div>
+              <div class="kv"><span class="k">Feature contract</span><span class="v" data-bind="runtime.feature_contract">…rgb64-bilinear-float64-patch8-v1</span></div>
+              <div class="kv"><span class="k">Toolchain pin</span><span class="v" data-bind="runtime.toolchain">onnxruntime 1.19.2 · numpy 2.0.2 · python 3.9.6</span></div>
+              <div class="kv"><span class="k">Determinism</span><span class="v" data-bind="runtime.determinism">single-thread · ORT_DISABLE_ALL · CPU EP</span></div>
+            </div>
+          </details>
+        </div>
+
+        <!-- right: trust — honestly empty -->
+        <div class="grid">
+          <div class="nyd">
+            <div class="badge"><span class="sq"></span>Trust qualification — not yet demonstrated</div>
+            <p>This is where the raw measure would become <b style="color:#b6c1d4">calibrated confidence</b> and an <b style="color:#b6c1d4">accept / review / reject / abstain</b> outcome. Kalibra has not built or evidenced that layer, so no gauge is shown here. The absence is the honest state — not an error.</p>
+            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:15px">
+              <span class="st gap"><span class="sd"></span><span data-bind="runtime.trust.absent.0" data-suffix=" · absent">Calibrated confidence · absent</span></span>
+              <span class="st gap"><span class="sd"></span><span data-bind="runtime.trust.absent.1" data-suffix=" · absent">Outcome routing · absent</span></span>
+              <span class="st gap"><span class="sd"></span><span data-bind="runtime.trust.absent.2" data-suffix=" · absent">Drift · absent</span></span>
+            </div>
+          </div>
+
+          <div class="card deep">
+            <div class="card-k">What the runtime does carry</div>
+            <div class="kv"><span class="k" data-bind="runtime.carried.0.name">Learned PaDiM signal, end to end</span><span class="v" style="color:var(--green)" data-bind="runtime.carried.0.status">real</span></div>
+            <div class="kv"><span class="k" data-bind="runtime.carried.1.name">Governed model artifact</span><span class="v" style="color:var(--green)" data-bind="runtime.carried.1.status">hash-anchored</span></div>
+            <div class="kv"><span class="k" data-bind="runtime.carried.2.name">Deterministic replay</span><span class="v" style="color:var(--green)" data-bind="runtime.carried.2.status">byte-identical</span></div>
+            <div class="kv"><span class="k" data-bind="runtime.carried.3.name">Placeholder on canonical path</span><span class="v" style="color:var(--green)" data-bind="runtime.carried.3.status">retired · false</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 02 · EVIDENCE CHAIN ===== -->
+    <section class="stn" id="evidence" data-screen-label="Evidence Chain">
+      <div class="stn-head">
+        <div>
+          <span class="kick">Evidence · A chain to walk, a claim to verify</span>
+          <div class="stn-title">From raw dataset to a governed runtime</div>
+        </div>
+        <p class="lede">Evidence here means <b>provenance and reproducibility</b>, not scores. Every link is a claim in one sentence, a proof handle, and an invitation to re-check it against the repository yourself.</p>
+      </div>
+
+      <div class="card chain">
+        <div class="link">
+          <div class="spine"><div class="node" data-bind="evidence.links.0.n">1</div><div class="stem"></div></div>
+          <div class="body">
+            <div class="claim"><b>Governed dataset.</b> A VisA proxy is acquired under a pinned, manifest-driven pipeline — archive and split hashed, not &ldquo;downloaded some images.&rdquo;</div>
+            <div class="meta"><span class="st real"><span class="sd"></span><span data-bind="evidence.links.0.status">governed</span></span><span class="pathpill" data-bind="evidence.links.0.labels.0">visa-acq-v1</span><span class="pathpill" data-bind="evidence.links.0.labels.1">archive + split SHA-256 in repo</span></div>
+          </div>
+        </div>
+        <div class="link">
+          <div class="spine"><div class="node" data-bind="evidence.links.1.n">2</div><div class="stem"></div></div>
+          <div class="body">
+            <div class="claim"><b>PaDiM baseline fit.</b> A baseline is trained with a replayable training record.</div>
+            <div class="meta"><span class="st real"><span class="sd"></span><span data-bind="evidence.links.1.status">replay</span></span><span class="pathpill" data-bind="evidence.links.1.labels.0">visa-padim-baseline-fit-v1</span></div>
+          </div>
+        </div>
+        <div class="link">
+          <div class="spine"><div class="node" data-bind="evidence.links.2.n">3</div><div class="stem"></div></div>
+          <div class="body">
+            <div class="claim"><b>ONNX export.</b> The model is exported to a governed ONNX artifact (opset 18, IR 10), hash-anchored.</div>
+            <div class="meta">
+              <div class="hashrow" onclick="kcopy(this,'0437ae28…741a')" data-copy-bind="evidence.links.2.copy_value" data-copy="0437ae28e172489387da07c4bd1f0c6b1ed95f3970ca3c7fa1dcd55935bd741a"><span class="h" data-bind="evidence.links.2.hash_short" data-prefix="sha256:">sha256:0437ae28…741a</span><span class="k-copy"><span class="k-copy-label">copy</span></span></div>
+            </div>
+          </div>
+        </div>
+        <div class="link">
+          <div class="spine"><div class="node" data-bind="evidence.links.3.n">4</div><div class="stem"></div></div>
+          <div class="body">
+            <div class="claim"><b>Export equivalence.</b> The ONNX model produces the same outputs as the PyTorch model it was exported from — <i>the export did not change the science.</i></div>
+            <div class="meta"><span class="st real"><span class="sd"></span><span data-bind="evidence.links.3.status">verified</span></span><span class="pathpill" data-bind="evidence.links.3.labels.0">export-equivalence evidence</span></div>
+          </div>
+        </div>
+        <div class="link">
+          <div class="spine"><div class="node" data-bind="evidence.links.4.n">5</div><div class="stem"></div></div>
+          <div class="body">
+            <div class="claim"><b>Runtime equivalence.</b> The runtime reproduces the export's outputs to machine precision across 6,492 samples — <i>the runtime did not change the science.</i></div>
+            <div class="meta"><span class="st real"><span class="sd"></span><span data-bind="evidence.links.4.status">verified</span></span><span class="pathpill" data-bind="evidence.links.4.labels.0">6,492 samples · max dev 7.1e-15</span><a class="pathpill" data-scroll="equivalence" style="color:var(--amber);cursor:pointer">see Station 03 →</a></div>
+          </div>
+        </div>
+        <div class="link">
+          <div class="spine"><div class="node" data-bind="evidence.links.5.n">6</div><div class="stem"></div></div>
+          <div class="body">
+            <div class="claim"><b>Runtime integration.</b> The canonical <span class="mono" style="color:var(--mut)">inspect()</span> path carries the real learned signal; the session config is fingerprinted.</div>
+            <div class="meta"><span class="st real"><span class="sd"></span><span data-bind="evidence.links.5.status">integrated</span></span>
+              <div class="hashrow" onclick="kcopy(this,'2893fd…a2e4')" data-copy-bind="evidence.links.5.copy_value" data-copy="2893fd1fc592cb831bfccd9d53c3e784a5aba4ffdfbb58ad4de32eb512c4a2e4"><span class="h" data-bind="evidence.links.5.hash_short" data-prefix="session cfg ">session cfg 2893fd1f…a2e4</span><span class="k-copy"><span class="k-copy-label">copy</span></span></div>
+            </div>
+          </div>
+        </div>
+        <div class="link">
+          <div class="spine"><div class="node" data-bind="evidence.links.6.n">7</div></div>
+          <div class="body">
+            <div class="claim"><b>Deterministic replay + placeholder retirement.</b> The same input, run twice, produces byte-identical governed output across all seven comparisons — and the canonical path no longer uses any placeholder.</div>
+            <div class="meta"><span class="st real"><span class="sd"></span><span data-bind="evidence.links.6.status">passed</span></span><span class="pathpill" data-bind="evidence.links.6.labels.0">runtime_replay.json · 7/7 true</span><span class="pathpill" data-bind="evidence.links.6.labels.1">placeholder_used… : false</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 03 · RUNTIME EQUIVALENCE ===== -->
+    <section class="stn" id="equivalence" data-screen-label="Runtime Equivalence">
+      <div class="stn-head">
+        <div>
+          <span class="kick">Equivalence · The runtime carries exactly the validated signal</span>
+          <div class="stn-title">Proven to machine precision</div>
+        </div>
+        <p class="lede">A serious runtime engineering result: across 6,492 samples the runtime's outputs match the offline-validated signal at the floor of float64 precision — far below the verification tolerance.</p>
+      </div>
+
+      <div class="eq-grid">
+        <div class="card">
+          <div class="card-k">Maximum runtime deviation vs. tolerance</div>
+          <div style="display:flex;align-items:baseline;gap:26px;flex-wrap:wrap">
+            <div>
+              <div class="mono" style="font-size:11px;color:var(--mut4);letter-spacing:.1em;margin-bottom:6px">SAMPLES COMPARED</div>
+              <span class="bignum" data-bind="equivalence.samples_compared">6,492</span>
+            </div>
+            <div>
+              <div class="mono" style="font-size:11px;color:var(--mut4);letter-spacing:.1em;margin-bottom:6px">MAX ABS DEVIATION</div>
+              <span class="bignum" style="font-size:40px" data-bind="equivalence.max_abs_deviation">7.105e-15</span>
+            </div>
+          </div>
+
+          <div class="axis">
+            <div class="track"></div>
+            <!-- log axis 1e-18 .. 1e-9 mapped 0..100% -->
+            <div class="tick" style="left:0%"></div><div class="tlab" style="left:0%">1e-18</div>
+            <div class="tick" style="left:33.3%"></div><div class="tlab" style="left:33.3%">1e-15</div>
+            <div class="tick" style="left:66.6%"></div><div class="tlab" style="left:66.6%">1e-12</div>
+            <div class="tick" style="left:100%"></div><div class="tlab" style="left:100%">1e-9</div>
+            <!-- max deviation 7.1e-15 -> log10=-14.15 -> (−14.15+18)/9 = 42.8% -->
+            <div class="marker" style="left:42.8%;background:var(--green);box-shadow:0 0 8px var(--green)"><div class="mlab" style="color:var(--green)">MAX DEVIATION</div></div>
+            <!-- tolerance 1e-12 -> 66.6% -->
+            <div class="marker" style="left:66.6%;background:var(--amber)"><div class="mlab" style="left:auto;right:0;transform:none;text-align:right;color:var(--amber)">TOLERANCE 1e-12</div></div>
+          </div>
+
+          <p style="font:400 13.5px var(--body);color:var(--mut2);margin-top:10px;line-height:1.6">
+            The maximum deviation sits over <b style="color:var(--ink2)" data-bind="equivalence.deviation_ratio_below_tolerance">140×</b> below the <span data-bind="equivalence.atol">1e-12</span> tolerance — at the noise floor of double-precision arithmetic. In plain terms: <b style="color:var(--ink2)">the runtime carries exactly the validated offline signal.</b>
+          </p>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:14px">
+            <span class="pathpill" data-bind="equivalence.atol" data-prefix="tolerance atol ">tolerance atol 1e-12</span>
+            <span class="pathpill" data-bind="equivalence.rtol" data-prefix="rtol ">rtol 1e-12</span>
+            <span class="pathpill" data-bind="equivalence.localization_exact" data-prefix="localization exact · ">localization exact · 0.0</span>
+          </div>
+        </div>
+
+        <div class="card deep">
+          <div class="card-k">Deterministic replay · run it twice, byte for byte</div>
+          <p style="font:400 13px var(--body);color:var(--mut3);margin-bottom:14px;line-height:1.55">Same input, two independent runs. Every governed comparison in <span class="mono">runtime_replay.json</span> is identical.</p>
+          <div class="replay-row"><span data-bind="equivalence.replay.comparisons.0.name">Artifact identity</span><span class="t" data-bind="equivalence.replay.comparisons.0.value" data-format="bool-check">✓ true</span></div>
+          <div class="replay-row"><span data-bind="equivalence.replay.comparisons.1.name">Predictions</span><span class="t" data-bind="equivalence.replay.comparisons.1.value" data-format="bool-check">✓ true</span></div>
+          <div class="replay-row"><span data-bind="equivalence.replay.comparisons.2.name">Localization</span><span class="t" data-bind="equivalence.replay.comparisons.2.value" data-format="bool-check">✓ true</span></div>
+          <div class="replay-row"><span data-bind="equivalence.replay.comparisons.3.name">Raw anomaly measures</span><span class="t" data-bind="equivalence.replay.comparisons.3.value" data-format="bool-check">✓ true</span></div>
+          <div class="replay-row"><span data-bind="equivalence.replay.comparisons.4.name">Run hash</span><span class="t" data-bind="equivalence.replay.comparisons.4.value" data-format="bool-check">✓ true</span></div>
+          <div class="replay-row"><span data-bind="equivalence.replay.comparisons.5.name">Session config</span><span class="t" data-bind="equivalence.replay.comparisons.5.value" data-format="bool-check">✓ true</span></div>
+          <div class="replay-row"><span data-bind="equivalence.replay.comparisons.6.name">Output digest</span><span class="t" data-bind="equivalence.replay.comparisons.6.value" data-format="bool-check">✓ true</span></div>
+          <div style="display:flex;align-items:center;gap:10px;margin-top:16px;padding-top:15px;border-top:1px solid var(--line)">
+            <span class="st real"><span class="sd"></span><span data-bind="equivalence.replay.status" data-prefix="status: ">status: passed</span></span>
+            <span class="mono" style="font-size:12px;color:var(--mut4)" data-bind="equivalence.replay.comparison_count_label">7 / 7 comparisons</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 04 · ARCHITECTURE ===== -->
+    <section class="stn" id="architecture" data-screen-label="Architecture">
+      <div class="stn-head">
+        <div>
+          <span class="kick">Architecture · A decision flowing through a system</span>
+          <div class="stn-title">Five domains — complete where real, unbuilt where honest</div>
+        </div>
+        <p class="lede">A decision is a chain, not a verdict. This flow is complete from Inspection → Evidence → Evaluation, and deliberately unbuilt at Trust → Review. The gap <b>is</b> the honest story, drawn to scale.</p>
+      </div>
+
+      <div class="arch">
+        <div class="domain real">
+          <span class="st real"><span class="sd"></span><span data-bind="architecture.domains.0.status_label">Real</span></span>
+          <div class="dn" data-bind="architecture.domains.0.name">Inspection Engine</div>
+          <div class="role">What the system sees. Carries the governed PaDiM signal end to end and emits a raw anomaly measure — explicitly <b style="color:#cfd6e0">not</b> confidence.</div>
+        </div>
+        <div class="domain gap">
+          <span class="st gap"><span class="sd"></span><span data-bind="architecture.domains.1.status_label">Not yet</span></span>
+          <div class="dn" data-bind="architecture.domains.1.name">Trust Qualification</div>
+          <div class="role">How far to trust it. Where a raw score would become calibrated confidence and accept / review / reject / abstain. Designed as a contract — <b style="color:#b6c1d4">not yet evidenced.</b></div>
+        </div>
+        <div class="domain gap">
+          <span class="st gap"><span class="sd"></span><span data-bind="architecture.domains.2.status_label">Not yet</span></span>
+          <div class="dn" data-bind="architecture.domains.2.name">Human Review</div>
+          <div class="role">Where uncertainty goes. An architectural seam only — the interactive review loop is <b style="color:#b6c1d4">not yet demonstrated.</b></div>
+        </div>
+        <div class="domain real">
+          <span class="st real"><span class="sd"></span><span data-bind="architecture.domains.3.status_label">Real</span></span>
+          <div class="dn" data-bind="architecture.domains.3.name">Evidence Engine</div>
+          <div class="role">What can be inspected. The governed artifacts and SHA-256 hashes the whole page stands on.</div>
+        </div>
+        <div class="domain real">
+          <span class="st real"><span class="sd"></span><span data-bind="architecture.domains.4.status_label">Real</span></span>
+          <div class="dn" data-bind="architecture.domains.4.name">Evaluation Engine</div>
+          <div class="role">What the science says. Governed C-6 metrics, reported honestly — weak numbers included.</div>
+        </div>
+      </div>
+
+      <div class="archflow">
+        <span data-bind="architecture.flow.0">Inspection</span>
+        <svg width="16" height="12" viewBox="0 0 24 16" fill="none"><path d="M2 8h18M15 3l6 5-6 5" stroke="#5f6975" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span style="color:var(--slate)" data-bind="architecture.flow.1">Trust Qualification</span>
+        <svg width="16" height="12" viewBox="0 0 24 16" fill="none"><path d="M2 8h18M15 3l6 5-6 5" stroke="#5f6975" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span style="color:var(--slate)" data-bind="architecture.flow.2">Human Review</span>
+        <span class="ar"></span>
+        <span data-bind="architecture.flow.3">Evidence</span>
+        <svg width="16" height="12" viewBox="0 0 24 16" fill="none"><path d="M22 8H4M9 3L3 8l6 5" stroke="#5f6975" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span data-bind="architecture.flow.4">Evaluation</span>
+      </div>
+    </section>
+
+    <!-- ===== 05 · WHY TRUST ===== -->
+    <section class="stn" id="trust" data-screen-label="Why Trust This Result">
+      <div class="stn-head">
+        <div>
+          <span class="kick">Trust · Inspectable, not authoritative</span>
+          <div class="stn-title">Why trust this result?</div>
+        </div>
+        <p class="lede">Not a gauge. A plain statement of what is demonstrated, what is not, and how a skeptic can verify every claim without reading the code.</p>
+      </div>
+
+      <div class="three">
+        <div class="card">
+          <div class="col-h" style="color:var(--green)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="#45c46a" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            What is demonstrated
+          </div>
+          <ul>
+            <li><span class="m" style="background:var(--green)"></span><span>A <b>real learned PaDiM signal</b> carried end to end by the runtime.</span></li>
+            <li><span class="m" style="background:var(--green)"></span><span>Runtime <b>equivalence to machine precision</b> across 6,492 samples.</span></li>
+            <li><span class="m" style="background:var(--green)"></span><span><b>Byte-identical deterministic replay</b> across all seven comparisons.</span></li>
+            <li><span class="m" style="background:var(--green)"></span><span>A <b>hash-anchored evidence chain</b> from dataset archive to runtime.</span></li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="col-h" style="color:var(--slate)">
+            <span class="sq" style="width:11px;height:11px;border:1.5px solid var(--slate);transform:rotate(45deg);display:inline-block"></span>
+            What is not
+          </div>
+          <ul>
+            <li><span class="m" style="background:var(--slate)"></span><span><b>No calibrated confidence</b> — the raw measure is not a probability of being correct.</span></li>
+            <li><span class="m" style="background:var(--slate)"></span><span><b>No accept / review / reject routing</b> and <b>no abstention.</b></span></li>
+            <li><span class="m" style="background:var(--slate)"></span><span><b>No drift assessment</b> and <b>no interactive human-review loop.</b></span></li>
+            <li><span class="m" style="background:var(--slate)"></span><span><b>Single seed, VisA-proxy domain</b> — not a production or domain-of-record claim.</span></li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="col-h" style="color:var(--amber)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#e6a23c" stroke-width="2"/><path d="M16 16l5 5" stroke="#e6a23c" stroke-width="2" stroke-linecap="round"/></svg>
+            How to verify
+          </div>
+          <ul>
+            <li><span class="m" style="background:var(--amber)"></span><span>Copy any <b>SHA-256</b> on this page and re-check it against the repository.</span></li>
+            <li><span class="m" style="background:var(--amber)"></span><span>Regenerate the equivalence and replay records from <b>fixed inputs.</b></span></li>
+            <li><span class="m" style="background:var(--amber)"></span><span>Read the governed evidence documents linked at <a data-scroll="repository" style="cursor:pointer">Station 08</a>.</span></li>
+            <li><span class="m" style="background:var(--amber)"></span><span>Every absence above is stated — <b>nothing is hidden</b> in a footnote.</span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 06 · SCIENTIFIC BOUNDARIES ===== -->
+    <section class="stn" id="boundaries" data-screen-label="Scientific Boundaries">
+      <div class="stn-head">
+        <div>
+          <span class="kick">Boundaries · Honesty read as rigor</span>
+          <div class="stn-title">The science, reported honestly</div>
+        </div>
+        <p class="lede">Governed C-6 metrics, each carrying its qualifier inline. The weak numbers are shown, not hidden — evidence that the author reads their own results honestly.</p>
+      </div>
+
+      <div class="metrics">
+        <div class="metric">
+          <div class="mn" data-bind="evaluation.metrics.0.name">Image AUROC</div>
+          <div class="mv" data-bind="evaluation.metrics.0.value">0.757826</div>
+          <div class="mq" data-bind="evaluation.metrics.0.note">Detection quality at the image level.</div>
+        </div>
+        <div class="metric">
+          <div class="mn" data-bind="evaluation.metrics.1.name">Pixel AUROC</div>
+          <div class="mv" data-bind="evaluation.metrics.1.value">0.865196</div>
+          <div class="mq" data-bind="evaluation.metrics.1.note">Localization quality at the pixel level.</div>
+        </div>
+        <div class="metric">
+          <div class="mn" data-bind="evaluation.metrics.2.name">AUPRO</div>
+          <div class="mv" data-bind="evaluation.metrics.2.value">0.555765</div>
+          <div class="mq" data-bind="evaluation.metrics.2.note">Per-region overlap — the harder, more honest localization measure.</div>
+        </div>
+      </div>
+
+      <div class="qualbar">
+        <span class="sq"></span>
+        <span>Every metric above is <b style="color:var(--mut)" data-bind="evaluation.qualifier">single-seed, VisA-proxy only</b> The qualifier travels with the number, always. Diagnostic weakness is named too — per-class precision falls as low as <b style="color:var(--amber)" data-bind="evaluation.weakest_precision">0.209</b> (high false positives). It is shown, not buried.</span>
+      </div>
+
+      <div class="card">
+        <div class="card-k">Not yet demonstrated — one consistent, calm convention</div>
+        <div class="nyd-list">
+          <div class="nyd-item"><span class="sq"></span><span data-bind="boundaries.not_yet_demonstrated.0">Calibrated confidence</span></div>
+          <div class="nyd-item"><span class="sq"></span><span data-bind="boundaries.not_yet_demonstrated.1">Accept / review / reject routing</span></div>
+          <div class="nyd-item"><span class="sq"></span><span data-bind="boundaries.not_yet_demonstrated.2">Abstention on low confidence</span></div>
+          <div class="nyd-item"><span class="sq"></span><span data-bind="boundaries.not_yet_demonstrated.3">Drift assessment</span></div>
+          <div class="nyd-item"><span class="sq"></span><span data-bind="boundaries.not_yet_demonstrated.4">Interactive human-review loop</span></div>
+          <div class="nyd-item"><span class="sq"></span><span data-bind="boundaries.not_yet_demonstrated.5">Multi-seed variance</span></div>
+          <div class="nyd-item"><span class="sq"></span><span data-bind="boundaries.not_yet_demonstrated.6">Multiple model families</span></div>
+          <div class="nyd-item"><span class="sq"></span><span data-bind="boundaries.not_yet_demonstrated.7">Real-time / on-device inference</span></div>
+          <div class="nyd-item"><span class="sq"></span><span data-bind="boundaries.not_yet_demonstrated.8">Production / deployment</span></div>
+        </div>
+      </div>
+
+      <p class="reframe">A clearly drawn limit is <b data-bind="boundaries.reframe_emphasis">a sign of understanding, not a gap.</b> The trust-qualification layer is the thesis of the whole system — and Kalibra says, in the same calm voice it uses for its proofs, that it is not yet demonstrated.</p>
+    </section>
+
+    <!-- ===== 07 · ENGINEERING TIMELINE ===== -->
+    <section class="stn" id="timeline" data-screen-label="Engineering Timeline">
+      <div class="stn-head">
+        <div>
+          <span class="kick">Timeline · Governance as a build history</span>
+          <div class="stn-title">How it was built, and proven</div>
+        </div>
+        <p class="lede">Process is only interesting once the output is believed. The phase lineage turns the repository's own governance discipline into an inspectable artifact.</p>
+      </div>
+
+      <div class="tl">
+        <details class="phase">
+          <summary>
+            <div class="pnum" data-bind="timeline.phases.0.id">P1</div>
+            <div><div class="pt" data-bind="timeline.phases.0.title">Engineering substrate</div><div class="ps" data-bind="timeline.phases.0.subtitle">Governed foundation, five-domain architecture, reproducible offline boundary.</div></div>
+            <span class="caret">▸</span>
+          </summary>
+          <div class="detail">
+            <div class="di"><span class="m"></span><span data-bind="timeline.phases.0.items.0">Offline, batch, locally reproducible system boundary defined.</span></div>
+            <div class="di"><span class="m"></span><span data-bind="timeline.phases.0.items.1">Five engineering domains established as architectural boundaries.</span></div>
+            <div class="di"><span class="m"></span><span data-bind="timeline.phases.0.items.2">SHA-256 governance introduced across every artifact.</span></div>
+          </div>
+        </details>
+        <details class="phase" open>
+          <summary>
+            <div class="pnum" data-bind="timeline.phases.1.id">P2</div>
+            <div><div class="pt" data-bind="timeline.phases.1.title">Offline science</div><div class="ps" data-bind="timeline.phases.1.subtitle">Governed VisA acquisition, PaDiM baseline, C-6 scientific evaluation.</div></div>
+            <span class="caret">▸</span>
+          </summary>
+          <div class="detail">
+            <div class="di"><span class="m"></span>Governed VisA proxy acquisition (<span class="mono" style="color:var(--mut)" data-bind="timeline.phases.1.labels.0">visa-acq-v1</span>) — archive + split hashed.</div>
+            <div class="di"><span class="m"></span>PaDiM baseline fit (<span class="mono" style="color:var(--mut)" data-bind="timeline.phases.1.labels.1">visa-padim-baseline-fit-v1</span>) with training replay.</div>
+            <div class="di"><span class="m"></span>C-6 evaluation: Image AUROC <span data-bind="evaluation.metrics.0.value">0.757826</span> · Pixel AUROC <span data-bind="evaluation.metrics.1.value">0.865196</span> · AUPRO <span data-bind="evaluation.metrics.2.value">0.555765</span> (<span data-bind="evaluation.qualifier">single-seed, VisA-proxy only</span>).</div>
+          </div>
+        </details>
+        <details class="phase" open>
+          <summary>
+            <div class="pnum" data-bind="timeline.phases.2.id">P3</div>
+            <div><div class="pt" data-bind="timeline.phases.2.title">Runtime integration</div><div class="ps" data-bind="timeline.phases.2.subtitle">ONNX export, export- &amp; runtime-equivalence, replay, placeholder retirement.</div></div>
+            <span class="caret">▸</span>
+          </summary>
+          <div class="detail">
+            <div class="di"><span class="m"></span>Governed ONNX export (opset <span data-bind="evidence.onnx.opset">18</span>, IR <span data-bind="evidence.onnx.ir_version">10</span>) + export-equivalence vs PyTorch.</div>
+            <div class="di"><span class="m"></span>Runtime equivalence: <span data-bind="equivalence.samples_compared">6,492</span> samples, max deviation <span data-bind="equivalence.max_abs_deviation">7.105e-15</span> (tolerance <span data-bind="equivalence.atol">1e-12</span>).</div>
+            <div class="di"><span class="m"></span>Deterministic replay <span class="mono" style="color:var(--green)" data-bind="equivalence.replay.status" data-prefix="status: ">status: passed</span> — <span data-bind="equivalence.replay.compact_comparison_count_label">7/7 comparisons</span> byte-identical.</div>
+            <div class="di"><span class="m"></span>Canonical placeholder retired — <span class="mono" style="color:var(--mut)" data-bind="runtime.carried.3.source_field">placeholder_used_on_canonical_runtime_path: false</span>.</div>
+          </div>
+        </details>
+        <div style="display:flex;align-items:center;gap:12px;padding:14px 22px 4px">
+          <span class="st amber"><span class="sd"></span><span data-bind="timeline.next_label">Next</span></span>
+          <span style="font:400 13px var(--body);color:var(--mut3)">Trust qualification — calibration, routing, abstention, drift, human review. <b style="color:var(--slate)" data-bind="timeline.next_status">Designed, not yet evidenced.</b></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 08 · REPOSITORY / VERIFY ===== -->
+    <section class="stn" id="repository" data-screen-label="Repository / Verify" style="border-bottom:none">
+      <div class="stn-head">
+        <div>
+          <span class="kick">Verify · The exit is a re-check, not a signup</span>
+          <div class="stn-title">Reproduce it yourself</div>
+        </div>
+        <p class="lede">The page earns the click to the repository by first proving the work is worth reading. Every claim regenerates from a fixed starting point.</p>
+      </div>
+
+      <div class="verify-grid">
+        <div>
+          <div class="term">
+            <div class="bar"><b style="background:#e5514e"></b><b style="background:#e6a23c"></b><b style="background:#45c46a"></b><span class="l">verify — governed re-check</span></div>
+<pre><span class="c"># 1 · confirm the model artifact fingerprint</span>
+<span class="a">sha256sum</span> artifacts/padim/model.onnx
+<span class="g" data-bind="meta.model_sha256_short">0437ae28…741a</span>
+
+<span class="c"># 2 · runtime provider integration</span>
+<span class="a">python3</span> scripts/run_runtime_provider_integration.py verify
+<span class="g" data-bind="runtime.integration_status" data-prefix="status: ">status: passed</span>
+
+<span class="c"># 3 · runtime equivalence</span>
+<span class="a">python3</span> scripts/verify_padim_runtime_equivalence.py verify
+<span class="g"><span data-bind="equivalence.samples_compared_plain">6492</span> samples · max_abs_dev <span data-bind="equivalence.max_abs_deviation">7.105e-15</span> &lt; <span data-bind="equivalence.atol">1e-12</span></span>
+
+<span class="c"># 4 · placeholder retirement</span>
+<span class="a">python3</span> scripts/verify_placeholder_retirement.py verify
+<span class="g" data-bind="runtime.carried.3.source_field">placeholder_used_on_canonical_runtime_path: false</span></pre>
+          </div>
+          <div class="repo-cta">
+            <svg class="hex" width="30" height="34" viewBox="0 0 34 38"><polygon points="17,2 32,10.5 32,27.5 17,36 2,27.5 2,10.5" fill="none" stroke="#e6a23c" stroke-width="2"></polygon><circle cx="17" cy="19" r="3.4" fill="#e6a23c"></circle></svg>
+            <div>
+              <div style="font:500 14px var(--disp);color:var(--ink)">Kalibra repository</div>
+              <div style="font:400 12px var(--body);color:var(--mut3);margin-top:2px">Static site lives next to the source · GitHub Pages · review HEAD <span class="mono" data-bind="meta.review_head">6cd5d5e</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card deep">
+          <div class="card-k">Where the evidence lives</div>
+          <div class="kv"><span class="k" data-bind="evidence.locations.0.label">Scientific evaluation (C-6)</span><span class="v" data-bind="evidence.locations.0.path_short">docs/evidence/…EVALUATION</span></div>
+          <div class="kv"><span class="k" data-bind="evidence.locations.1.label">Runtime equivalence</span><span class="v" data-bind="evidence.locations.1.path_short">docs/evidence/…EQUIVALENCE</span></div>
+          <div class="kv"><span class="k" data-bind="evidence.locations.2.label">Runtime provider integration</span><span class="v" data-bind="evidence.locations.2.path_short">docs/evidence/…INTEGRATION</span></div>
+          <div class="kv"><span class="k" data-bind="evidence.locations.3.label">Placeholder retirement</span><span class="v" data-bind="evidence.locations.3.path_short">docs/evidence/…RETIREMENT</span></div>
+          <div class="kv"><span class="k" data-bind="evidence.locations.4.label">Runtime artifacts</span><span class="v" data-bind="evidence.locations.4.path_short">artifacts/runtime/*.json</span></div>
+          <div style="display:flex;align-items:center;gap:10px;margin-top:16px;padding-top:15px;border-top:1px solid var(--line)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M4 12a8 8 0 018-8m8 8a8 8 0 01-8 8" stroke="#45c46a" stroke-width="2" stroke-linecap="round"/><path d="M12 4l3 3-3 3M12 20l-3-3 3-3" stroke="#45c46a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span style="font:400 12.5px var(--body);color:var(--mut3)">Regenerable from fixed inputs · no live inference, ever.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== FOOTER PRINCIPLES ===== -->
+    <div class="footer-principles">
+      <div class="fp"><div class="t" style="color:var(--amber)">One source of truth</div><div class="s">Inspection and evidence from the same governed artifacts.</div></div>
+      <div class="fp"><div class="t" style="color:var(--amber)">Evidence by construction</div><div class="s">Every claim is adjacent to a hash you can re-check.</div></div>
+      <div class="fp"><div class="t" style="color:var(--amber)">Honesty over capability</div><div class="s">Absence is designed and labeled, never faked.</div></div>
+      <div class="fp"><div class="t" style="color:var(--amber)">Engineered for trust</div><div class="s">Not just a result — a <i>trustworthy</i> result.</div></div>
+    </div>
+    <div class="proto-note">
+      Design handoff v1.0 · visually identical to the approved v0.2 prototype · no CDN, no external libraries, no live inference. Fonts reference the Kalibra identity (Space&nbsp;Grotesk / IBM&nbsp;Plex) with system fallbacks. All values shown are governed artifact values or explicit &ldquo;not yet demonstrated&rdquo; states — no fabricated metrics. Bound to the Portfolio UX Architecture v1.0.
+    </div>
+
+  </main>
+</div>
+
+<!-- KALIBRA_DATA:START -->
+<script type="application/json" id="kalibra-data">{
+  "architecture": {
+    "domains": [
+      {
+        "name": "Inspection Engine",
+        "role": "What the system sees.",
+        "status": "real",
+        "status_label": "Real"
+      },
+      {
+        "name": "Trust Qualification",
+        "role": "How far to trust it. Not yet evidenced.",
+        "status": "gap",
+        "status_label": "Not yet"
+      },
+      {
+        "name": "Human Review",
+        "role": "Where uncertainty goes. Not yet demonstrated.",
+        "status": "gap",
+        "status_label": "Not yet"
+      },
+      {
+        "name": "Evidence Engine",
+        "role": "What can be inspected.",
+        "status": "real",
+        "status_label": "Real"
+      },
+      {
+        "name": "Evaluation Engine",
+        "role": "What the science says.",
+        "status": "real",
+        "status_label": "Real"
+      }
+    ],
+    "flow": [
+      "Inspection",
+      "Trust Qualification",
+      "Human Review",
+      "Evidence",
+      "Evaluation"
+    ]
+  },
+  "boundaries": {
+    "not_yet_demonstrated": [
+      "Calibrated confidence",
+      "Accept / review / reject routing",
+      "Abstention on low confidence",
+      "Drift assessment",
+      "Interactive human-review loop",
+      "Multi-seed variance",
+      "Multiple model families",
+      "Real-time / on-device inference",
+      "Production / deployment"
+    ],
+    "primary_absence": "Calibrated confidence — not yet demonstrated.",
+    "reframe": "A clearly drawn limit is a sign of understanding, not a gap.",
+    "reframe_emphasis": "a sign of understanding, not a gap."
+  },
+  "equivalence": {
+    "atol": "1e-12",
+    "deviation_ratio_below_tolerance": "140×",
+    "localization_exact": "0.0",
+    "max_abs_deviation": "7.105e-15",
+    "max_abs_deviation_full": "7.105427357601002e-15",
+    "max_abs_deviation_short": "7.1e-15",
+    "max_relative_deviation": "3.586867160478407e-15",
+    "replay": {
+      "compact_comparison_count_label": "7/7 comparisons",
+      "comparison_count_label": "7 / 7 comparisons",
+      "comparisons": [
+        {
+          "name": "Artifact identity",
+          "value": true
+        },
+        {
+          "name": "Predictions",
+          "value": true
+        },
+        {
+          "name": "Localization",
+          "value": true
+        },
+        {
+          "name": "Raw anomaly measures",
+          "value": true
+        },
+        {
+          "name": "Run hash",
+          "value": true
+        },
+        {
+          "name": "Session config",
+          "value": true
+        },
+        {
+          "name": "Output digest",
+          "value": true
+        }
+      ],
+      "short_claim": "byte-identical second run",
+      "status": "passed"
+    },
+    "rtol": "1e-12",
+    "samples_compared": "6,492",
+    "samples_compared_plain": "6492"
+  },
+  "evaluation": {
+    "metrics": [
+      {
+        "name": "Image AUROC",
+        "note": "Detection quality at the image level.",
+        "value": "0.757826"
+      },
+      {
+        "name": "Pixel AUROC",
+        "note": "Localization quality at the pixel level.",
+        "value": "0.865196"
+      },
+      {
+        "name": "AUPRO",
+        "note": "Per-region overlap — the harder, more honest localization measure.",
+        "value": "0.555765"
+      }
+    ],
+    "qualifier": "single-seed, VisA-proxy only",
+    "weakest_precision": "0.209"
+  },
+  "evidence": {
+    "links": [
+      {
+        "claim": "Governed dataset.",
+        "labels": [
+          "visa-acq-v1",
+          "archive + split SHA-256 in repo"
+        ],
+        "n": 1,
+        "status": "governed"
+      },
+      {
+        "claim": "PaDiM baseline fit.",
+        "labels": [
+          "visa-padim-baseline-fit-v1"
+        ],
+        "n": 2,
+        "status": "replay"
+      },
+      {
+        "claim": "ONNX export.",
+        "copy_value": "0437ae28e172489387da07c4bd1f0c6b1ed95f3970ca3c7fa1dcd55935bd741a",
+        "hash_short": "0437ae28…741a",
+        "n": 3,
+        "status": "governed"
+      },
+      {
+        "claim": "Export equivalence.",
+        "labels": [
+          "export-equivalence evidence"
+        ],
+        "n": 4,
+        "status": "verified"
+      },
+      {
+        "claim": "Runtime equivalence.",
+        "labels": [
+          "6,492 samples · max dev 7.1e-15"
+        ],
+        "n": 5,
+        "status": "verified"
+      },
+      {
+        "claim": "Runtime integration.",
+        "copy_value": "2893fd1fc592cb831bfccd9d53c3e784a5aba4ffdfbb58ad4de32eb512c4a2e4",
+        "hash_short": "2893fd1f…a2e4",
+        "n": 6,
+        "status": "integrated"
+      },
+      {
+        "claim": "Deterministic replay + placeholder retirement.",
+        "labels": [
+          "runtime_replay.json · 7/7 true",
+          "placeholder_used… : false"
+        ],
+        "n": 7,
+        "status": "passed"
+      }
+    ],
+    "locations": [
+      {
+        "label": "Scientific evaluation (C-6)",
+        "path": "docs/evidence/KALIBRA_SCIENTIFIC_EVALUATION_EVIDENCE_v1.0.md",
+        "path_short": "docs/evidence/…EVALUATION"
+      },
+      {
+        "label": "Runtime equivalence",
+        "path": "docs/evidence/KALIBRA_RUNTIME_EQUIVALENCE_VERIFICATION_EVIDENCE_v1.0.md",
+        "path_short": "docs/evidence/…EQUIVALENCE"
+      },
+      {
+        "label": "Runtime provider integration",
+        "path": "docs/evidence/KALIBRA_RUNTIME_PROVIDER_INTEGRATION_EVIDENCE_v1.0.md",
+        "path_short": "docs/evidence/…INTEGRATION"
+      },
+      {
+        "label": "Placeholder retirement",
+        "path": "docs/evidence/KALIBRA_PLACEHOLDER_RETIREMENT_EVIDENCE_v1.0.md",
+        "path_short": "docs/evidence/…RETIREMENT"
+      },
+      {
+        "label": "Runtime artifacts",
+        "path": "artifacts/runtime/*.json",
+        "path_short": "artifacts/runtime/*.json"
+      }
+    ],
+    "onnx": {
+      "ir_version": "10",
+      "opset": "18"
+    }
+  },
+  "meta": {
+    "evidence_basis": "Single-seed · VisA-proxy",
+    "evidence_basis_sentence": "Single-seed, VisA-proxy evidence.",
+    "hero_proof_title": "RUNTIME EQUIVALENCE: VERIFIED · REPLAY: PASSED",
+    "model_sha256": "0437ae28e172489387da07c4bd1f0c6b1ed95f3970ca3c7fa1dcd55935bd741a",
+    "model_sha256_short": "0437ae28…741a",
+    "offline_mode": true,
+    "review_head": "6cd5d5e"
+  },
+  "runtime": {
+    "carried": [
+      {
+        "name": "Learned PaDiM signal, end to end",
+        "status": "real"
+      },
+      {
+        "name": "Governed model artifact",
+        "status": "hash-anchored"
+      },
+      {
+        "name": "Deterministic replay",
+        "status": "byte-identical"
+      },
+      {
+        "name": "Placeholder on canonical path",
+        "source_field": "placeholder_used_on_canonical_runtime_path: false",
+        "status": "retired · false"
+      }
+    ],
+    "determinism": "single-thread · ORT_DISABLE_ALL · CPU EP",
+    "feature_contract": "…rgb64-bilinear-float64-patch8-v1",
+    "input": {
+      "class_name": "candle",
+      "content_hash_short": "8b719296…0da45e",
+      "fixture": "4×4 PGM",
+      "fixture_tag": "INPUT · 4×4 PGM fixture",
+      "name": "blob_defect.pgm",
+      "projection_label": "Local-provider projection"
+    },
+    "integration_status": "passed",
+    "localization": {
+      "display_label": "LOCALIZATION · x 0.25–0.75, y 0.25–0.75",
+      "x": "0.25–0.75",
+      "y": "0.25–0.75"
+    },
+    "model_identity": "kalibra-padim-onnx-export-v1",
+    "model_sha256_short": "0437ae28…741a",
+    "precomputed_note": "Precomputed from a governed offline run. Kalibra does not run inference in your browser — this is a projection of a recorded local-provider result.",
+    "raw_anomaly_measure": "75.00",
+    "raw_bar_percent": "75",
+    "raw_scale_max": "100",
+    "session_config_hash_short": "2893fd1f…a2e4",
+    "toolchain": "onnxruntime 1.19.2 · numpy 2.0.2 · python 3.9.6",
+    "trust": {
+      "absent": [
+        "Calibrated confidence",
+        "Outcome routing",
+        "Drift"
+      ],
+      "state": "not_yet_demonstrated"
+    },
+    "verdict": "DEFECT"
+  },
+  "timeline": {
+    "next": "Trust qualification — calibration, routing, abstention, drift, human review. Designed, not yet evidenced.",
+    "next_label": "Next",
+    "next_status": "Designed, not yet evidenced.",
+    "phases": [
+      {
+        "id": "P1",
+        "items": [
+          "Offline, batch, locally reproducible system boundary defined.",
+          "Five engineering domains established as architectural boundaries.",
+          "SHA-256 governance introduced across every artifact."
+        ],
+        "open": false,
+        "subtitle": "Governed foundation, five-domain architecture, reproducible offline boundary.",
+        "title": "Engineering substrate"
+      },
+      {
+        "id": "P2",
+        "labels": [
+          "visa-acq-v1",
+          "visa-padim-baseline-fit-v1"
+        ],
+        "open": true,
+        "subtitle": "Governed VisA acquisition, PaDiM baseline, C-6 scientific evaluation.",
+        "title": "Offline science"
+      },
+      {
+        "id": "P3",
+        "open": true,
+        "subtitle": "ONNX export, export- & runtime-equivalence, replay, placeholder retirement.",
+        "title": "Runtime integration"
+      }
+    ]
+  }
+}</script>
+<!-- KALIBRA_DATA:END -->
+<script src="app.js"></script>
+</body>
+</html>

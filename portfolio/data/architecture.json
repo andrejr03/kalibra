@@ -1,0 +1,41 @@
+{
+  "domains": [
+    {
+      "name": "Inspection Engine",
+      "role": "What the system sees.",
+      "status": "real",
+      "status_label": "Real"
+    },
+    {
+      "name": "Trust Qualification",
+      "role": "How far to trust it. Not yet evidenced.",
+      "status": "gap",
+      "status_label": "Not yet"
+    },
+    {
+      "name": "Human Review",
+      "role": "Where uncertainty goes. Not yet demonstrated.",
+      "status": "gap",
+      "status_label": "Not yet"
+    },
+    {
+      "name": "Evidence Engine",
+      "role": "What can be inspected.",
+      "status": "real",
+      "status_label": "Real"
+    },
+    {
+      "name": "Evaluation Engine",
+      "role": "What the science says.",
+      "status": "real",
+      "status_label": "Real"
+    }
+  ],
+  "flow": [
+    "Inspection",
+    "Trust Qualification",
+    "Human Review",
+    "Evidence",
+    "Evaluation"
+  ]
+}

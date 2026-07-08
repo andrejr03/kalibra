@@ -1,0 +1,21 @@
+{
+  "metrics": [
+    {
+      "name": "Image AUROC",
+      "note": "Detection quality at the image level.",
+      "value": "0.757826"
+    },
+    {
+      "name": "Pixel AUROC",
+      "note": "Localization quality at the pixel level.",
+      "value": "0.865196"
+    },
+    {
+      "name": "AUPRO",
+      "note": "Per-region overlap — the harder, more honest localization measure.",
+      "value": "0.555765"
+    }
+  ],
+  "qualifier": "single-seed, VisA-proxy only",
+  "weakest_precision": "0.209"
+}

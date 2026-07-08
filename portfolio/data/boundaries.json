@@ -1,0 +1,16 @@
+{
+  "not_yet_demonstrated": [
+    "Calibrated confidence",
+    "Accept / review / reject routing",
+    "Abstention on low confidence",
+    "Drift assessment",
+    "Interactive human-review loop",
+    "Multi-seed variance",
+    "Multiple model families",
+    "Real-time / on-device inference",
+    "Production / deployment"
+  ],
+  "primary_absence": "Calibrated confidence — not yet demonstrated.",
+  "reframe": "A clearly drawn limit is a sign of understanding, not a gap.",
+  "reframe_emphasis": "a sign of understanding, not a gap."
+}

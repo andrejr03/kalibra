@@ -34,22 +34,76 @@ rather than merely claimed.
 
 ## Current Status
 
-Kalibra has completed its engineering foundation. The public architecture,
-requirements, evaluation methodology, dataset strategy, roadmap, and engineering
-plan now define the system's scope and boundaries.
+Kalibra has completed its documented engineering foundation and now has a
+governed offline inspection runtime. The current implemented slice includes a
+governed VisA proxy dataset, a PaDiM baseline, C-6 scientific evaluation, a
+governed ONNX runtime, export and runtime equivalence, deterministic replay, and
+retirement of the placeholder from the canonical runtime path.
 
-The five engineering domains have been implemented as architectural boundaries.
-Implementation of the inspection, trust qualification, review, evidence, and
-evaluation behavior is ongoing.
+The trust-qualification layer is designed but not yet evidenced. Kalibra does
+not yet produce calibrated confidence, accept / review / reject routing,
+abstention, drift assessment, or an interactive human-review loop.
 
 - [x] Engineering foundation documented
 - [x] Offline, batch, reproducible system boundary defined
 - [x] Five-domain architecture established
-- [x] Official workbench prototype created
-- [ ] Computer vision implementation
+- [x] Governed dataset, PaDiM baseline, and C-6 scientific evaluation
+- [x] Governed ONNX runtime with export and runtime equivalence, deterministic replay
 - [ ] Calibrated trust qualification
-- [ ] Evidence-backed evaluation results
+- [ ] Interactive human review and drift
 - [ ] End-to-end validation
+
+---
+
+## Project Maturity
+
+The offline inspection runtime is implemented and governed for the present
+single-seed VisA-proxy evidence base. The system is not production-ready and
+does not make a calibrated-confidence or domain-of-record performance claim.
+
+---
+
+## Portfolio Experience
+
+Overview station for the static portfolio experience.
+
+![Portfolio overview station](assets/portfolio-experience/screenshots/hero.png)
+
+Runtime inspection station showing the governed local-provider projection.
+
+![Runtime inspection station](assets/portfolio-experience/screenshots/runtime-inspection.png)
+
+Evidence chain station showing provenance from dataset to deterministic replay.
+
+![Evidence chain station](assets/portfolio-experience/screenshots/evidence-chain.png)
+
+Runtime equivalence station showing sample count, deviation, and replay status.
+
+![Runtime equivalence station](assets/portfolio-experience/screenshots/runtime-equivalence.png)
+
+Architecture station showing implemented and not-yet-demonstrated domains.
+
+![Architecture station](assets/portfolio-experience/screenshots/architecture.png)
+
+Trust explanation station separating demonstrated evidence from absent trust features.
+
+![Why trust this result station](assets/portfolio-experience/screenshots/why-trust-this-result.png)
+
+Scientific boundaries station showing metrics and explicit limitations.
+
+![Scientific boundaries station](assets/portfolio-experience/screenshots/scientific-boundaries.png)
+
+Engineering timeline station showing the governed build history.
+
+![Engineering timeline station](assets/portfolio-experience/screenshots/engineering-timeline.png)
+
+Repository verification station showing reproducibility commands and evidence paths.
+
+![Repository verification station](assets/portfolio-experience/screenshots/repository-verify.png)
+
+The static portfolio experience is implemented in `portfolio/` and is generated
+from governed repository artifacts. It is configured for GitHub Pages at
+`https://andrejr03.github.io/kalibra/` once Pages is enabled with GitHub Actions.
 
 ---
 
@@ -89,6 +143,7 @@ recorded, reproducible evidence.
 - `docs/` - public foundation, architecture, requirements, methodology, roadmap,
   and engineering plan.
 - `assets/` - project visuals and the official workbench prototype.
+- `portfolio/` - deployable static Portfolio Experience for GitHub Pages.
 - `README.md` - concise public overview of the current project state.
 
 ---

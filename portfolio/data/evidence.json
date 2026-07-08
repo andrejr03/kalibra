@@ -1,0 +1,91 @@
+{
+  "links": [
+    {
+      "claim": "Governed dataset.",
+      "labels": [
+        "visa-acq-v1",
+        "archive + split SHA-256 in repo"
+      ],
+      "n": 1,
+      "status": "governed"
+    },
+    {
+      "claim": "PaDiM baseline fit.",
+      "labels": [
+        "visa-padim-baseline-fit-v1"
+      ],
+      "n": 2,
+      "status": "replay"
+    },
+    {
+      "claim": "ONNX export.",
+      "copy_value": "0437ae28e172489387da07c4bd1f0c6b1ed95f3970ca3c7fa1dcd55935bd741a",
+      "hash_short": "0437ae28…741a",
+      "n": 3,
+      "status": "governed"
+    },
+    {
+      "claim": "Export equivalence.",
+      "labels": [
+        "export-equivalence evidence"
+      ],
+      "n": 4,
+      "status": "verified"
+    },
+    {
+      "claim": "Runtime equivalence.",
+      "labels": [
+        "6,492 samples · max dev 7.1e-15"
+      ],
+      "n": 5,
+      "status": "verified"
+    },
+    {
+      "claim": "Runtime integration.",
+      "copy_value": "2893fd1fc592cb831bfccd9d53c3e784a5aba4ffdfbb58ad4de32eb512c4a2e4",
+      "hash_short": "2893fd1f…a2e4",
+      "n": 6,
+      "status": "integrated"
+    },
+    {
+      "claim": "Deterministic replay + placeholder retirement.",
+      "labels": [
+        "runtime_replay.json · 7/7 true",
+        "placeholder_used… : false"
+      ],
+      "n": 7,
+      "status": "passed"
+    }
+  ],
+  "locations": [
+    {
+      "label": "Scientific evaluation (C-6)",
+      "path": "docs/evidence/KALIBRA_SCIENTIFIC_EVALUATION_EVIDENCE_v1.0.md",
+      "path_short": "docs/evidence/…EVALUATION"
+    },
+    {
+      "label": "Runtime equivalence",
+      "path": "docs/evidence/KALIBRA_RUNTIME_EQUIVALENCE_VERIFICATION_EVIDENCE_v1.0.md",
+      "path_short": "docs/evidence/…EQUIVALENCE"
+    },
+    {
+      "label": "Runtime provider integration",
+      "path": "docs/evidence/KALIBRA_RUNTIME_PROVIDER_INTEGRATION_EVIDENCE_v1.0.md",
+      "path_short": "docs/evidence/…INTEGRATION"
+    },
+    {
+      "label": "Placeholder retirement",
+      "path": "docs/evidence/KALIBRA_PLACEHOLDER_RETIREMENT_EVIDENCE_v1.0.md",
+      "path_short": "docs/evidence/…RETIREMENT"
+    },
+    {
+      "label": "Runtime artifacts",
+      "path": "artifacts/runtime/*.json",
+      "path_short": "artifacts/runtime/*.json"
+    }
+  ],
+  "onnx": {
+    "ir_version": "10",
+    "opset": "18"
+  }
+}
