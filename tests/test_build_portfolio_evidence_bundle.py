@@ -159,6 +159,30 @@ def test_cli_check_mode_passes_after_generate(tmp_path):
     )
 
 
+def test_check_mode_uses_committed_review_head_by_default(tmp_path, monkeypatch):
+    repo = _copy_minimal_repo(tmp_path)
+    builder.generate_portfolio(repo, review_head="abc1234")
+
+    def fail_if_head_is_read(repo_root: Path) -> str:
+        raise AssertionError("check mode must not read current git HEAD")
+
+    monkeypatch.setattr(builder, "current_git_head", fail_if_head_is_read)
+
+    assert builder.main(["--repo-root", str(repo), "--check"]) == 0
+    assert (
+        builder.main(
+            [
+                "--repo-root",
+                str(repo),
+                "--check",
+                "--review-head",
+                "def5678",
+            ]
+        )
+        == 1
+    )
+
+
 def _copy_minimal_repo(tmp_path: Path) -> Path:
     repo = tmp_path / "repo"
     paths = [

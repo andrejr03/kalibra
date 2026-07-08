@@ -67,9 +67,9 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     repo_root = args.repo_root.expanduser().resolve()
-    review_head = args.review_head or current_git_head(repo_root)
     try:
         if args.check:
+            review_head = args.review_head or committed_portfolio_review_head(repo_root)
             diffs = check_portfolio(repo_root, review_head=review_head)
             if diffs:
                 print("portfolio evidence bundle drift detected:", file=sys.stderr)
@@ -77,6 +77,7 @@ def main(argv: list[str] | None = None) -> int:
                     print(f"- {diff}", file=sys.stderr)
                 return 1
             return 0
+        review_head = args.review_head or current_git_head(repo_root)
         generate_portfolio(repo_root, review_head=review_head)
         return 0
     except PortfolioEvidenceError as exc:
@@ -94,6 +95,17 @@ def current_git_head(repo_root: Path) -> str:
         stderr=subprocess.PIPE,
     )
     return completed.stdout.strip()
+
+
+def committed_portfolio_review_head(repo_root: Path) -> str:
+    meta_path = repo_root / "portfolio/data/meta.json"
+    meta = read_json_required(meta_path)
+    review_head = require_path(meta, "review_head", str(meta_path))
+    if not isinstance(review_head, str) or not review_head:
+        raise PortfolioEvidenceError(
+            f"{meta_path} has invalid required field review_head"
+        )
+    return review_head
 
 
 def generate_portfolio(repo_root: Path, *, review_head: str) -> None:
