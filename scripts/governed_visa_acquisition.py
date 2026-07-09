@@ -28,10 +28,7 @@ SPLITS_DIR = MANIFESTS_DIR / "splits"
 PROVENANCE_DIR = DATA_ROOT / "provenance"
 DERIVED_DIR = DATA_ROOT / "derived"
 EVIDENCE_PATH = (
-    REPO_ROOT
-    / "docs"
-    / "evidence"
-    / "KALIBRA_GOVERNED_VISA_ACQUISITION_EVIDENCE_v1.0.md"
+    REPO_ROOT / "docs" / "evidence" / "VISA_ACQUISITION.md"
 )
 
 ARCHIVE_FILENAME = "VisA_20220922.tar"

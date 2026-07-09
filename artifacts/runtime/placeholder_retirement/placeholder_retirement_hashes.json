@@ -1,7 +1,7 @@
 {
   "governed_retirement_artifacts": {
-    "placeholder_retirement_metadata.json": "31846ea244ff7b2d297db0f0a101a114ca824b7267bb08c91b26c5fe419fbd48",
-    "placeholder_retirement_replay.json": "6cdd804b46f26fbe4743e12b501f2dca984233f5f271ed2771d1f44b5ae21450"
+    "placeholder_retirement_metadata.json": "3915e5e09617b22c175c5974a4b44efa0a773096dfaf9cdcba1f2a346e577861",
+    "placeholder_retirement_replay.json": "50ed3fb0561b0a14eb271cab1081f31bfe79cfb278a6e43395506c5fcf5563e3"
   },
   "hash_algorithm": "sha256",
   "hash_scope": "artifacts/runtime/placeholder_retirement/placeholder_retirement_metadata.json and artifacts/runtime/placeholder_retirement/placeholder_retirement_replay.json",

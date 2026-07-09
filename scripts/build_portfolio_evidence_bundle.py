@@ -162,16 +162,13 @@ def build_bundles(repo_root: Path, *, review_head: str) -> dict[str, Any]:
         / "artifacts/runtime/equivalence/runtime_equivalence_report.json"
     )
     scientific_evidence = read_text_required(
-        repo_root
-        / "docs/evidence/KALIBRA_SCIENTIFIC_EVALUATION_EVIDENCE_v1.0.md"
+        repo_root / "docs/evidence/SCIENTIFIC_EVALUATION.md"
     )
     architecture_doc = read_text_required(
-        repo_root / "docs/plans/KALIBRA_PORTFOLIO_UX_ARCHITECTURE_v1.0.md"
+        repo_root / "docs/engineering/PORTFOLIO_UX_ARCHITECTURE.md"
     )
-    stack_checkpoint = read_text_required(
-        repo_root
-        / "docs/checkpoints/"
-        "KALIBRA_PORTFOLIO_UX_STACK_AND_PROTOTYPE_REVIEW_v1.0.md"
+    runtime_milestone = read_text_required(
+        repo_root / "docs/engineering/RUNTIME_INTEGRATION_MILESTONE.md"
     )
     _require_source_tokens(
         architecture_doc,
@@ -185,9 +182,9 @@ def build_bundles(repo_root: Path, *, review_head: str) -> dict[str, Any]:
         "portfolio UX architecture",
     )
     _require_source_tokens(
-        stack_checkpoint,
-        ["Option B", "Static HTML/CSS/JS", "GitHub Pages"],
-        "portfolio stack checkpoint",
+        runtime_milestone,
+        ["canonical", "runtime", "equivalence"],
+        "runtime integration milestone",
     )
 
     local_projection = build_local_provider_projection(repo_root)
@@ -574,34 +571,22 @@ def build_evidence_bundle(
         "locations": [
             {
                 "label": "Scientific evaluation (C-6)",
-                "path": (
-                    "docs/evidence/"
-                    "KALIBRA_SCIENTIFIC_EVALUATION_EVIDENCE_v1.0.md"
-                ),
+                "path": "docs/evidence/SCIENTIFIC_EVALUATION.md",
                 "path_short": "docs/evidence/\u2026EVALUATION",
             },
             {
                 "label": "Runtime equivalence",
-                "path": (
-                    "docs/evidence/"
-                    "KALIBRA_RUNTIME_EQUIVALENCE_VERIFICATION_EVIDENCE_v1.0.md"
-                ),
+                "path": "docs/evidence/RUNTIME_EQUIVALENCE.md",
                 "path_short": "docs/evidence/\u2026EQUIVALENCE",
             },
             {
                 "label": "Runtime provider integration",
-                "path": (
-                    "docs/evidence/"
-                    "KALIBRA_RUNTIME_PROVIDER_INTEGRATION_EVIDENCE_v1.0.md"
-                ),
+                "path": "docs/evidence/RUNTIME_PROVIDER_INTEGRATION.md",
                 "path_short": "docs/evidence/\u2026INTEGRATION",
             },
             {
                 "label": "Placeholder retirement",
-                "path": (
-                    "docs/evidence/"
-                    "KALIBRA_PLACEHOLDER_RETIREMENT_EVIDENCE_v1.0.md"
-                ),
+                "path": "docs/evidence/PLACEHOLDER_RETIREMENT.md",
                 "path_short": "docs/evidence/\u2026RETIREMENT",
             },
             {

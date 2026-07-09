@@ -35,10 +35,7 @@ ARTIFACT_HASHES_PATH = ARTIFACT_DIR / "artifact_hashes.json"
 METADATA_PATH = ARTIFACT_DIR / "metadata.json"
 EXPORT_REPLAY_PATH = ARTIFACT_DIR / "export_replay.json"
 EVIDENCE_PATH = (
-    REPO_ROOT
-    / "docs"
-    / "evidence"
-    / "KALIBRA_GOVERNED_PADIM_ONNX_EXPORT_EVIDENCE_v1.0.md"
+    REPO_ROOT / "docs" / "evidence" / "PADIM_ONNX_EXPORT.md"
 )
 
 EXPORT_LABEL = "visa-padim-governed-onnx-export-v1"

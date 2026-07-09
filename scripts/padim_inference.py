@@ -41,10 +41,7 @@ INFERENCE_METADATA_DIR = INFERENCE_DIR / "metadata"
 REPLAY_DIR = INFERENCE_DIR / "replay"
 INFERENCE_ARTIFACT_HASHES_PATH = INFERENCE_DIR / "artifact_hashes.json"
 EVIDENCE_PATH = (
-    REPO_ROOT
-    / "docs"
-    / "evidence"
-    / "KALIBRA_GOVERNED_PADIM_INFERENCE_EVIDENCE_v1.0.md"
+    REPO_ROOT / "docs" / "evidence" / "PADIM_INFERENCE.md"
 )
 
 INFERENCE_LABEL = "visa-padim-governed-inference-v1"

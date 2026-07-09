@@ -60,22 +60,22 @@
   "locations": [
     {
       "label": "Scientific evaluation (C-6)",
-      "path": "docs/evidence/KALIBRA_SCIENTIFIC_EVALUATION_EVIDENCE_v1.0.md",
+      "path": "docs/evidence/SCIENTIFIC_EVALUATION.md",
       "path_short": "docs/evidence/…EVALUATION"
     },
     {
       "label": "Runtime equivalence",
-      "path": "docs/evidence/KALIBRA_RUNTIME_EQUIVALENCE_VERIFICATION_EVIDENCE_v1.0.md",
+      "path": "docs/evidence/RUNTIME_EQUIVALENCE.md",
       "path_short": "docs/evidence/…EQUIVALENCE"
     },
     {
       "label": "Runtime provider integration",
-      "path": "docs/evidence/KALIBRA_RUNTIME_PROVIDER_INTEGRATION_EVIDENCE_v1.0.md",
+      "path": "docs/evidence/RUNTIME_PROVIDER_INTEGRATION.md",
       "path_short": "docs/evidence/…INTEGRATION"
     },
     {
       "label": "Placeholder retirement",
-      "path": "docs/evidence/KALIBRA_PLACEHOLDER_RETIREMENT_EVIDENCE_v1.0.md",
+      "path": "docs/evidence/PLACEHOLDER_RETIREMENT.md",
       "path_short": "docs/evidence/…RETIREMENT"
     },
     {

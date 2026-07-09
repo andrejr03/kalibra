@@ -1,5 +1,5 @@
 {
-  "authorization_basis": "docs/checkpoints/KALIBRA_SCIENTIFIC_EVALUATION_AUTHORIZATION_CHECKPOINT_v1.0.md",
+  "governance_basis": "docs/engineering/SCIENTIFIC_EVALUATION_SUMMARY.md",
   "dataset_identity": {
     "acquisition_label": "visa-acq-v1",
     "archive_sha256": "2eb8690c803ab37de0324772964100169ec8ba1fa3f7e94291c9ca673f40f362",
@@ -58500,7 +58500,7 @@
     "not_product_threshold": true,
     "rule_id": "validation_balanced_fpr_fnr_v1"
   },
-  "protocol_basis": "docs/checkpoints/KALIBRA_C2_EVALUATION_PROTOCOL_FIXATION_CHECKPOINT_v1.0.md",
+  "protocol_basis": "docs/engineering/EVALUATION_PROTOCOL.md",
   "sample_counts": {
     "test": 4328,
     "test_by_class": {

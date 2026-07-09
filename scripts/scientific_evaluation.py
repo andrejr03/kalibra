@@ -40,10 +40,7 @@ EVALUATION_OPERATING_POINT_DIR = EVALUATION_DIR / "operating_point"
 EVALUATION_REPLAY_DIR = EVALUATION_DIR / "replay"
 EVALUATION_ARTIFACT_HASHES_PATH = EVALUATION_DIR / "artifact_hashes.json"
 EVIDENCE_PATH = (
-    REPO_ROOT
-    / "docs"
-    / "evidence"
-    / "KALIBRA_SCIENTIFIC_EVALUATION_EVIDENCE_v1.0.md"
+    REPO_ROOT / "docs" / "evidence" / "SCIENTIFIC_EVALUATION.md"
 )
 
 EVALUATION_LABEL = "visa-padim-scientific-evaluation-v1"
@@ -1189,8 +1186,8 @@ def evaluate_observations(
         "schema": EVALUATION_METADATA_SCHEMA,
         "evaluation_label": EVALUATION_LABEL,
         "evaluation_timestamp_utc": evaluation_timestamp,
-        "authorization_basis": "docs/checkpoints/KALIBRA_SCIENTIFIC_EVALUATION_AUTHORIZATION_CHECKPOINT_v1.0.md",
-        "protocol_basis": "docs/checkpoints/KALIBRA_C2_EVALUATION_PROTOCOL_FIXATION_CHECKPOINT_v1.0.md",
+        "governance_basis": "docs/engineering/SCIENTIFIC_EVALUATION_SUMMARY.md",
+        "protocol_basis": "docs/engineering/EVALUATION_PROTOCOL.md",
         "dataset_identity": identity.dataset_identity,
         "training_identity": identity.training_identity,
         "inference_identity": identity.inference_identity,

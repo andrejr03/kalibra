@@ -34,10 +34,7 @@ EQUIVALENCE_REPORT_PATH = EQUIVALENCE_DIR / "equivalence_report.json"
 EQUIVALENCE_HASHES_PATH = EQUIVALENCE_DIR / "equivalence_hashes.json"
 EQUIVALENCE_REPLAY_PATH = EQUIVALENCE_DIR / "equivalence_replay.json"
 EVIDENCE_PATH = (
-    REPO_ROOT
-    / "docs"
-    / "evidence"
-    / "KALIBRA_PADIM_ONNX_EXPORT_EQUIVALENCE_EVIDENCE_v1.0.md"
+    REPO_ROOT / "docs" / "evidence" / "PADIM_ONNX_EQUIVALENCE.md"
 )
 
 EQUIVALENCE_LABEL = "visa-padim-onnx-export-equivalence-v1"

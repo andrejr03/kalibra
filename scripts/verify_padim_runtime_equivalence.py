@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import copy
 import hashlib
 import json
 import platform
@@ -58,10 +59,7 @@ RUNTIME_EQUIVALENCE_REPLAY_PATH = (
     RUNTIME_EQUIVALENCE_DIR / "runtime_equivalence_replay.json"
 )
 EVIDENCE_PATH = (
-    REPO_ROOT
-    / "docs"
-    / "evidence"
-    / "KALIBRA_RUNTIME_EQUIVALENCE_VERIFICATION_EVIDENCE_v1.0.md"
+    REPO_ROOT / "docs" / "evidence" / "RUNTIME_EQUIVALENCE.md"
 )
 
 RUNTIME_DIR = REPO_ROOT / "artifacts" / "runtime"
@@ -83,23 +81,23 @@ EXPECTED_SESSION_CONFIGURATION_HASH = (
 )
 
 EXPECTED_TASK3_INTEGRATION_METADATA_SHA256 = (
-    "5e885feb6ada4585a0c295b3935a0d1c73ce2753dd7a1227adad63953fae2757"
+    "8e80ffd9637708b92d6f5de7534c49247a9740e30678ac3ae18598bfb9c8b5e0"
 )
 EXPECTED_TASK3_RUNTIME_REPLAY_SHA256 = (
-    "0a7969eb6da592ff7de73c2853b460d5b50acb8c80892054532c03889b36b579"
+    "376b7a84cb65949aa55189d8cc57fb7b14dfcf899e26b697d7954c87282f2e76"
 )
 EXPECTED_TASK3_RUNTIME_HASHES_SHA256 = (
-    "6b746f4c0ab7babd8d957ebdb6b9d3f7b8ff83aefa65cfef192aacf1ee7c23e3"
+    "0009ffc8982c17478f0494a49562aa4408dad4261c645e75a799e72d80a2ecdd"
 )
 
 EXPECTED_C6_ARTIFACT_HASHES_SHA256 = (
-    "7793bbf1b00c2bb7ae1f0372620da3491f265b803acd8fe7f4b5c133601c8e8a"
+    "c9a3baa00693cbe87cd21e1527033fbe58c7660b3aae431adacaf0771597e1c8"
 )
 EXPECTED_C6_METADATA_SHA256 = (
-    "02ebf0ba9da0ab1c747cce4218d0685094a7c39908a4f21b5af2075f2110b1f9"
+    "05c8b6994bf7c1856bd3b5e2b4842570af8aab2092382c705e6bbd7fc0d5196b"
 )
 EXPECTED_C6_REPLAY_SHA256 = (
-    "aecb4f1b5450531b8e53127bbd13cde597646b6a836f63c684d5eb8cabea6286"
+    "e3162c17e32a32ef66e4c00e16049b8e40c8f3068af829469608a63603dc1844"
 )
 
 EXPECTED_SPLIT_COUNTS = {"validation": 2164, "test": 4328}
@@ -577,6 +575,7 @@ def verify_runtime_loaded_identity(
         },
         "runtime session options",
     )
+    session_json = public_session_configuration_json(session_json)
     runtime_identity = {
         "model_reference_id": metadata["model_reference_id"],
         "model_sha256": metadata["model_sha256"],
@@ -594,6 +593,25 @@ def verify_runtime_loaded_identity(
         "canonical_default_provider_configuration": True,
     }
     return runtime_identity, provider_configuration, session_json, session_hash
+
+
+def public_repo_path(path: str) -> str:
+    try:
+        absolute_path = Path(path).expanduser().resolve()
+        repo_relative = absolute_path.relative_to(REPO_ROOT)
+    except (OSError, ValueError):
+        return path
+    return f"<REPO>/{repo_relative.as_posix()}"
+
+
+def public_session_configuration_json(session_json: Mapping[str, Any]) -> dict[str, Any]:
+    public_json = copy.deepcopy(dict(session_json))
+    model_reference = public_json.get("model_reference")
+    if isinstance(model_reference, dict):
+        artifact_path = model_reference.get("artifact_path")
+        if isinstance(artifact_path, str):
+            model_reference["artifact_path"] = public_repo_path(artifact_path)
+    return public_json
 
 
 def runtime_graph_contract(provider: OnnxInspectionInferenceProvider) -> dict[str, Any]:

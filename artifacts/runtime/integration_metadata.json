@@ -43,7 +43,7 @@
   "representative_input_count": 2,
   "representative_inputs": [
     {
-      "artifact_uri": "/Users/agentisstudio/Documents/kalibra/data/visa/extracted/candle/Data/Images/Anomaly/004.JPG",
+      "artifact_uri": "<REPO>/data/visa/extracted/candle/Data/Images/Anomaly/004.JPG",
       "class_name": "candle",
       "content_hash": "a78ee870594f161f86073b5983ae1f05be178009d819b4a73997f7cbc99a5ab2",
       "input_id": "visa-inference-input-8ddbf63dbe194bfd91ebe271",
@@ -51,7 +51,7 @@
       "split": "validation"
     },
     {
-      "artifact_uri": "/Users/agentisstudio/Documents/kalibra/data/visa/extracted/candle/Data/Images/Anomaly/000.JPG",
+      "artifact_uri": "<REPO>/data/visa/extracted/candle/Data/Images/Anomaly/000.JPG",
       "class_name": "candle",
       "content_hash": "c004dbc05698f01cf415e07d2a8cf8fef48aa19516eece6600e13f92f1f788b7",
       "input_id": "visa-inference-input-4016f830f89425cd0ac90494",
@@ -111,7 +111,7 @@
       }
     ],
     "model_reference": {
-      "artifact_path": "/Users/agentisstudio/Documents/kalibra/artifacts/padim/model.onnx",
+      "artifact_path": "<REPO>/artifacts/padim/model.onnx",
       "content_sha256": "0437ae28e172489387da07c4bd1f0c6b1ed95f3970ca3c7fa1dcd55935bd741a",
       "reference_id": "kalibra/inspection/padim-onnx-export@1.0.0#sha256:0437ae28e172489387da07c4bd1f0c6b1ed95f3970ca3c7fa1dcd55935bd741a"
     },

@@ -47,10 +47,7 @@ INTEGRATION_METADATA_PATH = RUNTIME_DIR / "integration_metadata.json"
 RUNTIME_REPLAY_PATH = RUNTIME_DIR / "runtime_replay.json"
 RUNTIME_HASHES_PATH = RUNTIME_DIR / "runtime_hashes.json"
 EVIDENCE_PATH = (
-    REPO_ROOT
-    / "docs"
-    / "evidence"
-    / "KALIBRA_RUNTIME_PROVIDER_INTEGRATION_EVIDENCE_v1.0.md"
+    REPO_ROOT / "docs" / "evidence" / "RUNTIME_PROVIDER_INTEGRATION.md"
 )
 PADIM_ARTIFACT_DIR = REPO_ROOT / "artifacts" / "padim"
 PADIM_MODEL_PATH = PADIM_ARTIFACT_DIR / "model.onnx"

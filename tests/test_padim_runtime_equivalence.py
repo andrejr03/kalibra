@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import subprocess
 import sys
 from pathlib import Path
 
@@ -141,3 +142,47 @@ def test_hashes_record_covers_report_and_replay_artifacts() -> None:
             replay_bytes
         ),
     }
+
+
+def test_public_session_configuration_json_replaces_repo_local_artifact_path() -> None:
+    repo_model_path = (
+        runtime_equivalence.REPO_ROOT / "artifacts" / "padim" / "model.onnx"
+    )
+    session_json = {
+        "model_reference": {
+            "artifact_path": str(repo_model_path),
+            "content_sha256": "a" * 64,
+        },
+        "execution_providers": [],
+    }
+
+    public_json = runtime_equivalence.public_session_configuration_json(session_json)
+
+    assert public_json["model_reference"]["artifact_path"] == (
+        "<REPO>/artifacts/padim/model.onnx"
+    )
+    assert session_json["model_reference"]["artifact_path"] == str(repo_model_path)
+
+
+def test_real_runtime_equivalence_verifier_command_passes() -> None:
+    subprocess.run(
+        [
+            sys.executable,
+            str(SCRIPT_PATH),
+            "verify",
+        ],
+        cwd=SCRIPT_PATH.parents[1],
+        check=True,
+    )
+
+
+def test_real_placeholder_retirement_verifier_command_passes() -> None:
+    subprocess.run(
+        [
+            sys.executable,
+            str(SCRIPT_PATH.parents[1] / "scripts" / "verify_placeholder_retirement.py"),
+            "verify",
+        ],
+        cwd=SCRIPT_PATH.parents[1],
+        check=True,
+    )

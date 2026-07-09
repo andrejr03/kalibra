@@ -56,8 +56,7 @@ def test_sampled_values_match_governed_sources():
         / "artifacts/runtime/equivalence/runtime_equivalence_report.json"
     )
     evidence_text = (
-        REPO_ROOT
-        / "docs/evidence/KALIBRA_SCIENTIFIC_EVALUATION_EVIDENCE_v1.0.md"
+        REPO_ROOT / "docs/evidence/SCIENTIFIC_EVALUATION.md"
     ).read_text(encoding="utf-8")
 
     assert bundles["meta"]["model_sha256"] == (
@@ -190,9 +189,9 @@ def _copy_minimal_repo(tmp_path: Path) -> Path:
         "artifacts/runtime/integration_metadata.json",
         "artifacts/runtime/runtime_replay.json",
         "artifacts/runtime/equivalence/runtime_equivalence_report.json",
-        "docs/evidence/KALIBRA_SCIENTIFIC_EVALUATION_EVIDENCE_v1.0.md",
-        "docs/plans/KALIBRA_PORTFOLIO_UX_ARCHITECTURE_v1.0.md",
-        "docs/checkpoints/KALIBRA_PORTFOLIO_UX_STACK_AND_PROTOTYPE_REVIEW_v1.0.md",
+        "docs/evidence/SCIENTIFIC_EVALUATION.md",
+        "docs/engineering/PORTFOLIO_UX_ARCHITECTURE.md",
+        "docs/engineering/RUNTIME_INTEGRATION_MILESTONE.md",
         "tests/fixtures/inspection/blob_defect.pgm",
         "portfolio/index.html",
     ]

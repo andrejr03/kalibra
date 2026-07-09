@@ -10,10 +10,10 @@
     "status_identical": true
   },
   "complete_second_retirement_verification_run": true,
-  "first_run_hash": "31846ea244ff7b2d297db0f0a101a114ca824b7267bb08c91b26c5fe419fbd48",
+  "first_run_hash": "3915e5e09617b22c175c5974a4b44efa0a773096dfaf9cdcba1f2a346e577861",
   "retirement_label": "kalibra-placeholder-retirement-v1",
   "schema": "kalibra_runtime_placeholder_retirement_replay_v1",
   "scope": "deterministic placeholder retirement replay only",
-  "second_run_hash": "31846ea244ff7b2d297db0f0a101a114ca824b7267bb08c91b26c5fe419fbd48",
+  "second_run_hash": "3915e5e09617b22c175c5974a4b44efa0a773096dfaf9cdcba1f2a346e577861",
   "status": "passed"
 }

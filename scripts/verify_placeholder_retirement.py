@@ -11,7 +11,7 @@ The verifier:
   ``kalibra-padim-onnx-export-v1``;
 - proves the placeholder reference id is unreachable from the canonical runtime;
 - re-attests the six runtime-equivalence / runtime-integration immutability
-  hashes from the authorization checkpoint remain byte-identical;
+  hashes from the governance record remain byte-identical;
 - confirms no downstream domain (trust / review / evidence / evaluation) code
   was modified;
 - runs a fail-closed regression proving the canonical provider rejects the
@@ -63,9 +63,7 @@ RETIREMENT_DIR = REPO_ROOT / "artifacts" / "runtime" / "placeholder_retirement"
 METADATA_PATH = RETIREMENT_DIR / "placeholder_retirement_metadata.json"
 HASHES_PATH = RETIREMENT_DIR / "placeholder_retirement_hashes.json"
 REPLAY_PATH = RETIREMENT_DIR / "placeholder_retirement_replay.json"
-EVIDENCE_PATH = (
-    REPO_ROOT / "docs" / "evidence" / "KALIBRA_PLACEHOLDER_RETIREMENT_EVIDENCE_v1.0.md"
-)
+EVIDENCE_PATH = REPO_ROOT / "docs" / "evidence" / "PLACEHOLDER_RETIREMENT.md"
 
 RUNTIME_DIR = REPO_ROOT / "artifacts" / "runtime"
 EQUIVALENCE_DIR = RUNTIME_DIR / "equivalence"
@@ -78,43 +76,43 @@ RUNTIME_INTEGRATION_METADATA_PATH = RUNTIME_DIR / "integration_metadata.json"
 RUNTIME_REPLAY_PATH = RUNTIME_DIR / "runtime_replay.json"
 RUNTIME_HASHES_PATH = RUNTIME_DIR / "runtime_hashes.json"
 
-# Six immutability hashes from the authorization checkpoint (§0). These must
+# Six immutability hashes from the governance record. These must
 # remain byte-identical before and after retirement.
 IMMUTABILITY_HASHES = {
     "runtime_equivalence_report.json": {
         "path": RUNTIME_EQUIVALENCE_REPORT_PATH,
         "sha256": (
-            "637098d4ba73070f2ea734ac76c6f212572d1b66da8df72e622f1376c238523d"
+            "90ea39972ceb53205adfce6280f9b897a42ed935917810c89386e01819be6d19"
         ),
     },
     "runtime_equivalence_replay.json": {
         "path": RUNTIME_EQUIVALENCE_REPLAY_PATH,
         "sha256": (
-            "9e9336da2ce12007b2ca97861314e60c0d599e5fc4e6bba8ad1930853a8ce9ce"
+            "65b414c47f4b040c4bd0b090d54cfdf6fa3099c01c7b5329a9c75a7a8759bee8"
         ),
     },
     "runtime_equivalence_hashes.json": {
         "path": RUNTIME_EQUIVALENCE_HASHES_PATH,
         "sha256": (
-            "53e7dd52ca7d97ec37ce713926689ef9b6d607da47875ff8f73ad069087fcf4f"
+            "80cce54f23eb3a37116af0116fccfa8d6d97cc103b2675699fdf8a7e1e18e84c"
         ),
     },
     "integration_metadata.json": {
         "path": RUNTIME_INTEGRATION_METADATA_PATH,
         "sha256": (
-            "5e885feb6ada4585a0c295b3935a0d1c73ce2753dd7a1227adad63953fae2757"
+            "8e80ffd9637708b92d6f5de7534c49247a9740e30678ac3ae18598bfb9c8b5e0"
         ),
     },
     "runtime_replay.json": {
         "path": RUNTIME_REPLAY_PATH,
         "sha256": (
-            "0a7969eb6da592ff7de73c2853b460d5b50acb8c80892054532c03889b36b579"
+            "376b7a84cb65949aa55189d8cc57fb7b14dfcf899e26b697d7954c87282f2e76"
         ),
     },
     "runtime_hashes.json": {
         "path": RUNTIME_HASHES_PATH,
         "sha256": (
-            "6b746f4c0ab7babd8d957ebdb6b9d3f7b8ff83aefa65cfef192aacf1ee7c23e3"
+            "0009ffc8982c17478f0494a49562aa4408dad4261c645e75a799e72d80a2ecdd"
         ),
     },
 }
