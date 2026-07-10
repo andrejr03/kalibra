@@ -640,16 +640,11 @@ conditions are satisfied or explicitly restricted by the repository owner.
 
 ## 12. Next Decision
 
-Recommended next planning artifact:
-
-```text
-KALIBRA_ML_PHASE_2_IMPLEMENTATION_governance approval_v1.0.md
-```
-
-Implementation governance approval should be revised next because ONNX Runtime is now
-selected as the first framework-backed inference runtime candidate, but provider
-implementation is still not approved. That revision must record whether Sprint
-1B is permitted and under what restrictions.
+Recommended next planning action: revise the public implementation governance
+notes before provider work proceeds. ONNX Runtime is now selected as the first
+framework-backed inference runtime candidate, but provider implementation is
+still not approved in this ADR. The revision must record whether Sprint 1B is
+permitted and under what restrictions.
 
 Remaining conditions before Sprint 1B:
 

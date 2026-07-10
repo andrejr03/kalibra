@@ -17,16 +17,14 @@ science, benchmark performance, production operation, or product functionality.
 Phase 1 completed the public architecture foundation. The system boundary,
 offline batch operating model, five-domain decomposition, evidence
 requirements, and deferred capabilities are documented in
-`docs/KALIBRA_ARCHITECTURE_v1.0.md`.
+`docs/ARCHITECTURE.md`.
 
-The engineering plan is complete. `docs/KALIBRA_ENGINEERING_PLAN_v1.0.md`
-defines the domain responsibilities, dependency order, engineering principles,
-and cross-domain constraints for substrate work.
+The engineering plan is complete. `docs/ENGINEERING_PLAN.md` defines the domain
+responsibilities, dependency order, engineering principles, and cross-domain
+constraints for substrate work.
 
 The deterministic asset pipeline is complete for prototype-ready visuals.
-`docs/KALIBRA_ASSET_PIPELINE_v1.0.md`,
-`docs/KALIBRA_ASSET_PIPELINE_IMPLEMENTATION_PLAN_v1.0.md`,
-`tools/generate_kalibra_part_assets.py`, and `tests/test_asset_pipeline.py`
+`tools/generate_kalibra_part_assets.py` and `tests/test_asset_pipeline.py`
 establish a local, reproducible, non-destructive pipeline from immutable master
 images in `assets/parts/source/` to generated outputs under
 `assets/parts/generated/`. These assets remain prototype visuals only, not
@@ -40,10 +38,9 @@ The five domain implementation plans are complete:
 - Evidence Engine
 - Evaluation Engine
 
-The domain plans index is complete.
-`docs/KALIBRA_DOMAIN_PLANS_INDEX_v1.0.md` fixes the implementation sequence,
-documents the domain seams, and records the governance rules that prevent scope
-drift across the five substrates.
+The implementation sequence, domain seams, and scope-control rules are recorded
+in the public engineering documentation and reflected in the five substrate
+packages.
 
 The five deterministic substrates are implemented under:
 
@@ -56,10 +53,8 @@ The five deterministic substrates are implemented under:
 Each substrate contains explicit domain contracts, engine entry points, errors,
 interfaces, and compatibility types where required by the repository state.
 
-The end-to-end integration plan is complete.
-`docs/KALIBRA_END_TO_END_SUBSTRATE_INTEGRATION_PLAN_v1.0.md` defines the next
-thin integration layer across the five substrates without adding product
-functionality, feedback loops, persistence, UI, or model behavior.
+The end-to-end integration substrate is documented and exercised without adding
+product functionality, feedback loops, persistence, UI, or model behavior.
 
 ## 3. Architectural State
 

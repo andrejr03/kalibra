@@ -1,6 +1,6 @@
 /* ============================================================
-   KALIBRA — Portfolio Experience · Design Handoff v1.0
-   Behaviour is identical to the approved v0.2 prototype.
+   KALIBRA — Portfolio Experience
+   Static governed-data rendering for the portfolio surface.
    Vanilla JS only. No framework, no libraries, no CDN.
    ============================================================ */
 

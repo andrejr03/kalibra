@@ -111,7 +111,7 @@ from governed repository artifacts. It is configured for GitHub Pages at
 
 Official Kalibra Workbench prototype.
 
-![Kalibra Workbench Prototype](assets/KALIBRA_WORKBENCH_PROTOTYPE_v1.0.png)
+![Kalibra Workbench Prototype](assets/kalibra-workbench-prototype.png)
 
 The workbench prototype shows the intended inspection surface for reviewing an
 input, its suspected defect localization, trust qualification, human-review

@@ -1,7 +1,7 @@
-# Kalibra — Portfolio Experience · Design Handoff v1.0
+# Kalibra — Portfolio Experience · Static Baseline Asset
 
-Front-end handoff for the **approved v0.2 visual prototype**. These four files
-reproduce that design exactly. Open `index.html` in any browser — it works
+Static frontend baseline for the portfolio experience. These four files
+preserve that design exactly. Open `index.html` in any browser — it works
 fully offline, with no build step, no server, and no network access.
 
 ```
@@ -11,7 +11,7 @@ app.js        interaction only (vanilla, ~40 lines)
 README.md     this file
 ```
 
-This document exists only to help you reproduce the approved look and feel.
+This document exists only to help you reproduce the public portfolio look and feel.
 It does **not** describe the Kalibra system, architecture, or repository — see
 the product's own docs for that.
 
@@ -20,7 +20,7 @@ the product's own docs for that.
 ## 1 · Project purpose
 
 A single-page, scroll-driven "workbench" that walks a reader through nine
-stations (00 Overview → 08 Verify). It is a **visual approval artifact**: every
+stations (00 Overview → 08 Verify). It is a **visual baseline artifact**: every
 number shown is a real governed value or an explicit "Not yet demonstrated"
 state. There is no live inference and no dashboard — the page presents recorded
 evidence, calmly.
@@ -119,23 +119,25 @@ Reusable classes in `styles.css` (selector → purpose):
 - `.verify-grid`, `.term` — verify terminal block.
 - `.footer-principles` / `.fp`, `.proto-note` — footer.
 
-## 8 · Implementation notes for the frontend engineer
+## 8 · Static baseline notes
 
-- **Reproduce exactly.** This is an approved design. Match spacing, colour, and
-  type. If you migrate into a framework, keep the class names as component names
-  and the tokens as your theme — do not re-derive values.
+- **Visual baseline.** Spacing, colour, type, class names, and CSS tokens are
+  part of the public artifact. Keep those relationships stable so the baseline
+  remains comparable over time.
 - **Static content.** All governed values (SHA prefixes, `6,492`, `7.105e-15`,
   the three AUROC/AUPRO metrics) are literal text. They are correct as written;
   do not compute or "improve" them, and never invent confidence or metrics.
-- **The two inspection images are inline SVG `data:` URIs** in the markup — no
-  binary assets ship with this package. They render pixelated by design.
+- **The two inspection images are inline SVG `data:` URIs** in the markup. No
+  binary inspection-image assets ship with this package. They render pixelated
+  by design.
 - **`app.js` is optional to behaviour, not to content.** With JS disabled the
   page is fully readable; only copy/scrollspy degrade.
 - **No dependencies.** No framework, no CDN, no fonts fetched over the network.
-  Keep it that way — the offline guarantee is part of the approval.
-- **Fonts:** to pin the identity precisely, self-host Space Grotesk, IBM Plex
-  Sans, and IBM Plex Mono and add `@font-face` rules; the `--disp/--body/--mono`
-  variables already route every element to the right family.
-- **Accessibility carried over:** semantic landmarks (`header`, `nav`, `main`,
-  `section`), `alt` text on both SVG images, native `<details>` for disclosures.
-  Preserve these if you refactor.
+  Keep it that way: the offline guarantee is part of the public baseline.
+- **Typography.** Space Grotesk, IBM Plex Sans, and IBM Plex Mono define the
+  intended identity, with system fallbacks already wired through
+  `--disp` / `--body` / `--mono`. Any future font hosting should keep those
+  roles intact.
+- **Accessibility expectations.** Keep semantic landmarks (`header`, `nav`,
+  `main`, `section`), `alt` text on both SVG images, and native `<details>` for
+  disclosures.

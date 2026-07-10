@@ -148,4 +148,4 @@ Update Dataset Selection ADR from DEFER to SELECTED — VisA.
 
 That ADR update is a separate, approved documentation action and is **not**
 performed by this record. See the C-1 strategy context in
-KALIBRA_ML_CAPABILITY_ENGINEERING_STRATEGY_record_v1.0.md.
+`docs/adr/001-dataset-selection.md`.

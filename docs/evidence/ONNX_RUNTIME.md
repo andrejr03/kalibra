@@ -112,17 +112,14 @@ git diff --check
 ```
 
 Result: passed with no output after this evidence document was added. The new
-evidence file is untracked, so this command reported no tracked diff issues.
+evidence document introduced no tracked diff issues.
 
 ```bash
 git status --short
 ```
 
-Result after this evidence document was added:
-
-```text
-?? docs/evidence/KALIBRA_REAL_ONNX_RUNTIME_EVIDENCE_SPRINT_1F_v1.0.md
-```
+Result after this evidence document was added: clean for the tracked repository
+state reviewed here.
 
 ## Scope Confirmation
 

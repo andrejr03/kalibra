@@ -468,8 +468,8 @@ generated-React dependency — and bind exclusively to governed JSON projected f
   `docs/evidence/RUNTIME_PROVIDER_INTEGRATION.md`,
   `docs/evidence/PLACEHOLDER_RETIREMENT.md`,
   `artifacts/runtime/{integration_metadata,runtime_replay,runtime_hashes}.json`.
-- Prior UX findings: `docs/records/KALIBRA_PORTFOLIO_UX_STACK_AND_PROTOTYPE_REVIEW_v1.0.md`.
-- Thesis and domain vocabulary: `docs/KALIBRA__DESIGN_BRIEF_v1.0.md`.
+- Thesis and domain vocabulary: `README.md`, `docs/FOUNDATION.md`, and
+  `docs/ARCHITECTURE.md`.
 
-**Next natural step:** review this persisted Portfolio UX Architecture before starting
-the  visual redesign.
+**Next natural step:** review this persisted portfolio architecture before
+starting any future visual redesign.

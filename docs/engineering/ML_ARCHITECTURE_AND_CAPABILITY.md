@@ -115,6 +115,7 @@ problem, not an engineering-substrate problem.
 
 ## 9. Next Natural Step
 
-Proceed to the ML Capability Engineering Strategy record, which sequences the
-capability phases beginning immediately after Sprint 1H. See
-KALIBRA_ML_CAPABILITY_ENGINEERING_STRATEGY_record_v1.0.md.
+Proceed to the public ML capability evidence sequence documented in
+`docs/engineering/DATASET_SELECTION_RATIONALE.md`,
+`docs/engineering/MODEL_FAMILY_SELECTION.md`, and
+`docs/engineering/ML_CAPABILITY_MILESTONE.md`.

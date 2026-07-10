@@ -135,5 +135,5 @@ choice, no hedge: **PaDiM first.**
 
 Review the persisted ML capability record documents before committing, then begin
 **C-1 Dataset Selection Closure & Governed Acquisition** as the highest-value phase.
-See
-KALIBRA_ML_CAPABILITY_ENGINEERING_STRATEGY_record_v1.0.md.
+See `docs/engineering/DATASET_SELECTION_RATIONALE.md` and
+`docs/adr/001-dataset-selection.md`.
