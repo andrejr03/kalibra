@@ -99,6 +99,31 @@ def test_pages_deploys_only_after_public_verification() -> None:
     assert "uses: actions/deploy-pages@v4" in workflow
 
 
+def test_pages_trusts_only_the_checked_out_repository_before_tests() -> None:
+    workflow = (REPO_ROOT / ".github/workflows/pages.yml").read_text(
+        encoding="utf-8"
+    )
+    runtime_tests = (
+        REPO_ROOT / "tests/test_padim_runtime_equivalence.py"
+    ).read_text(encoding="utf-8")
+
+    checkout = workflow.index("      - name: Checkout")
+    trust = workflow.index("      - name: Trust checked-out repository")
+    tests = workflow.index("      - name: Run clean-clone tests")
+
+    assert checkout < trust < tests
+    assert (
+        'git config --global --add safe.directory "$GITHUB_WORKSPACE"'
+        in workflow
+    )
+    assert "/__w/kalibra/kalibra" not in workflow
+    assert "safe.directory '*'" not in workflow
+    assert 'safe.directory "*"' not in workflow
+    assert (
+        "test_real_placeholder_retirement_verifier_command_passes" in runtime_tests
+    )
+
+
 def test_real_data_tests_remain_explicitly_marked_and_real() -> None:
     provider_tests = (REPO_ROOT / "tests/test_onnx_provider.py").read_text(
         encoding="utf-8"
