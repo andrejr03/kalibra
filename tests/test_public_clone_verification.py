@@ -34,27 +34,42 @@ def test_pages_uses_governed_verification_dependencies() -> None:
         encoding="utf-8"
     )
     metadata = json.loads(
-        (REPO_ROOT / "artifacts/padim/metadata.json").read_text(encoding="utf-8")
+        (
+            REPO_ROOT
+            / "artifacts/runtime/placeholder_retirement/"
+            "placeholder_retirement_metadata.json"
+        ).read_text(encoding="utf-8")
     )
-    provider = (REPO_ROOT / "src/inspection/providers_onnx.py").read_text(
-        encoding="utf-8"
-    )
+    verifier = (
+        REPO_ROOT / "scripts/verify_placeholder_retirement.py"
+    ).read_text(encoding="utf-8")
 
+    numpy_requirements = [
+        requirement
+        for requirement in requirements
+        if requirement.startswith("numpy")
+    ]
     runtime_requirements = [
         requirement
         for requirement in requirements
         if requirement.startswith("onnxruntime")
     ]
+
+    assert 'python-version: "3.9.6"' in workflow
+    assert 'python-version: "3.11"' not in workflow
+    assert numpy_requirements == ["numpy==2.0.2"]
     assert runtime_requirements == ["onnxruntime==1.19.2"]
+    assert metadata["toolchain"]["python"] == "3.9.6"
+    assert numpy_requirements[0].partition("==")[2] == metadata["toolchain"][
+        "numpy"
+    ]
     assert runtime_requirements[0].partition("==")[2] == metadata["toolchain"][
         "onnxruntime"
     ]
     assert "python -m pip install -r requirements-verification.txt" in workflow
+    assert "pip install pytest numpy" not in workflow
     assert "pip install pytest numpy pillow onnx onnxruntime" not in workflow
-    assert (
-        'toolchain.get("onnxruntime") != _framework_version_for_artifact()'
-        in provider
-    )
+    assert "if path.exists() and path.read_bytes() != content:" in verifier
 
 
 def test_real_data_tests_remain_explicitly_marked_and_real() -> None:

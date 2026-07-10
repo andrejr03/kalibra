@@ -1,5 +1,5 @@
 pytest
-numpy
+numpy==2.0.2
 pillow
 onnx
 onnxruntime==1.19.2
