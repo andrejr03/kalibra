@@ -26,6 +26,37 @@ def test_default_pytest_contract_excludes_external_data_markers() -> None:
     assert "scientific_replay:" in config
 
 
+def test_pages_uses_governed_verification_dependencies() -> None:
+    requirements = (
+        REPO_ROOT / "requirements-verification.txt"
+    ).read_text(encoding="utf-8").splitlines()
+    workflow = (REPO_ROOT / ".github/workflows/pages.yml").read_text(
+        encoding="utf-8"
+    )
+    metadata = json.loads(
+        (REPO_ROOT / "artifacts/padim/metadata.json").read_text(encoding="utf-8")
+    )
+    provider = (REPO_ROOT / "src/inspection/providers_onnx.py").read_text(
+        encoding="utf-8"
+    )
+
+    runtime_requirements = [
+        requirement
+        for requirement in requirements
+        if requirement.startswith("onnxruntime")
+    ]
+    assert runtime_requirements == ["onnxruntime==1.19.2"]
+    assert runtime_requirements[0].partition("==")[2] == metadata["toolchain"][
+        "onnxruntime"
+    ]
+    assert "python -m pip install -r requirements-verification.txt" in workflow
+    assert "pip install pytest numpy pillow onnx onnxruntime" not in workflow
+    assert (
+        'toolchain.get("onnxruntime") != _framework_version_for_artifact()'
+        in provider
+    )
+
+
 def test_real_data_tests_remain_explicitly_marked_and_real() -> None:
     provider_tests = (REPO_ROOT / "tests/test_onnx_provider.py").read_text(
         encoding="utf-8"

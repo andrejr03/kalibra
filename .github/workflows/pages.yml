@@ -31,7 +31,7 @@ jobs:
           python-version: "3.11"
 
       - name: Install public verification dependencies
-        run: python3 -m pip install pytest numpy pillow onnx onnxruntime
+        run: python -m pip install -r requirements-verification.txt
 
       - name: Run clean-clone tests
         run: python3 -m pytest -q

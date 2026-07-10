@@ -1,0 +1,5 @@
+pytest
+numpy
+pillow
+onnx
+onnxruntime==1.19.2
