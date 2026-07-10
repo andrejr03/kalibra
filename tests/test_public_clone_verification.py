@@ -55,8 +55,9 @@ def test_pages_uses_governed_verification_dependencies() -> None:
         if requirement.startswith("onnxruntime")
     ]
 
-    assert 'python-version: "3.9.6"' in workflow
-    assert 'python-version: "3.11"' not in workflow
+    assert "actions/setup-python" not in workflow
+    assert "python-version:" not in workflow
+    assert "container: python:3.9.6-slim" in workflow
     assert numpy_requirements == ["numpy==2.0.2"]
     assert runtime_requirements == ["onnxruntime==1.19.2"]
     assert metadata["toolchain"]["python"] == "3.9.6"
@@ -69,7 +70,33 @@ def test_pages_uses_governed_verification_dependencies() -> None:
     assert "python -m pip install -r requirements-verification.txt" in workflow
     assert "pip install pytest numpy" not in workflow
     assert "pip install pytest numpy pillow onnx onnxruntime" not in workflow
+    assert "python --version" in workflow
+    assert "assert sys.version.split()[0] == '3.9.6'" in workflow
+    assert "assert np.__version__ == '2.0.2'" in workflow
+    assert "assert ort.__version__ == '1.19.2'" in workflow
     assert "if path.exists() and path.read_bytes() != content:" in verifier
+
+
+def test_pages_deploys_only_after_public_verification() -> None:
+    workflow = (REPO_ROOT / ".github/workflows/pages.yml").read_text(
+        encoding="utf-8"
+    )
+
+    assert workflow.index("  verify:") < workflow.index("  deploy:")
+    assert "  deploy:\n    needs: verify" in workflow
+    assert "python -m pytest -q" in workflow
+    assert "python scripts/verify_public_clone.py" in workflow
+    assert "python scripts/build_portfolio_evidence_bundle.py --check" in workflow
+    assert "verify_padim_runtime_equivalence.py" not in workflow
+    assert "verify_placeholder_retirement.py" not in workflow
+    assert "VisA_20220922.tar" not in workflow
+    assert "contents: read" in workflow
+    assert "pages: write" in workflow
+    assert "id-token: write" in workflow
+    assert "uses: actions/configure-pages@v5" in workflow
+    assert "uses: actions/upload-pages-artifact@v3" in workflow
+    assert "path: portfolio" in workflow
+    assert "uses: actions/deploy-pages@v4" in workflow
 
 
 def test_real_data_tests_remain_explicitly_marked_and_real() -> None:

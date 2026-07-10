@@ -16,34 +16,56 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  verify:
     runs-on: ubuntu-latest
+    container: python:3.9.6-slim
     steps:
+      - name: Install operating-system dependencies
+        run: |
+          apt-get update
+          apt-get install --yes --no-install-recommends git
+          rm -rf /var/lib/apt/lists/*
+
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.9.6"
+      - name: Confirm governed Python version
+        run: |
+          python --version
+          python -c "import sys; print(sys.version.split()[0]); assert sys.version.split()[0] == '3.9.6'"
+
+      - name: Upgrade pip
+        run: python -m pip install --upgrade pip
 
       - name: Install public verification dependencies
         run: python -m pip install -r requirements-verification.txt
 
+      - name: Confirm governed dependency versions
+        run: |
+          python -c "import numpy as np; print(np.__version__); assert np.__version__ == '2.0.2'"
+          python -c "import onnxruntime as ort; print(ort.__version__); assert ort.__version__ == '1.19.2'"
+
       - name: Run clean-clone tests
-        run: python3 -m pytest -q
+        run: python -m pytest -q
 
       - name: Verify public clone artifacts
-        run: python3 scripts/verify_public_clone.py
+        run: python scripts/verify_public_clone.py
+
+      - name: Verify governed portfolio bundle
+        run: python scripts/build_portfolio_evidence_bundle.py --check
+
+  deploy:
+    needs: verify
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
-
-      - name: Verify governed portfolio bundle
-        run: python3 scripts/build_portfolio_evidence_bundle.py --check
 
       - name: Upload portfolio artifact
         uses: actions/upload-pages-artifact@v3
