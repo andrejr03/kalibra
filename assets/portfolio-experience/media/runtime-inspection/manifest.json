@@ -1,0 +1,53 @@
+{
+  "anomaly_map_asset": "media/runtime-inspection/pcb4-049-padim-map.png",
+  "anomaly_map_asset_sha256": "4a9716ebedc873324cd41bdd82dcb6b7df085434fd9177ec42147c35a158aaba",
+  "anomaly_map_native_dimensions": {
+    "height": 64,
+    "width": 64
+  },
+  "anomaly_map_sha256": "41c9f22495beb491cd83845abbfd826a796651b593606bb6c05021d7a29d83e2",
+  "anomaly_overlay_alpha": 0.33,
+  "anomaly_overlay_asset": "media/runtime-inspection/pcb4-049-anomaly-overlay.png",
+  "anomaly_overlay_asset_sha256": "226af27eca1831b07025dac7379c61466ae502ec40f69bd9ccd7ebf1783ce8b2",
+  "category": "pcb4",
+  "colour_map_identity": "kalibra_raw_anomaly_six_stop_linear_rgb_v1",
+  "dataset": "VisA",
+  "dataset_acquisition_label": "visa-acq-v1",
+  "input_asset": "media/runtime-inspection/pcb4-049-input.jpg",
+  "input_asset_sha256": "d7873fe67f9e5c195504e3fec7d71daeb7818791e3bf4be23b6ec2764fa91d2e",
+  "input_id": "visa-inference-input-07fabbcc7f1fc18cdff4634f",
+  "interpolation_mode": "bilinear (presentation-only)",
+  "localization_asset": "media/runtime-inspection/pcb4-049-localization.png",
+  "localization_asset_sha256": "8281f0edfba1b0808d38a8a3feb6ba5be59317eb9dc90cb8fcf6cd7989499df2",
+  "localization_kind": "padim_raw_anomaly_map_argmax_region_v1",
+  "localization_region": {
+    "x_max": 0.375,
+    "x_min": 0.25,
+    "y_max": 0.5,
+    "y_min": 0.375
+  },
+  "model_method": "visa-padim-governed-inference-v1",
+  "prediction_id": "padim-inspection-prediction-542d2df3c9baee3daf0d9c99",
+  "raw_anomaly_measure": 6.276092568280337,
+  "raw_map_interpolation_mode": "nearest-neighbour",
+  "raw_measure_kind": "raw_anomaly_measure",
+  "raw_measure_scale": "model_raw_anomaly_measure",
+  "rendered_overlay_dimensions": {
+    "height": 1104,
+    "width": 1358
+  },
+  "sample_filename": "pcb4/Data/Images/Anomaly/049.JPG",
+  "sample_sha256": "d7873fe67f9e5c195504e3fec7d71daeb7818791e3bf4be23b6ec2764fa91d2e",
+  "schema": "kalibra_portfolio_runtime_visual_projection_v2",
+  "scientific_boundary": "The anomaly overlay is presentation-only and displays raw PaDiM anomaly intensity over the governed input. It is not calibrated confidence. It creates no new metric, changes no prediction or localization, does not increase scientific resolution, and expands no scientific claim. The displayed case remains illustrative evidence from a single-seed VisA-proxy evaluation.",
+  "selection_rationale": "Governed VisA-proxy PCB anomaly with a visible defect, recorded PaDiM raw anomaly map, and a predicted localization region not listed as a C-6 localization failure; selected for public understandability, not as generalized performance proof.",
+  "source_artifacts": [
+    "data/visa/extracted/pcb4/Data/Images/Anomaly/049.JPG",
+    "data/visa/derived/padim/inference/anomaly_maps/test_anomaly_maps.npy",
+    "data/visa/derived/padim/inference/predictions/test_predictions.jsonl",
+    "data/visa/derived/padim/inference/metadata/inference_inputs.json",
+    "data/visa/manifests/files.sha256"
+  ],
+  "split": "test",
+  "split_sha256": "2d86ae7fa4cffe7f5f4aeb89f2c9c23351f44413da5d8aa0d5a3628a1c505510"
+}

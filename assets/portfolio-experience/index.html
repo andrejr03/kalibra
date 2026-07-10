@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Kalibra — Portfolio Experience</title>
+<link rel="icon" href="data:,">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -106,29 +107,61 @@
       <div class="insp-grid">
         <!-- left: the decision -->
         <div class="card">
-          <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
-            <span class="mono" style="font-size:15px;color:var(--ink2)">blob_defect.pgm</span>
-            <span class="st amber"><span class="sd"></span>Local-provider projection</span>
+          <div class="inspection-case-head">
+            <div class="case-title">
+              <span class="mono sample">pcb4 / anomaly / 049.JPG</span>
+              <span class="st amber"><span class="sd"></span>Recorded governed case</span>
+            </div>
+            <div class="case-meta">
+              <span class="pathpill">split test</span>
+              <span class="pathpill">category pcb4</span>
+              <span class="pathpill">sha256 d7873fe6…a91d2e</span>
+            </div>
           </div>
 
-          <div style="display:flex;gap:16px">
-            <div style="flex:1;min-width:0">
-              <div class="frame">
-                <img alt="Governed inspection input, rendered from the local-provider projection" src="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%204%204%22%20shape-rendering=%22crispEdges%22%3E%3Crect%20width=%22100%25%22%20height=%22100%25%22%20fill=%22%23070a0e%22/%3E%3Crect%20x=%221%22%20y=%221%22%20width=%221%22%20height=%221%22%20fill=%22rgb%28255,255,255%29%22/%3E%3Crect%20x=%222%22%20y=%221%22%20width=%221%22%20height=%221%22%20fill=%22rgb%28255,255,255%29%22/%3E%3Crect%20x=%221%22%20y=%222%22%20width=%221%22%20height=%221%22%20fill=%22rgb%28255,255,255%29%22/%3E%3Crect%20x=%222%22%20y=%222%22%20width=%221%22%20height=%221%22%20fill=%22rgb%28255,255,255%29%22/%3E%3C/svg%3E">
-                <div class="tag">INPUT · 4×4 PGM fixture</div>
+          <div class="inspection-visuals">
+            <figure class="visual-panel">
+              <div class="visual-frame">
+                <img alt="Governed VisA-proxy PCB inspection input" src="media/runtime-inspection/pcb4-049-input.jpg">
               </div>
-            </div>
-            <div style="flex:1;min-width:0">
-              <div class="frame">
-                <img alt="Defect localization overlay" src="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%204%204%22%20shape-rendering=%22crispEdges%22%3E%3Crect%20width=%22100%25%22%20height=%22100%25%22%20fill=%22%23070a0e%22/%3E%3Crect%20x=%221%22%20y=%221%22%20width=%221%22%20height=%221%22%20fill=%22rgb%28255,255,255%29%22/%3E%3Crect%20x=%222%22%20y=%221%22%20width=%221%22%20height=%221%22%20fill=%22rgb%28255,255,255%29%22/%3E%3Crect%20x=%221%22%20y=%222%22%20width=%221%22%20height=%221%22%20fill=%22rgb%28255,255,255%29%22/%3E%3Crect%20x=%222%22%20y=%222%22%20width=%221%22%20height=%221%22%20fill=%22rgb%28255,255,255%29%22/%3E%3Crect%20x=%221%22%20y=%221%22%20width=%222%22%20height=%222%22%20fill=%22%23e5514e%22%20fill-opacity=%220.24%22%20stroke=%22%23e5514e%22%20stroke-width=%220.08%22/%3E%3C/svg%3E">
-                <div class="tag">LOCALIZATION · x 0.25–0.75, y 0.25–0.75</div>
+              <figcaption class="visual-caption">
+                <span class="t">Governed input</span>
+                <span class="s">pcb4 / anomaly / 049.JPG</span>
+              </figcaption>
+            </figure>
+            <figure class="visual-panel">
+              <div class="visual-frame">
+                <img alt="Semi-transparent PaDiM raw anomaly intensity over the governed PCB input" src="media/runtime-inspection/pcb4-049-anomaly-overlay.png">
               </div>
-            </div>
+              <figcaption class="visual-caption">
+                <span class="t">PaDiM anomaly overlay</span>
+                <span class="s visual-explainer">Raw anomaly intensity over governed input — not calibrated confidence</span>
+                <span class="heat-legend"><span>low</span><span class="ramp"></span><span>high raw anomaly</span></span>
+              </figcaption>
+            </figure>
+            <figure class="visual-panel">
+              <div class="visual-frame">
+                <img alt="PaDiM raw anomaly map for the governed PCB case" src="media/runtime-inspection/pcb4-049-padim-map.png">
+              </div>
+              <figcaption class="visual-caption">
+                <span class="t">PaDiM raw anomaly map</span>
+                <span class="s">map sha256 41c9f224…9d83e2</span>
+              </figcaption>
+            </figure>
+            <figure class="visual-panel">
+              <div class="visual-frame">
+                <img alt="Recorded localization region overlaid on the governed PCB input" src="media/runtime-inspection/pcb4-049-localization.png">
+              </div>
+              <figcaption class="visual-caption">
+                <span class="t">Recorded localization</span>
+                <span class="s">LOCALIZATION · x 0.250–0.375, y 0.375–0.500</span>
+              </figcaption>
+            </figure>
           </div>
 
           <div style="height:1px;background:var(--line);margin:20px 0 18px"></div>
 
-          <div style="display:grid;grid-template-columns:0.8fr 1.2fr;gap:28px;align-items:start">
+          <div class="result-grid">
             <div>
               <div class="card-k">Inspection result</div>
               <div style="display:inline-flex;align-items:center;gap:9px;background:rgba(229,81,78,0.12);border:1px solid rgba(229,81,78,0.4);border-radius:8px;padding:10px 16px">
@@ -138,12 +171,12 @@
               <p style="font:400 12px var(--body);color:var(--mut4);margin-top:12px;line-height:1.55">Judgement only — &ldquo;is this defective, and where?&rdquo;</p>
             </div>
             <div>
-              <div class="card-k">Raw anomaly measure</div>
+              <div class="card-k">Raw anomaly measure — not calibrated confidence</div>
               <div style="display:flex;align-items:center;gap:18px">
-                <span class="metric-big">75.00</span>
+                <span class="metric-big">6.276</span>
                 <div style="flex:1">
-                  <div class="bar"><i style="width:75%"></i></div>
-                  <div style="display:flex;justify-content:space-between;margin-top:6px"><span class="mono" style="font-size:11px;color:var(--mut4)">0</span><span class="mono" style="font-size:11px;color:var(--mut4)">100 · model raw scale</span></div>
+                  <div class="bar"><i style="width:63%"></i></div>
+                  <div class="raw-scale"><span class="mono" style="font-size:11px;color:var(--mut4)">0</span><span class="mono" style="font-size:11px;color:var(--mut4)">10+ · model raw scale</span></div>
                 </div>
               </div>
               <p style="font:400 12px var(--body);color:var(--mut4);margin-top:10px;line-height:1.55">A standalone measure of how unusual the input is — <span style="color:var(--mut2)">not a probability of being correct, and not calibrated confidence.</span></p>
@@ -152,7 +185,7 @@
 
           <div class="precomp">
             <span class="sq"></span>
-            <span>Precomputed from a governed offline run. Kalibra does not run inference in your browser — this is a projection of a recorded local-provider result.</span>
+            <span>Precomputed from a governed offline run on the VisA proxy dataset. Kalibra does not run inference in your browser — this single case is illustrative evidence, not proof of generalized performance.</span>
           </div>
 
           <details class="disclose">
@@ -160,7 +193,9 @@
             <div style="margin-top:14px">
               <div class="kv"><span class="k">Model identity</span><span class="v">kalibra-padim-onnx-export-v1</span></div>
               <div class="kv"><span class="k">Model artifact</span><span class="v">sha256:0437ae28…741a</span></div>
-              <div class="kv"><span class="k">Input content hash</span><span class="v">8b719296…0da45e</span></div>
+              <div class="kv"><span class="k">Input content hash</span><span class="v">d7873fe6…a91d2e</span></div>
+              <div class="kv"><span class="k">Anomaly-map hash</span><span class="v">41c9f224…9d83e2</span></div>
+              <div class="kv"><span class="k">Projection manifest</span><span class="v">c60a3bd4…3bb25c</span></div>
               <div class="kv"><span class="k">Feature contract</span><span class="v">…rgb64-bilinear-float64-patch8-v1</span></div>
               <div class="kv"><span class="k">Toolchain pin</span><span class="v">onnxruntime 1.19.2 · numpy 2.0.2 · python 3.9.6</span></div>
               <div class="kv"><span class="k">Determinism</span><span class="v">single-thread · ORT_DISABLE_ALL · CPU EP</span></div>

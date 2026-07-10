@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from hashlib import sha256
+import io
 import json
 from pathlib import Path
 import re
@@ -31,6 +33,12 @@ def test_bundles_have_required_fields_and_no_fabricated_claims():
     assert bundles["meta"]["review_head"] == "abc1234"
     assert bundles["meta"]["model_sha256"].startswith("0437ae28")
     assert bundles["runtime"]["trust"]["state"] == "not_yet_demonstrated"
+    assert bundles["runtime"]["visual"]["input"]["filename"] == (
+        "pcb4/Data/Images/Anomaly/049.JPG"
+    )
+    assert bundles["runtime"]["visual"]["anomaly_map"]["label"] == (
+        "PaDiM raw anomaly map"
+    )
     assert bundles["boundaries"]["not_yet_demonstrated"][0] == (
         "Calibrated confidence"
     )
@@ -65,9 +73,13 @@ def test_sampled_values_match_governed_sources():
     assert bundles["runtime"]["session_config_hash_short"] == builder.short_hash(
         integration["session_configuration_hash"]
     )
-    assert bundles["runtime"]["input"]["content_hash_short"] == builder.short_hash(
-        builder.build_local_provider_projection(REPO_ROOT)["contentHash"],
-        tail=6,
+    visual = builder.build_governed_runtime_visual_projection(REPO_ROOT)
+    assert bundles["runtime"]["input"]["content_hash_short"] == (
+        visual["bundle"]["input"]["content_hash_short"]
+    )
+    assert bundles["runtime"]["raw_anomaly_measure"] == "6.276"
+    assert bundles["runtime"]["localization"]["kind"] == (
+        "padim_raw_anomaly_map_argmax_region_v1"
     )
     assert bundles["evaluation"]["metrics"][0]["value"] == _metric(
         evidence_text, "Image AUROC"
@@ -85,6 +97,272 @@ def test_sampled_values_match_governed_sources():
         replay["comparisons"]["artifact_identity"]
     )
     assert all(replay["comparisons"].values())
+
+
+@pytest.mark.governed_data
+def test_runtime_visual_projection_uses_governed_case_and_stable_assets():
+    first = builder.build_governed_runtime_visual_projection(REPO_ROOT)
+    second = builder.build_governed_runtime_visual_projection(REPO_ROOT)
+    bundle = first["bundle"]
+    manifest = json.loads(
+        first["assets"][builder.RUNTIME_VISUAL_MANIFEST_ASSET].decode("utf-8")
+    )
+
+    assert bundle == second["bundle"]
+    assert first["assets"] == second["assets"]
+    assert bundle["input"]["filename"] == "pcb4/Data/Images/Anomaly/049.JPG"
+    assert bundle["split"] == "test"
+    assert bundle["category"] == "pcb4"
+    assert manifest["input_id"] == builder.RUNTIME_VISUAL_INPUT_ID
+    assert manifest["input_asset_sha256"] == (
+        "d7873fe67f9e5c195504e3fec7d71daeb7818791e3bf4be23b6ec2764fa91d2e"
+    )
+    assert manifest["input_asset_sha256"] == sha256(
+        (REPO_ROOT / "data/visa/extracted/pcb4/Data/Images/Anomaly/049.JPG").read_bytes()
+    ).hexdigest()
+    assert manifest["anomaly_map_sha256"] == bundle["anomaly_map"]["sha256"]
+    assert manifest["anomaly_overlay_asset"] == (
+        builder.RUNTIME_VISUAL_ANOMALY_OVERLAY_ASSET
+    )
+    assert manifest["anomaly_overlay_asset_sha256"] == sha256(
+        first["assets"][builder.RUNTIME_VISUAL_ANOMALY_OVERLAY_ASSET]
+    ).hexdigest()
+    assert manifest["anomaly_overlay_alpha"] == 0.33
+    assert manifest["colour_map_identity"] == builder.RUNTIME_VISUAL_COLOUR_MAP
+    assert manifest["interpolation_mode"] == "bilinear (presentation-only)"
+    assert manifest["raw_map_interpolation_mode"] == "nearest-neighbour"
+    assert bundle["anomaly_map"]["interpolation_mode"] == "nearest-neighbour"
+    assert manifest["anomaly_map_native_dimensions"] == {
+        "height": 64,
+        "width": 64,
+    }
+    assert manifest["rendered_overlay_dimensions"] == {
+        "height": 1104,
+        "width": 1358,
+    }
+    assert manifest["localization_region"] == bundle["localization"]["region"]
+    assert manifest["raw_measure_kind"] == "raw_anomaly_measure"
+    assert "presentation-only" in manifest["scientific_boundary"]
+    assert "creates no new metric" in manifest["scientific_boundary"]
+    assert "changes no prediction or localization" in manifest["scientific_boundary"]
+    assert "does not increase scientific resolution" in manifest[
+        "scientific_boundary"
+    ]
+    assert "confidence" not in bundle["anomaly_map"]["label"].lower()
+    assert "confidence" not in bundle["anomaly_overlay"]["label"].lower()
+    assert "not calibrated confidence" in bundle["anomaly_overlay"][
+        "supporting_text"
+    ].lower()
+    assert "generalized performance proof" in bundle["selection_rationale"]
+
+    for relative_path in first["assets"]:
+        assert not Path(relative_path).is_absolute()
+        assert "/Users/" not in relative_path
+        assert "agentisstudio" not in relative_path
+
+    overlay_bytes = first["assets"][builder.RUNTIME_VISUAL_ANOMALY_OVERLAY_ASSET]
+    assert b"/Users/" not in overlay_bytes
+    assert b"agentisstudio" not in overlay_bytes
+
+
+@pytest.mark.governed_data
+def test_anomaly_overlay_is_exact_blend_of_governed_input_and_recorded_map():
+    from PIL import Image
+
+    projection = builder.build_governed_runtime_visual_projection(REPO_ROOT)
+    overlay = Image.open(
+        io.BytesIO(
+            projection["assets"][builder.RUNTIME_VISUAL_ANOMALY_OVERLAY_ASSET]
+        )
+    ).convert("RGB")
+    overlay_with_metadata = Image.open(
+        io.BytesIO(
+            projection["assets"][builder.RUNTIME_VISUAL_ANOMALY_OVERLAY_ASSET]
+        )
+    )
+    governed_input = Image.open(
+        REPO_ROOT / "data/visa/extracted/pcb4/Data/Images/Anomaly/049.JPG"
+    ).convert("RGB")
+    inputs = _read_json(
+        REPO_ROOT
+        / "data/visa/derived/padim/inference/metadata/inference_inputs.json"
+    )
+    sample_index, _ = builder._find_inference_sample(
+        inputs, builder.RUNTIME_VISUAL_INPUT_ID
+    )
+    anomaly_map = builder._load_selected_anomaly_map(
+        REPO_ROOT
+        / "data/visa/derived/padim/inference/anomaly_maps/test_anomaly_maps.npy",
+        sample_index,
+    )
+    colour_layer = Image.fromarray(
+        builder._colourize_anomaly_map(anomaly_map)
+    ).resize(governed_input.size, Image.Resampling.BILINEAR)
+    expected = Image.blend(
+        governed_input,
+        colour_layer,
+        builder.RUNTIME_VISUAL_OVERLAY_ALPHA,
+    )
+
+    assert overlay.size == governed_input.size
+    assert overlay.tobytes() == expected.tobytes()
+    assert overlay_with_metadata.info["kalibra.recorded_localization_region"] == (
+        '{"x_max":0.375,"x_min":0.25,"y_max":0.5,"y_min":0.375}'
+    )
+    assert "not calibrated confidence" in overlay_with_metadata.info[
+        "kalibra.scientific_boundary"
+    ]
+
+
+@pytest.mark.governed_data
+def test_raw_anomaly_map_remains_nearest_neighbour_and_byte_stable():
+    from PIL import Image
+
+    projection = builder.build_governed_runtime_visual_projection(REPO_ROOT)
+    inputs = _read_json(
+        REPO_ROOT
+        / "data/visa/derived/padim/inference/metadata/inference_inputs.json"
+    )
+    sample_index, _ = builder._find_inference_sample(
+        inputs, builder.RUNTIME_VISUAL_INPUT_ID
+    )
+    anomaly_map = builder._load_selected_anomaly_map(
+        REPO_ROOT
+        / "data/visa/derived/padim/inference/anomaly_maps/test_anomaly_maps.npy",
+        sample_index,
+    )
+    expected = Image.fromarray(builder._colourize_anomaly_map(anomaly_map)).resize(
+        (768, 768), Image.Resampling.NEAREST
+    )
+    rendered = Image.open(
+        io.BytesIO(projection["assets"][builder.RUNTIME_VISUAL_HEATMAP_ASSET])
+    ).convert("RGB")
+
+    assert rendered.tobytes() == expected.tobytes()
+    assert sha256(
+        projection["assets"][builder.RUNTIME_VISUAL_HEATMAP_ASSET]
+    ).hexdigest() == "4a9716ebedc873324cd41bdd82dcb6b7df085434fd9177ec42147c35a158aaba"
+
+
+def test_overlay_refinement_does_not_change_governed_result_or_metrics():
+    bundles = builder.build_bundles(REPO_ROOT, review_head="abc1234")
+    visual = bundles["runtime"]["visual"]
+
+    assert visual["prediction_id"] == (
+        "padim-inspection-prediction-542d2df3c9baee3daf0d9c99"
+    )
+    assert bundles["runtime"]["raw_anomaly_measure"] == "6.276"
+    assert visual["localization"]["region"] == {
+        "x_max": 0.375,
+        "x_min": 0.25,
+        "y_max": 0.5,
+        "y_min": 0.375,
+    }
+    assert [metric["value"] for metric in bundles["evaluation"]["metrics"]] == [
+        "0.757826",
+        "0.865196",
+        "0.555765",
+    ]
+
+
+def test_runtime_visual_render_outputs_include_public_safe_assets():
+    outputs = builder.render_outputs(REPO_ROOT, review_head="abc1234")
+
+    for prefix in ("portfolio", "assets/portfolio-experience"):
+        for relative_asset in (
+            builder.RUNTIME_VISUAL_INPUT_ASSET,
+            builder.RUNTIME_VISUAL_HEATMAP_ASSET,
+            builder.RUNTIME_VISUAL_ANOMALY_OVERLAY_ASSET,
+            builder.RUNTIME_VISUAL_LOCALIZATION_ASSET,
+            builder.RUNTIME_VISUAL_MANIFEST_ASSET,
+        ):
+            key = f"{prefix}/{relative_asset}"
+            assert key in outputs
+            assert outputs[key]
+
+    html = outputs["portfolio/index.html"].decode("utf-8")
+    assert "4×4 PGM fixture" not in html
+    assert "4x4 PGM fixture" not in html
+    assert "PaDiM raw anomaly map" in html
+    assert "PaDiM anomaly overlay" in html
+    assert "Raw anomaly intensity over governed input — not calibrated confidence" in html
+    assert "confidence overlay" not in html.lower()
+    assert "confidence heatmap" not in html.lower()
+    assert "/Users/" not in html
+    assert "agentisstudio" not in html
+
+
+def test_public_runtime_station_no_longer_uses_synthetic_fixture():
+    rendered = builder.render_outputs(REPO_ROOT, review_head="abc1234")[
+        "portfolio/index.html"
+    ].decode("utf-8")
+    public_static = (
+        REPO_ROOT / "assets/portfolio-experience/index.html"
+    ).read_text(encoding="utf-8")
+    for html in (rendered, public_static):
+        assert "4×4 PGM fixture" not in html
+        assert "4x4 PGM fixture" not in html
+        assert "blob_defect.pgm" not in html
+        assert "PaDiM raw anomaly map" in html
+        assert "PaDiM anomaly overlay" in html
+        assert "media/runtime-inspection/pcb4-049-input.jpg" in html
+        assert "media/runtime-inspection/pcb4-049-anomaly-overlay.png" in html
+        assert "media/runtime-inspection/pcb4-049-padim-map.png" in html
+        assert "media/runtime-inspection/pcb4-049-localization.png" in html
+        assert html.index("pcb4-049-anomaly-overlay.png") != html.index(
+            "pcb4-049-padim-map.png"
+        )
+        assert "confidence overlay" not in html.lower()
+
+
+def test_canonical_and_public_runtime_assets_and_layout_are_aligned():
+    canonical_html = (REPO_ROOT / "portfolio/index.html").read_text(encoding="utf-8")
+    public_html = (
+        REPO_ROOT / "assets/portfolio-experience/index.html"
+    ).read_text(encoding="utf-8")
+    required_runtime_copy = (
+        "Governed input",
+        "PaDiM anomaly overlay",
+        "Raw anomaly intensity over governed input — not calibrated confidence",
+        "PaDiM raw anomaly map",
+        "Recorded localization",
+    )
+    required_runtime_assets = (
+        builder.RUNTIME_VISUAL_INPUT_ASSET,
+        builder.RUNTIME_VISUAL_ANOMALY_OVERLAY_ASSET,
+        builder.RUNTIME_VISUAL_HEATMAP_ASSET,
+        builder.RUNTIME_VISUAL_LOCALIZATION_ASSET,
+    )
+    for value in required_runtime_copy + required_runtime_assets:
+        assert value in canonical_html
+        assert value in public_html
+
+    canonical_css = (REPO_ROOT / "portfolio/styles.css").read_text(encoding="utf-8")
+    public_css = (
+        REPO_ROOT / "assets/portfolio-experience/styles.css"
+    ).read_text(encoding="utf-8")
+    assert canonical_css[canonical_css.index(":root") :] == public_css[
+        public_css.index(":root") :
+    ]
+    for relative_asset in required_runtime_assets + (builder.RUNTIME_VISUAL_MANIFEST_ASSET,):
+        assert (REPO_ROOT / "portfolio" / relative_asset).read_bytes() == (
+            REPO_ROOT / "assets/portfolio-experience" / relative_asset
+        ).read_bytes()
+
+    overlay_sha256 = sha256(
+        (REPO_ROOT / "portfolio" / builder.RUNTIME_VISUAL_ANOMALY_OVERLAY_ASSET).read_bytes()
+    ).hexdigest()
+    for prefix in ("portfolio", "assets/portfolio-experience"):
+        manifest = _read_json(
+            REPO_ROOT / prefix / builder.RUNTIME_VISUAL_MANIFEST_ASSET
+        )
+        assert manifest["anomaly_overlay_asset_sha256"] == overlay_sha256
+        assert manifest["input_asset_sha256"] == (
+            "d7873fe67f9e5c195504e3fec7d71daeb7818791e3bf4be23b6ec2764fa91d2e"
+        )
+        assert manifest["anomaly_map_sha256"] == (
+            "41c9f22495beb491cd83845abbfd826a796651b593606bb6c05021d7a29d83e2"
+        )
 
 
 def test_missing_governed_source_field_raises(tmp_path):
@@ -189,18 +467,31 @@ def _copy_minimal_repo(tmp_path: Path) -> Path:
         "artifacts/runtime/integration_metadata.json",
         "artifacts/runtime/runtime_replay.json",
         "artifacts/runtime/equivalence/runtime_equivalence_report.json",
+        "data/visa/derived/padim/evaluation/failure_analysis/failure_analysis.json",
         "docs/evidence/SCIENTIFIC_EVALUATION.md",
         "docs/engineering/PORTFOLIO_UX_ARCHITECTURE.md",
         "docs/engineering/RUNTIME_INTEGRATION_MILESTONE.md",
         "tests/fixtures/inspection/blob_defect.pgm",
         "portfolio/index.html",
+        "portfolio/data/runtime.json",
     ]
+    paths.extend(
+        f"portfolio/{relative_path}"
+        for relative_path in (
+            builder.RUNTIME_VISUAL_INPUT_ASSET,
+            builder.RUNTIME_VISUAL_HEATMAP_ASSET,
+            builder.RUNTIME_VISUAL_ANOMALY_OVERLAY_ASSET,
+            builder.RUNTIME_VISUAL_LOCALIZATION_ASSET,
+            builder.RUNTIME_VISUAL_MANIFEST_ASSET,
+        )
+    )
     for path in paths:
         src = REPO_ROOT / path
         dst = repo / path
         dst.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(src, dst)
     (repo / "portfolio/data").mkdir(parents=True, exist_ok=True)
+    (repo / "assets/portfolio-experience").mkdir(parents=True, exist_ok=True)
     return repo
 
 
@@ -212,3 +503,11 @@ def _metric(source: str, name: str) -> str:
     match = re.search(rf"- {re.escape(name)} .*: `([^`]+)`", source)
     assert match is not None
     return match.group(1)
+
+
+def _link_or_copy(src: Path, dst: Path) -> None:
+    dst.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        dst.symlink_to(src)
+    except OSError:
+        shutil.copy2(src, dst)

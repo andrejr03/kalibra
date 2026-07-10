@@ -25,6 +25,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install public verification dependencies
+        run: python3 -m pip install pytest numpy pillow onnx onnxruntime
+
+      - name: Run clean-clone tests
+        run: python3 -m pytest -q
+
+      - name: Verify public clone artifacts
+        run: python3 scripts/verify_public_clone.py
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
 

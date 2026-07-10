@@ -24,16 +24,47 @@ VisA is used as the governed proxy dataset, not as the industrial domain of reco
 
 ## Quick Verification
 
-Run this dependency-light verification path from a clean clone:
+Kalibra has three explicit verification levels. Level 1 is the public clean-clone
+contract; Levels 2 and 3 require separately acquired governed VisA data.
+
+### Level 1 — Clean-Clone Verification
+
+Quick Verification works using tracked repository contents only:
 
 ```bash
 git clone https://github.com/andrejr03/kalibra.git
 cd kalibra
+python3 -m pytest -q
+python3 scripts/verify_public_clone.py
 python3 scripts/build_portfolio_evidence_bundle.py --check
-python3 -c "from hashlib import sha256; from pathlib import Path; expected='0437ae28e172489387da07c4bd1f0c6b1ed95f3970ca3c7fa1dcd55935bd741a'; actual=sha256(Path('artifacts/padim/model.onnx').read_bytes()).hexdigest(); assert actual == expected, actual; print('model hash verified')"
 ```
 
-Expected result: the bundle check exits successfully, and the final command prints `model hash verified`.
+This checks the default committed-fixture tests, model and governed-artifact
+SHA-256 records, the public evidence manifest, and portfolio bundle drift. It does
+not perform governed runtime replay or scientific reproduction.
+
+### Level 2 — Governed Runtime Verification
+
+The full runtime-equivalence replay requires the separately governed VisA archive
+and extracted dataset:
+
+```bash
+python3 scripts/verify_padim_runtime_equivalence.py verify
+python3 scripts/verify_placeholder_retirement.py verify
+python3 -m pytest -q -m governed_data
+```
+
+The dataset is not shipped in Git. That is an intentional licensing and governance
+boundary, not a missing repository file. Acquisition, expected paths, and integrity
+steps are documented in [VisA Acquisition and Governance](docs/engineering/VISA_ACQUISITION_AND_GOVERNANCE.md).
+
+### Level 3 — Full Scientific Reproduction
+
+Full scientific reproduction is a separate workflow requiring governed dataset
+acquisition plus the documented training, inference, evaluation, export, and
+runtime environment. It is not a default clean-clone guarantee. Follow the
+[scientific evaluation methodology](docs/evidence/SCIENTIFIC_EVALUATION.md) after
+completing the governed acquisition instructions.
 
 Complete governed replay evidence is documented in [Runtime Equivalence](docs/evidence/RUNTIME_EQUIVALENCE.md) and [Runtime Provider Integration](docs/evidence/RUNTIME_PROVIDER_INTEGRATION.md).
 

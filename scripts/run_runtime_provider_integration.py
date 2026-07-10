@@ -483,6 +483,12 @@ def evidence_markdown(
 **Date:** {EVIDENCE_DATE}
 **Scope:** Phase 3 / Task 3 - Runtime Provider Integration only
 
+## Verification Levels
+
+- **Level 1 - Clean-Clone Verification:** `python3 scripts/verify_public_clone.py` validates the committed model, runtime records, and public evidence drift without replaying governed data.
+- **Level 2 - Governed Runtime Verification:** `python3 scripts/verify_padim_runtime_equivalence.py verify` requires separately acquired VisA source/archive bytes; see `docs/engineering/VISA_ACQUISITION_AND_GOVERNANCE.md`.
+- **Level 3 - Full Scientific Reproduction:** governed acquisition plus the documented scientific and runtime environment; it is separate from the public clone contract.
+
 ## Integration Result
 
 - Runtime integration completed: `true`

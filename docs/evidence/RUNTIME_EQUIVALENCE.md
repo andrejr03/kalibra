@@ -4,6 +4,12 @@
 **Date:** 2026-07-07
 **Scope:** Phase 3 / Task 4 - Runtime Equivalence Verification only
 
+## Verification Levels
+
+- **Level 1 - Clean-Clone Verification:** `python3 scripts/verify_public_clone.py` checks committed public artifacts and does not replay this result.
+- **Level 2 - Governed Runtime Verification:** this verifier requires the separately acquired `data/visa/source/VisA_20220922.tar` archive and extracted VisA data. Their absence is expected in a normal public clone; follow `docs/engineering/VISA_ACQUISITION_AND_GOVERNANCE.md`.
+- **Level 3 - Full Scientific Reproduction:** dataset acquisition plus the documented training, inference, evaluation, export, and runtime environment; this is a separate workflow, not a clean-clone guarantee.
+
 ## Verification Scope
 
 - Canonical runtime path executed: `OnnxInspectionInferenceProvider().predict(StabilizedInspectionInput)`

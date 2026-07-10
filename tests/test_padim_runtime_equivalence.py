@@ -5,6 +5,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+import pytest
+
 
 SCRIPT_PATH = (
     Path(__file__).resolve().parents[1]
@@ -164,6 +166,25 @@ def test_public_session_configuration_json_replaces_repo_local_artifact_path() -
     assert session_json["model_reference"]["artifact_path"] == str(repo_model_path)
 
 
+def test_missing_governed_archive_reports_expected_public_clone_boundary(
+    tmp_path: Path,
+) -> None:
+    try:
+        runtime_equivalence.require_governed_runtime_data(tmp_path)
+    except runtime_equivalence.GovernedDataUnavailableError as error:
+        message = str(error)
+    else:
+        raise AssertionError("missing governed data must fail closed")
+
+    assert "GOVERNED DATA UNAVAILABLE" in message
+    assert "data/visa/source/VisA_20220922.tar" in message
+    assert "intentionally not shipped in Git" in message
+    assert "docs/engineering/VISA_ACQUISITION_AND_GOVERNANCE.md" in message
+    assert "expected in a normal public clone" in message
+    assert "verification failed" not in message.lower()
+
+
+@pytest.mark.governed_data
 def test_real_runtime_equivalence_verifier_command_passes() -> None:
     subprocess.run(
         [

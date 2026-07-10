@@ -47,7 +47,7 @@
     <div class="railfoot">
       <div class="blk"><div class="k">MODE</div><div class="v">Offline · Batch · Reproducible</div></div>
       <div class="blk"><div class="k">EVIDENCE BASIS</div><div class="v" data-bind="meta.evidence_basis">Single-seed · VisA-proxy</div></div>
-      <div class="blk"><div class="k">REVIEW HEAD</div><div class="v mn" data-bind="meta.review_head">65c24d8</div></div>
+      <div class="blk"><div class="k">REVIEW HEAD</div><div class="v mn" data-bind="meta.review_head">d8bba98</div></div>
     </div>
   </nav>
 
@@ -107,29 +107,61 @@
       <div class="insp-grid">
         <!-- left: the decision -->
         <div class="card">
-          <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
-            <span class="mono" style="font-size:15px;color:var(--ink2)" data-bind="runtime.input.name">blob_defect.pgm</span>
-            <span class="st amber"><span class="sd"></span><span data-bind="runtime.input.projection_label">Local-provider projection</span></span>
+          <div class="inspection-case-head">
+            <div class="case-title">
+              <span class="mono sample" data-bind="runtime.input.name">pcb4 / anomaly / 049.JPG</span>
+              <span class="st amber"><span class="sd"></span><span data-bind="runtime.input.projection_label">Recorded governed case</span></span>
+            </div>
+            <div class="case-meta">
+              <span class="pathpill" data-bind="runtime.input.split" data-prefix="split ">split test</span>
+              <span class="pathpill" data-bind="runtime.input.category" data-prefix="category ">category pcb4</span>
+              <span class="pathpill" data-bind="runtime.input.content_hash_short" data-prefix="sha256 ">sha256 d7873fe6…a91d2e</span>
+            </div>
           </div>
 
-          <div style="display:flex;gap:16px">
-            <div style="flex:1;min-width:0">
-              <div class="frame">
-                <img alt="Governed inspection input, rendered from the local-provider projection" src="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%204%204%22%20shape-rendering=%22crispEdges%22%3E%3Crect%20width=%22100%25%22%20height=%22100%25%22%20fill=%22%23070a0e%22/%3E%3Crect%20x=%221%22%20y=%221%22%20width=%221%22%20height=%221%22%20fill=%22rgb%28255,255,255%29%22/%3E%3Crect%20x=%222%22%20y=%221%22%20width=%221%22%20height=%221%22%20fill=%22rgb%28255,255,255%29%22/%3E%3Crect%20x=%221%22%20y=%222%22%20width=%221%22%20height=%221%22%20fill=%22rgb%28255,255,255%29%22/%3E%3Crect%20x=%222%22%20y=%222%22%20width=%221%22%20height=%221%22%20fill=%22rgb%28255,255,255%29%22/%3E%3C/svg%3E">
-                <div class="tag" data-bind="runtime.input.fixture_tag">INPUT · 4×4 PGM fixture</div>
+          <div class="inspection-visuals">
+            <figure class="visual-panel">
+              <div class="visual-frame">
+                <img alt="Governed VisA-proxy PCB inspection input" src="media/runtime-inspection/pcb4-049-input.jpg">
               </div>
-            </div>
-            <div style="flex:1;min-width:0">
-              <div class="frame">
-                <img alt="Defect localization overlay" src="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%204%204%22%20shape-rendering=%22crispEdges%22%3E%3Crect%20width=%22100%25%22%20height=%22100%25%22%20fill=%22%23070a0e%22/%3E%3Crect%20x=%221%22%20y=%221%22%20width=%221%22%20height=%221%22%20fill=%22rgb%28255,255,255%29%22/%3E%3Crect%20x=%222%22%20y=%221%22%20width=%221%22%20height=%221%22%20fill=%22rgb%28255,255,255%29%22/%3E%3Crect%20x=%221%22%20y=%222%22%20width=%221%22%20height=%221%22%20fill=%22rgb%28255,255,255%29%22/%3E%3Crect%20x=%222%22%20y=%222%22%20width=%221%22%20height=%221%22%20fill=%22rgb%28255,255,255%29%22/%3E%3Crect%20x=%221%22%20y=%221%22%20width=%222%22%20height=%222%22%20fill=%22%23e5514e%22%20fill-opacity=%220.24%22%20stroke=%22%23e5514e%22%20stroke-width=%220.08%22/%3E%3C/svg%3E">
-                <div class="tag" data-bind="runtime.localization.display_label">LOCALIZATION · x 0.25–0.75, y 0.25–0.75</div>
+              <figcaption class="visual-caption">
+                <span class="t">Governed input</span>
+                <span class="s" data-bind="runtime.input.name">pcb4 / anomaly / 049.JPG</span>
+              </figcaption>
+            </figure>
+            <figure class="visual-panel">
+              <div class="visual-frame">
+                <img alt="Semi-transparent PaDiM raw anomaly intensity over the governed PCB input" src="media/runtime-inspection/pcb4-049-anomaly-overlay.png">
               </div>
-            </div>
+              <figcaption class="visual-caption">
+                <span class="t" data-bind="runtime.visual.anomaly_overlay.label">PaDiM anomaly overlay</span>
+                <span class="s visual-explainer" data-bind="runtime.visual.anomaly_overlay.supporting_text">Raw anomaly intensity over governed input — not calibrated confidence</span>
+                <span class="heat-legend"><span>low</span><span class="ramp"></span><span>high raw anomaly</span></span>
+              </figcaption>
+            </figure>
+            <figure class="visual-panel">
+              <div class="visual-frame">
+                <img alt="PaDiM raw anomaly map for the governed PCB case" src="media/runtime-inspection/pcb4-049-padim-map.png">
+              </div>
+              <figcaption class="visual-caption">
+                <span class="t" data-bind="runtime.visual.anomaly_map.label">PaDiM raw anomaly map</span>
+                <span class="s" data-bind="runtime.visual.anomaly_map.sha256_short" data-prefix="map sha256 ">map sha256 41c9f224…9d83e2</span>
+              </figcaption>
+            </figure>
+            <figure class="visual-panel">
+              <div class="visual-frame">
+                <img alt="Recorded localization region overlaid on the governed PCB input" src="media/runtime-inspection/pcb4-049-localization.png">
+              </div>
+              <figcaption class="visual-caption">
+                <span class="t">Recorded localization</span>
+                <span class="s" data-bind="runtime.localization.display_label">LOCALIZATION · x 0.250–0.375, y 0.375–0.500</span>
+              </figcaption>
+            </figure>
           </div>
 
           <div style="height:1px;background:var(--line);margin:20px 0 18px"></div>
 
-          <div style="display:grid;grid-template-columns:0.8fr 1.2fr;gap:28px;align-items:start">
+          <div class="result-grid">
             <div>
               <div class="card-k">Inspection result</div>
               <div style="display:inline-flex;align-items:center;gap:9px;background:rgba(229,81,78,0.12);border:1px solid rgba(229,81,78,0.4);border-radius:8px;padding:10px 16px">
@@ -139,12 +171,12 @@
               <p style="font:400 12px var(--body);color:var(--mut4);margin-top:12px;line-height:1.55">Judgement only — &ldquo;is this defective, and where?&rdquo;</p>
             </div>
             <div>
-              <div class="card-k">Raw anomaly measure</div>
+              <div class="card-k" data-bind="runtime.raw_statement">Raw anomaly measure — not calibrated confidence</div>
               <div style="display:flex;align-items:center;gap:18px">
-                <span class="metric-big" data-bind="runtime.raw_anomaly_measure">75.00</span>
+                <span class="metric-big" data-bind="runtime.raw_anomaly_measure">6.276</span>
                 <div style="flex:1">
-                  <div class="bar"><i style="width:75%"></i></div>
-                  <div style="display:flex;justify-content:space-between;margin-top:6px"><span class="mono" style="font-size:11px;color:var(--mut4)">0</span><span class="mono" style="font-size:11px;color:var(--mut4)" data-bind="runtime.raw_scale_max" data-suffix=" · model raw scale">100 · model raw scale</span></div>
+                  <div class="bar"><i style="width:63%"></i></div>
+                  <div class="raw-scale"><span class="mono" style="font-size:11px;color:var(--mut4)">0</span><span class="mono" style="font-size:11px;color:var(--mut4)" data-bind="runtime.raw_scale_max" data-suffix=" · model raw scale">10+ · model raw scale</span></div>
                 </div>
               </div>
               <p style="font:400 12px var(--body);color:var(--mut4);margin-top:10px;line-height:1.55">A standalone measure of how unusual the input is — <span style="color:var(--mut2)">not a probability of being correct, and not calibrated confidence.</span></p>
@@ -153,7 +185,7 @@
 
           <div class="precomp">
             <span class="sq"></span>
-            <span data-bind="runtime.precomputed_note">Precomputed from a governed offline run. Kalibra does not run inference in your browser — this is a projection of a recorded local-provider result.</span>
+            <span data-bind="runtime.precomputed_note">Precomputed from a governed offline run on the VisA proxy dataset. Kalibra does not run inference in your browser — this single case is illustrative evidence, not proof of generalized performance.</span>
           </div>
 
           <details class="disclose">
@@ -161,7 +193,9 @@
             <div style="margin-top:14px">
               <div class="kv"><span class="k">Model identity</span><span class="v" data-bind="runtime.model_identity">kalibra-padim-onnx-export-v1</span></div>
               <div class="kv"><span class="k">Model artifact</span><span class="v" data-bind="runtime.model_sha256_short" data-prefix="sha256:">sha256:0437ae28…741a</span></div>
-              <div class="kv"><span class="k">Input content hash</span><span class="v" data-bind="runtime.input.content_hash_short">8b719296…0da45e</span></div>
+              <div class="kv"><span class="k">Input content hash</span><span class="v" data-bind="runtime.input.content_hash_short">d7873fe6…a91d2e</span></div>
+              <div class="kv"><span class="k">Anomaly-map hash</span><span class="v" data-bind="runtime.visual.anomaly_map.sha256_short">41c9f224…9d83e2</span></div>
+              <div class="kv"><span class="k">Projection manifest</span><span class="v" data-bind="runtime.visual.manifest.sha256_short">c60a3bd4…3bb25c</span></div>
               <div class="kv"><span class="k">Feature contract</span><span class="v" data-bind="runtime.feature_contract">…rgb64-bilinear-float64-patch8-v1</span></div>
               <div class="kv"><span class="k">Toolchain pin</span><span class="v" data-bind="runtime.toolchain">onnxruntime 1.19.2 · numpy 2.0.2 · python 3.9.6</span></div>
               <div class="kv"><span class="k">Determinism</span><span class="v" data-bind="runtime.determinism">single-thread · ORT_DISABLE_ALL · CPU EP</span></div>
@@ -565,7 +599,7 @@
             <svg class="hex" width="30" height="34" viewBox="0 0 34 38"><polygon points="17,2 32,10.5 32,27.5 17,36 2,27.5 2,10.5" fill="none" stroke="#e6a23c" stroke-width="2"></polygon><circle cx="17" cy="19" r="3.4" fill="#e6a23c"></circle></svg>
             <div>
               <div style="font:500 14px var(--disp);color:var(--ink)">Kalibra repository</div>
-              <div style="font:400 12px var(--body);color:var(--mut3);margin-top:2px">Static site lives next to the source · GitHub Pages · review HEAD <span class="mono" data-bind="meta.review_head">65c24d8</span></div>
+              <div style="font:400 12px var(--body);color:var(--mut3);margin-top:2px">Static site lives next to the source · GitHub Pages · review HEAD <span class="mono" data-bind="meta.review_head">d8bba98</span></div>
             </div>
           </div>
         </div>
@@ -825,7 +859,7 @@
     "model_sha256": "0437ae28e172489387da07c4bd1f0c6b1ed95f3970ca3c7fa1dcd55935bd741a",
     "model_sha256_short": "0437ae28…741a",
     "offline_mode": true,
-    "review_head": "65c24d8"
+    "review_head": "d8bba98"
   },
   "runtime": {
     "carried": [
@@ -850,25 +884,31 @@
     "determinism": "single-thread · ORT_DISABLE_ALL · CPU EP",
     "feature_contract": "…rgb64-bilinear-float64-patch8-v1",
     "input": {
-      "class_name": "candle",
-      "content_hash_short": "8b719296…0da45e",
-      "fixture": "4×4 PGM",
-      "fixture_tag": "INPUT · 4×4 PGM fixture",
-      "name": "blob_defect.pgm",
-      "projection_label": "Local-provider projection"
+      "category": "pcb4",
+      "class_name": "pcb4",
+      "content_hash_short": "d7873fe6…a91d2e",
+      "dataset_label": "visa-acq-v1",
+      "fixture": "governed VisA-proxy image",
+      "fixture_tag": "INPUT · governed VisA-proxy image",
+      "name": "pcb4 / anomaly / 049.JPG",
+      "projection_label": "Recorded governed case",
+      "sample_id": "049",
+      "split": "test"
     },
     "integration_status": "passed",
     "localization": {
-      "display_label": "LOCALIZATION · x 0.25–0.75, y 0.25–0.75",
-      "x": "0.25–0.75",
-      "y": "0.25–0.75"
+      "display_label": "LOCALIZATION · x 0.250–0.375, y 0.375–0.500",
+      "kind": "padim_raw_anomaly_map_argmax_region_v1",
+      "x": "0.250–0.375",
+      "y": "0.375–0.500"
     },
     "model_identity": "kalibra-padim-onnx-export-v1",
     "model_sha256_short": "0437ae28…741a",
-    "precomputed_note": "Precomputed from a governed offline run. Kalibra does not run inference in your browser — this is a projection of a recorded local-provider result.",
-    "raw_anomaly_measure": "75.00",
-    "raw_bar_percent": "75",
-    "raw_scale_max": "100",
+    "precomputed_note": "Precomputed from a governed offline run on the VisA proxy dataset. Kalibra does not run inference in your browser — this single case is illustrative evidence, not proof of generalized performance.",
+    "raw_anomaly_measure": "6.276",
+    "raw_bar_percent": "63",
+    "raw_scale_max": "10+",
+    "raw_statement": "Raw anomaly measure — not calibrated confidence",
     "session_config_hash_short": "2893fd1f…a2e4",
     "toolchain": "onnxruntime 1.19.2 · numpy 2.0.2 · python 3.9.6",
     "trust": {
@@ -879,7 +919,72 @@
       ],
       "state": "not_yet_demonstrated"
     },
-    "verdict": "DEFECT"
+    "verdict": "DEFECT",
+    "visual": {
+      "anomaly_map": {
+        "asset_path": "media/runtime-inspection/pcb4-049-padim-map.png",
+        "asset_sha256": "4a9716ebedc873324cd41bdd82dcb6b7df085434fd9177ec42147c35a158aaba",
+        "interpolation_mode": "nearest-neighbour",
+        "label": "PaDiM raw anomaly map",
+        "max_raw": "6.276",
+        "min_raw": "0.793",
+        "sha256": "41c9f22495beb491cd83845abbfd826a796651b593606bb6c05021d7a29d83e2",
+        "sha256_short": "41c9f224…9d83e2"
+      },
+      "anomaly_overlay": {
+        "alpha": 0.33,
+        "asset_path": "media/runtime-inspection/pcb4-049-anomaly-overlay.png",
+        "asset_sha256": "226af27eca1831b07025dac7379c61466ae502ec40f69bd9ccd7ebf1783ce8b2",
+        "colour_map_identity": "kalibra_raw_anomaly_six_stop_linear_rgb_v1",
+        "interpolation_mode": "bilinear (presentation-only)",
+        "label": "PaDiM anomaly overlay",
+        "native_dimensions": {
+          "height": 64,
+          "width": 64
+        },
+        "rendered_dimensions": {
+          "height": 1104,
+          "width": 1358
+        },
+        "supporting_text": "Raw anomaly intensity over governed input — not calibrated confidence"
+      },
+      "category": "pcb4",
+      "dataset_label": "visa-acq-v1",
+      "input": {
+        "asset_path": "media/runtime-inspection/pcb4-049-input.jpg",
+        "asset_sha256": "d7873fe67f9e5c195504e3fec7d71daeb7818791e3bf4be23b6ec2764fa91d2e",
+        "content_hash_short": "d7873fe6…a91d2e",
+        "filename": "pcb4/Data/Images/Anomaly/049.JPG",
+        "sample_id": "049",
+        "sample_label": "pcb4 / anomaly / 049.JPG"
+      },
+      "localization": {
+        "asset_path": "media/runtime-inspection/pcb4-049-localization.png",
+        "asset_sha256": "8281f0edfba1b0808d38a8a3feb6ba5be59317eb9dc90cb8fcf6cd7989499df2",
+        "display_label": "LOCALIZATION · x 0.250–0.375, y 0.375–0.500",
+        "kind": "padim_raw_anomaly_map_argmax_region_v1",
+        "region": {
+          "x_max": 0.375,
+          "x_min": 0.25,
+          "y_max": 0.5,
+          "y_min": 0.375
+        }
+      },
+      "manifest": {
+        "asset_path": "media/runtime-inspection/manifest.json",
+        "sha256": "c60a3bd4c96a866ad780fa31d8d701742ba5e4513536487bc6bbf082973bb25c",
+        "sha256_short": "c60a3bd4…3bb25c"
+      },
+      "prediction_id": "padim-inspection-prediction-542d2df3c9baee3daf0d9c99",
+      "raw_anomaly_measure": "6.276",
+      "raw_bar_percent": "63",
+      "raw_measure_kind": "raw_anomaly_measure",
+      "raw_measure_scale": "model_raw_anomaly_measure",
+      "selection_rationale": "Governed VisA-proxy PCB anomaly with a visible defect, recorded PaDiM raw anomaly map, and a predicted localization region not listed as a C-6 localization failure; selected for public understandability, not as generalized performance proof.",
+      "source_license": "VisA dataset license recorded as CC BY 4.0",
+      "split": "test",
+      "split_sha256_short": "2d86ae7f…505510"
+    }
   },
   "timeline": {
     "next": "Trust qualification — calibration, routing, abstention, drift, human review. Designed, not yet evidenced.",

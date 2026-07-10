@@ -61,6 +61,9 @@ RUNTIME_EQUIVALENCE_REPLAY_PATH = (
 EVIDENCE_PATH = (
     REPO_ROOT / "docs" / "evidence" / "RUNTIME_EQUIVALENCE.md"
 )
+GOVERNANCE_DOCUMENTATION_PATH = (
+    "docs/engineering/VISA_ACQUISITION_AND_GOVERNANCE.md"
+)
 
 RUNTIME_DIR = REPO_ROOT / "artifacts" / "runtime"
 RUNTIME_INTEGRATION_METADATA_PATH = RUNTIME_DIR / "integration_metadata.json"
@@ -109,6 +112,10 @@ BBOX_ABSOLUTE_TOLERANCE = 0.0
 
 class RuntimeEquivalenceError(RuntimeError):
     """Raised when runtime equivalence cannot be verified safely."""
+
+
+class GovernedDataUnavailableError(RuntimeEquivalenceError):
+    """Raised when the separately governed dataset is unavailable."""
 
 
 @dataclass(frozen=True)
@@ -245,6 +252,28 @@ def verify_reference_context() -> RuntimeReferenceContext:
         export_context=export_context,
         task3_identity=task3_identity,
         c6_identity=c6_identity,
+    )
+
+
+def require_governed_runtime_data(repo_root: Path = REPO_ROOT) -> None:
+    archive_path = (
+        repo_root
+        / "data"
+        / "visa"
+        / "source"
+        / acquisition.ARCHIVE_FILENAME
+    )
+    if archive_path.is_file():
+        return
+    expected_path = archive_path.relative_to(repo_root).as_posix()
+    raise GovernedDataUnavailableError(
+        "GOVERNED DATA UNAVAILABLE — runtime equivalence was not run.\n"
+        f"Missing required file: {expected_path}\n"
+        "The VisA archive is intentionally not shipped in Git because it is "
+        "managed as separately acquired, governed dataset material.\n"
+        f"Acquisition and governance instructions: {GOVERNANCE_DOCUMENTATION_PATH}\n"
+        "This absence is expected in a normal public clone. Run "
+        "scripts/verify_public_clone.py for Level 1 clean-clone verification."
     )
 
 
@@ -1226,6 +1255,12 @@ def write_evidence(
 **Date:** {date}
 **Scope:** Phase 3 / Task 4 - Runtime Equivalence Verification only
 
+## Verification Levels
+
+- **Level 1 - Clean-Clone Verification:** `python3 scripts/verify_public_clone.py` checks committed public artifacts and does not replay this result.
+- **Level 2 - Governed Runtime Verification:** this verifier requires the separately acquired `data/visa/source/VisA_20220922.tar` archive and extracted VisA data. Their absence is expected in a normal public clone; follow `docs/engineering/VISA_ACQUISITION_AND_GOVERNANCE.md`.
+- **Level 3 - Full Scientific Reproduction:** dataset acquisition plus the documented training, inference, evaluation, export, and runtime environment; this is a separate workflow, not a clean-clone guarantee.
+
 ## Verification Scope
 
 - Canonical runtime path executed: `OnnxInspectionInferenceProvider().predict(StabilizedInspectionInput)`
@@ -1350,7 +1385,12 @@ def main(argv: Sequence[str] | None = None) -> int:
         help="Run the bounded runtime-equivalence verification.",
     )
     parser.parse_args(argv)
-    persist_records()
+    try:
+        require_governed_runtime_data()
+        persist_records()
+    except GovernedDataUnavailableError as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
     return 0
 
 

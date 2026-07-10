@@ -21,25 +21,31 @@
   "determinism": "single-thread · ORT_DISABLE_ALL · CPU EP",
   "feature_contract": "…rgb64-bilinear-float64-patch8-v1",
   "input": {
-    "class_name": "candle",
-    "content_hash_short": "8b719296…0da45e",
-    "fixture": "4×4 PGM",
-    "fixture_tag": "INPUT · 4×4 PGM fixture",
-    "name": "blob_defect.pgm",
-    "projection_label": "Local-provider projection"
+    "category": "pcb4",
+    "class_name": "pcb4",
+    "content_hash_short": "d7873fe6…a91d2e",
+    "dataset_label": "visa-acq-v1",
+    "fixture": "governed VisA-proxy image",
+    "fixture_tag": "INPUT · governed VisA-proxy image",
+    "name": "pcb4 / anomaly / 049.JPG",
+    "projection_label": "Recorded governed case",
+    "sample_id": "049",
+    "split": "test"
   },
   "integration_status": "passed",
   "localization": {
-    "display_label": "LOCALIZATION · x 0.25–0.75, y 0.25–0.75",
-    "x": "0.25–0.75",
-    "y": "0.25–0.75"
+    "display_label": "LOCALIZATION · x 0.250–0.375, y 0.375–0.500",
+    "kind": "padim_raw_anomaly_map_argmax_region_v1",
+    "x": "0.250–0.375",
+    "y": "0.375–0.500"
   },
   "model_identity": "kalibra-padim-onnx-export-v1",
   "model_sha256_short": "0437ae28…741a",
-  "precomputed_note": "Precomputed from a governed offline run. Kalibra does not run inference in your browser — this is a projection of a recorded local-provider result.",
-  "raw_anomaly_measure": "75.00",
-  "raw_bar_percent": "75",
-  "raw_scale_max": "100",
+  "precomputed_note": "Precomputed from a governed offline run on the VisA proxy dataset. Kalibra does not run inference in your browser — this single case is illustrative evidence, not proof of generalized performance.",
+  "raw_anomaly_measure": "6.276",
+  "raw_bar_percent": "63",
+  "raw_scale_max": "10+",
+  "raw_statement": "Raw anomaly measure — not calibrated confidence",
   "session_config_hash_short": "2893fd1f…a2e4",
   "toolchain": "onnxruntime 1.19.2 · numpy 2.0.2 · python 3.9.6",
   "trust": {
@@ -50,5 +56,70 @@
     ],
     "state": "not_yet_demonstrated"
   },
-  "verdict": "DEFECT"
+  "verdict": "DEFECT",
+  "visual": {
+    "anomaly_map": {
+      "asset_path": "media/runtime-inspection/pcb4-049-padim-map.png",
+      "asset_sha256": "4a9716ebedc873324cd41bdd82dcb6b7df085434fd9177ec42147c35a158aaba",
+      "interpolation_mode": "nearest-neighbour",
+      "label": "PaDiM raw anomaly map",
+      "max_raw": "6.276",
+      "min_raw": "0.793",
+      "sha256": "41c9f22495beb491cd83845abbfd826a796651b593606bb6c05021d7a29d83e2",
+      "sha256_short": "41c9f224…9d83e2"
+    },
+    "anomaly_overlay": {
+      "alpha": 0.33,
+      "asset_path": "media/runtime-inspection/pcb4-049-anomaly-overlay.png",
+      "asset_sha256": "226af27eca1831b07025dac7379c61466ae502ec40f69bd9ccd7ebf1783ce8b2",
+      "colour_map_identity": "kalibra_raw_anomaly_six_stop_linear_rgb_v1",
+      "interpolation_mode": "bilinear (presentation-only)",
+      "label": "PaDiM anomaly overlay",
+      "native_dimensions": {
+        "height": 64,
+        "width": 64
+      },
+      "rendered_dimensions": {
+        "height": 1104,
+        "width": 1358
+      },
+      "supporting_text": "Raw anomaly intensity over governed input — not calibrated confidence"
+    },
+    "category": "pcb4",
+    "dataset_label": "visa-acq-v1",
+    "input": {
+      "asset_path": "media/runtime-inspection/pcb4-049-input.jpg",
+      "asset_sha256": "d7873fe67f9e5c195504e3fec7d71daeb7818791e3bf4be23b6ec2764fa91d2e",
+      "content_hash_short": "d7873fe6…a91d2e",
+      "filename": "pcb4/Data/Images/Anomaly/049.JPG",
+      "sample_id": "049",
+      "sample_label": "pcb4 / anomaly / 049.JPG"
+    },
+    "localization": {
+      "asset_path": "media/runtime-inspection/pcb4-049-localization.png",
+      "asset_sha256": "8281f0edfba1b0808d38a8a3feb6ba5be59317eb9dc90cb8fcf6cd7989499df2",
+      "display_label": "LOCALIZATION · x 0.250–0.375, y 0.375–0.500",
+      "kind": "padim_raw_anomaly_map_argmax_region_v1",
+      "region": {
+        "x_max": 0.375,
+        "x_min": 0.25,
+        "y_max": 0.5,
+        "y_min": 0.375
+      }
+    },
+    "manifest": {
+      "asset_path": "media/runtime-inspection/manifest.json",
+      "sha256": "c60a3bd4c96a866ad780fa31d8d701742ba5e4513536487bc6bbf082973bb25c",
+      "sha256_short": "c60a3bd4…3bb25c"
+    },
+    "prediction_id": "padim-inspection-prediction-542d2df3c9baee3daf0d9c99",
+    "raw_anomaly_measure": "6.276",
+    "raw_bar_percent": "63",
+    "raw_measure_kind": "raw_anomaly_measure",
+    "raw_measure_scale": "model_raw_anomaly_measure",
+    "selection_rationale": "Governed VisA-proxy PCB anomaly with a visible defect, recorded PaDiM raw anomaly map, and a predicted localization region not listed as a C-6 localization failure; selected for public understandability, not as generalized performance proof.",
+    "source_license": "VisA dataset license recorded as CC BY 4.0",
+    "split": "test",
+    "split_sha256_short": "2d86ae7f…505510"
+  }
 }

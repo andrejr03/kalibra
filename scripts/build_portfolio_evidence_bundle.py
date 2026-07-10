@@ -4,7 +4,9 @@ from __future__ import annotations
 import argparse
 import copy
 import difflib
+import hashlib
 import html
+import io
 import json
 from pathlib import Path
 import re
@@ -21,6 +23,28 @@ from src.prototype_ui.local_provider_projection import (
     build_local_provider_demo_projection,
 )
 
+
+RUNTIME_VISUAL_INPUT_ID = "visa-inference-input-07fabbcc7f1fc18cdff4634f"
+RUNTIME_VISUAL_MEDIA_DIR = "media/runtime-inspection"
+RUNTIME_VISUAL_INPUT_ASSET = f"{RUNTIME_VISUAL_MEDIA_DIR}/pcb4-049-input.jpg"
+RUNTIME_VISUAL_HEATMAP_ASSET = f"{RUNTIME_VISUAL_MEDIA_DIR}/pcb4-049-padim-map.png"
+RUNTIME_VISUAL_ANOMALY_OVERLAY_ASSET = (
+    f"{RUNTIME_VISUAL_MEDIA_DIR}/pcb4-049-anomaly-overlay.png"
+)
+RUNTIME_VISUAL_LOCALIZATION_ASSET = f"{RUNTIME_VISUAL_MEDIA_DIR}/pcb4-049-localization.png"
+RUNTIME_VISUAL_MANIFEST_ASSET = f"{RUNTIME_VISUAL_MEDIA_DIR}/manifest.json"
+RUNTIME_VISUAL_OVERLAY_ALPHA = 0.33
+RUNTIME_VISUAL_COLOUR_MAP = "kalibra_raw_anomaly_six_stop_linear_rgb_v1"
+RUNTIME_VISUAL_INTERPOLATION = "bilinear (presentation-only)"
+RUNTIME_VISUAL_RAW_MAP_INTERPOLATION = "nearest-neighbour"
+RUNTIME_VISUAL_PALETTE = (
+    (5, 7, 13),
+    (18, 43, 88),
+    (96, 49, 111),
+    (202, 65, 64),
+    (238, 158, 63),
+    (255, 238, 174),
+)
 
 BUNDLE_NAMES = (
     "meta",
@@ -132,11 +156,19 @@ def check_portfolio(repo_root: Path, *, review_head: str) -> list[str]:
 
 
 def render_outputs(repo_root: Path, *, review_head: str) -> dict[str, bytes]:
-    bundles = build_bundles(repo_root, review_head=review_head)
+    runtime_visual = build_governed_runtime_visual_projection(repo_root)
+    bundles = build_bundles(
+        repo_root,
+        review_head=review_head,
+        runtime_visual=runtime_visual["bundle"],
+    )
     outputs: dict[str, bytes] = {}
     for name in BUNDLE_NAMES:
         outputs[f"portfolio/data/{name}.json"] = encode_json(bundles[name])
     outputs["portfolio/index.html"] = render_index_html(repo_root, bundles)
+    for relative_path, content in runtime_visual["assets"].items():
+        outputs[f"portfolio/{relative_path}"] = content
+        outputs[f"assets/portfolio-experience/{relative_path}"] = content
     return outputs
 
 
@@ -146,7 +178,12 @@ def encode_json(value: Any) -> bytes:
     ).encode("utf-8")
 
 
-def build_bundles(repo_root: Path, *, review_head: str) -> dict[str, Any]:
+def build_bundles(
+    repo_root: Path,
+    *,
+    review_head: str,
+    runtime_visual: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
     repo_root = repo_root.expanduser().resolve()
     artifact_hashes = read_json_required(
         repo_root / "artifacts/padim/artifact_hashes.json"
@@ -187,7 +224,8 @@ def build_bundles(repo_root: Path, *, review_head: str) -> dict[str, Any]:
         "runtime integration milestone",
     )
 
-    local_projection = build_local_provider_projection(repo_root)
+    if runtime_visual is None:
+        runtime_visual = build_governed_runtime_visual_projection(repo_root)["bundle"]
     model_sha256 = require_key(
         require_path(
             artifact_hashes,
@@ -225,7 +263,7 @@ def build_bundles(repo_root: Path, *, review_head: str) -> dict[str, Any]:
     evaluation = build_evaluation_bundle(scientific_evidence)
     equivalence = build_equivalence_bundle(equivalence_report, runtime_replay)
     runtime = build_runtime_bundle(
-        local_projection,
+        runtime_visual,
         integration,
         runtime_replay,
         model_sha256,
@@ -272,8 +310,320 @@ def build_local_provider_projection(repo_root: Path) -> dict[str, Any]:
     )
 
 
+def build_governed_runtime_visual_projection(repo_root: Path) -> dict[str, Any]:
+    repo_root = repo_root.expanduser().resolve()
+    governed_image = (
+        repo_root
+        / "data/visa/extracted/pcb4/Data/Images/Anomaly/049.JPG"
+    )
+    governed_map = (
+        repo_root
+        / "data/visa/derived/padim/inference/anomaly_maps/test_anomaly_maps.npy"
+    )
+    if not governed_image.is_file() or not governed_map.is_file():
+        return _load_committed_runtime_visual_projection(repo_root)
+    return _build_governed_runtime_visual_projection(repo_root)
+
+
+def _load_committed_runtime_visual_projection(repo_root: Path) -> dict[str, Any]:
+    runtime_path = repo_root / "portfolio/data/runtime.json"
+    runtime = read_json_required(runtime_path)
+    visual = require_path(runtime, "visual", str(runtime_path))
+    if not isinstance(visual, Mapping):
+        raise PortfolioEvidenceError(f"{runtime_path} visual is not an object")
+
+    manifest_relative = require_path(
+        visual, "manifest.asset_path", str(runtime_path)
+    )
+    manifest_path = repo_root / "portfolio" / manifest_relative
+    manifest_bytes = _read_file_with_sha256(
+        manifest_path,
+        require_path(visual, "manifest.sha256", str(runtime_path)),
+    )
+    manifest = json.loads(manifest_bytes)
+    if manifest.get("schema") != "kalibra_portfolio_runtime_visual_projection_v2":
+        raise PortfolioEvidenceError(
+            f"unexpected committed runtime visual schema: {manifest_path}"
+        )
+
+    asset_contracts = (
+        ("input_asset", "input_asset_sha256"),
+        ("anomaly_map_asset", "anomaly_map_asset_sha256"),
+        ("anomaly_overlay_asset", "anomaly_overlay_asset_sha256"),
+        ("localization_asset", "localization_asset_sha256"),
+    )
+    assets: dict[str, bytes] = {manifest_relative: manifest_bytes}
+    for path_key, hash_key in asset_contracts:
+        relative_path = require_key(manifest, path_key, str(manifest_path))
+        expected_hash = require_key(manifest, hash_key, str(manifest_path))
+        assets[relative_path] = _read_file_with_sha256(
+            repo_root / "portfolio" / relative_path,
+            expected_hash,
+        )
+
+    expected_visual_values = {
+        "anomaly_map.asset_path": manifest["anomaly_map_asset"],
+        "anomaly_map.asset_sha256": manifest["anomaly_map_asset_sha256"],
+        "anomaly_map.sha256": manifest["anomaly_map_sha256"],
+        "anomaly_overlay.asset_path": manifest["anomaly_overlay_asset"],
+        "anomaly_overlay.asset_sha256": manifest["anomaly_overlay_asset_sha256"],
+        "input.asset_path": manifest["input_asset"],
+        "input.asset_sha256": manifest["input_asset_sha256"],
+        "localization.asset_path": manifest["localization_asset"],
+        "localization.asset_sha256": manifest["localization_asset_sha256"],
+        "prediction_id": manifest["prediction_id"],
+        "split": manifest["split"],
+    }
+    for path, expected in expected_visual_values.items():
+        actual = require_path(visual, path, str(runtime_path))
+        if actual != expected:
+            raise PortfolioEvidenceError(
+                f"committed runtime visual mismatch at {path}: "
+                f"expected {expected!r}, got {actual!r}"
+            )
+
+    return {"assets": assets, "bundle": dict(visual)}
+
+
+def _build_governed_runtime_visual_projection(repo_root: Path) -> dict[str, Any]:
+    repo_root = repo_root.expanduser().resolve()
+    inputs = read_json_required(
+        repo_root / "data/visa/derived/padim/inference/metadata/inference_inputs.json"
+    )
+    dataset_identity = read_json_required(
+        repo_root / "data/visa/derived/padim/inference/metadata/dataset_identity.json"
+    )
+    inference_hashes = read_json_required(
+        repo_root / "data/visa/derived/padim/inference/artifact_hashes.json"
+    )
+    failure_analysis = read_json_required(
+        repo_root / "data/visa/derived/padim/evaluation/failure_analysis/failure_analysis.json"
+    )
+
+    sample_index, sample = _find_inference_sample(inputs, RUNTIME_VISUAL_INPUT_ID)
+    if sample["split"] != "test":
+        raise PortfolioEvidenceError("runtime visual sample must come from the test split")
+    if "/Anomaly/" not in sample["filename"]:
+        raise PortfolioEvidenceError("runtime visual sample must be an anomaly case")
+
+    localization_failures = {
+        item["input_id"]
+        for item in require_path(
+            failure_analysis,
+            "localization_failures",
+            "data/visa/derived/padim/evaluation/failure_analysis/failure_analysis.json",
+        )
+    }
+    if RUNTIME_VISUAL_INPUT_ID in localization_failures:
+        raise PortfolioEvidenceError(
+            "runtime visual sample is recorded as a localization failure"
+        )
+
+    prediction = _find_prediction_record(repo_root, sample["split"], RUNTIME_VISUAL_INPUT_ID)
+    model_metadata = require_path(
+        prediction,
+        "model_metadata",
+        "data/visa/derived/padim/inference/predictions/test_predictions.jsonl",
+    )
+    if model_metadata["sample_filename"] != sample["filename"]:
+        raise PortfolioEvidenceError("runtime visual sample filename mismatch")
+    if model_metadata["sample_sha256"] != sample["sample_sha256"]:
+        raise PortfolioEvidenceError("runtime visual sample hash mismatch")
+
+    image_path = repo_root / "data/visa/extracted" / sample["filename"]
+    input_bytes = _read_file_with_sha256(image_path, sample["sample_sha256"])
+    _require_file_manifest_entry(
+        repo_root,
+        relative_path=sample["filename"],
+        expected_sha256=sample["sample_sha256"],
+    )
+
+    anomaly_maps_path = (
+        repo_root
+        / "data/visa/derived/padim/inference/anomaly_maps/test_anomaly_maps.npy"
+    )
+    expected_map_file_hash = require_key(
+        require_path(
+            inference_hashes,
+            "local_output_artifacts",
+            "data/visa/derived/padim/inference/artifact_hashes.json",
+        ),
+        "anomaly_maps/test_anomaly_maps.npy",
+        "data/visa/derived/padim/inference/artifact_hashes.json",
+    )
+    _read_file_with_sha256(anomaly_maps_path, expected_map_file_hash)
+    anomaly_map = _load_selected_anomaly_map(anomaly_maps_path, sample_index)
+    if _npy_sha256(anomaly_map) != model_metadata["anomaly_map_sha256"]:
+        raise PortfolioEvidenceError("runtime visual anomaly-map hash mismatch")
+
+    localization = require_path(
+        prediction,
+        "predicted_localization",
+        "data/visa/derived/padim/inference/predictions/test_predictions.jsonl",
+    )
+    if localization["localization_kind"] != "padim_raw_anomaly_map_argmax_region_v1":
+        raise PortfolioEvidenceError("runtime visual localization kind mismatch")
+    raw_measure = float(prediction["predicted_raw_anomaly_measure"])
+    if abs(raw_measure - float(anomaly_map.max())) > 1e-12:
+        raise PortfolioEvidenceError("runtime visual raw measure does not match map max")
+
+    heatmap_bytes = _render_anomaly_map_png(anomaly_map)
+    anomaly_overlay_bytes = _render_anomaly_overlay_png(
+        image_path,
+        anomaly_map,
+        alpha=RUNTIME_VISUAL_OVERLAY_ALPHA,
+        localization_region=localization["region"],
+    )
+    localization_bytes = _render_localization_overlay_png(
+        image_path, localization["region"]
+    )
+    heatmap_sha256 = _sha256_bytes(heatmap_bytes)
+    anomaly_overlay_sha256 = _sha256_bytes(anomaly_overlay_bytes)
+    localization_sha256 = _sha256_bytes(localization_bytes)
+    try:
+        from PIL import Image
+    except ImportError as exc:
+        raise PortfolioEvidenceError(
+            "Pillow is required to inspect the runtime visual dimensions"
+        ) from exc
+    with Image.open(image_path) as governed_image:
+        rendered_dimensions = {
+            "width": governed_image.width,
+            "height": governed_image.height,
+        }
+    native_dimensions = {
+        "width": int(anomaly_map.shape[1]),
+        "height": int(anomaly_map.shape[0]),
+    }
+
+    manifest = {
+        "anomaly_map_asset": RUNTIME_VISUAL_HEATMAP_ASSET,
+        "anomaly_map_asset_sha256": heatmap_sha256,
+        "anomaly_map_sha256": model_metadata["anomaly_map_sha256"],
+        "anomaly_map_native_dimensions": native_dimensions,
+        "anomaly_overlay_alpha": RUNTIME_VISUAL_OVERLAY_ALPHA,
+        "anomaly_overlay_asset": RUNTIME_VISUAL_ANOMALY_OVERLAY_ASSET,
+        "anomaly_overlay_asset_sha256": anomaly_overlay_sha256,
+        "category": model_metadata["class_name"],
+        "colour_map_identity": RUNTIME_VISUAL_COLOUR_MAP,
+        "dataset": model_metadata["dataset"],
+        "dataset_acquisition_label": model_metadata["dataset_acquisition_label"],
+        "input_asset": RUNTIME_VISUAL_INPUT_ASSET,
+        "input_asset_sha256": sample["sample_sha256"],
+        "input_id": RUNTIME_VISUAL_INPUT_ID,
+        "interpolation_mode": RUNTIME_VISUAL_INTERPOLATION,
+        "localization_asset": RUNTIME_VISUAL_LOCALIZATION_ASSET,
+        "localization_asset_sha256": localization_sha256,
+        "localization_kind": localization["localization_kind"],
+        "localization_region": localization["region"],
+        "model_method": model_metadata["method"],
+        "prediction_id": prediction["prediction_id"],
+        "raw_anomaly_measure": raw_measure,
+        "raw_map_interpolation_mode": RUNTIME_VISUAL_RAW_MAP_INTERPOLATION,
+        "raw_measure_kind": prediction["raw_measure_kind"],
+        "raw_measure_scale": prediction["raw_measure_scale"],
+        "rendered_overlay_dimensions": rendered_dimensions,
+        "sample_filename": sample["filename"],
+        "sample_sha256": sample["sample_sha256"],
+        "schema": "kalibra_portfolio_runtime_visual_projection_v2",
+        "scientific_boundary": (
+            "The anomaly overlay is presentation-only and displays raw PaDiM "
+            "anomaly intensity over the governed input. It is not calibrated "
+            "confidence. It creates no new metric, changes no prediction or "
+            "localization, does not increase scientific resolution, and expands "
+            "no scientific claim. The displayed case remains illustrative evidence "
+            "from a single-seed VisA-proxy evaluation."
+        ),
+        "selection_rationale": (
+            "Governed VisA-proxy PCB anomaly with a visible defect, recorded "
+            "PaDiM raw anomaly map, and a predicted localization region not "
+            "listed as a C-6 localization failure; selected for public "
+            "understandability, not as generalized performance proof."
+        ),
+        "split": sample["split"],
+        "split_sha256": model_metadata["split_sha256"],
+        "source_artifacts": [
+            "data/visa/extracted/pcb4/Data/Images/Anomaly/049.JPG",
+            "data/visa/derived/padim/inference/anomaly_maps/test_anomaly_maps.npy",
+            "data/visa/derived/padim/inference/predictions/test_predictions.jsonl",
+            "data/visa/derived/padim/inference/metadata/inference_inputs.json",
+            "data/visa/manifests/files.sha256",
+        ],
+    }
+    manifest_bytes = encode_json(manifest)
+    manifest_sha256 = _sha256_bytes(manifest_bytes)
+
+    bundle = {
+        "anomaly_map": {
+            "asset_path": RUNTIME_VISUAL_HEATMAP_ASSET,
+            "asset_sha256": heatmap_sha256,
+            "label": "PaDiM raw anomaly map",
+            "max_raw": f"{float(anomaly_map.max()):.3f}",
+            "min_raw": f"{float(anomaly_map.min()):.3f}",
+            "interpolation_mode": RUNTIME_VISUAL_RAW_MAP_INTERPOLATION,
+            "sha256": model_metadata["anomaly_map_sha256"],
+            "sha256_short": short_hash(model_metadata["anomaly_map_sha256"], tail=6),
+        },
+        "anomaly_overlay": {
+            "alpha": RUNTIME_VISUAL_OVERLAY_ALPHA,
+            "asset_path": RUNTIME_VISUAL_ANOMALY_OVERLAY_ASSET,
+            "asset_sha256": anomaly_overlay_sha256,
+            "colour_map_identity": RUNTIME_VISUAL_COLOUR_MAP,
+            "interpolation_mode": RUNTIME_VISUAL_INTERPOLATION,
+            "label": "PaDiM anomaly overlay",
+            "native_dimensions": native_dimensions,
+            "rendered_dimensions": rendered_dimensions,
+            "supporting_text": (
+                "Raw anomaly intensity over governed input — not calibrated confidence"
+            ),
+        },
+        "category": model_metadata["class_name"],
+        "dataset_label": model_metadata["dataset_acquisition_label"],
+        "input": {
+            "asset_path": RUNTIME_VISUAL_INPUT_ASSET,
+            "asset_sha256": sample["sample_sha256"],
+            "content_hash_short": short_hash(sample["sample_sha256"], tail=6),
+            "filename": sample["filename"],
+            "sample_id": Path(sample["filename"]).stem,
+            "sample_label": "pcb4 / anomaly / 049.JPG",
+        },
+        "localization": {
+            "asset_path": RUNTIME_VISUAL_LOCALIZATION_ASSET,
+            "asset_sha256": localization_sha256,
+            "display_label": "LOCALIZATION · " + _region_display(localization["region"]),
+            "kind": localization["localization_kind"],
+            "region": localization["region"],
+        },
+        "manifest": {
+            "asset_path": RUNTIME_VISUAL_MANIFEST_ASSET,
+            "sha256": manifest_sha256,
+            "sha256_short": short_hash(manifest_sha256, tail=6),
+        },
+        "prediction_id": prediction["prediction_id"],
+        "raw_anomaly_measure": f"{raw_measure:.3f}",
+        "raw_bar_percent": str(max(0, min(100, int(round((raw_measure / 10.0) * 100))))),
+        "raw_measure_kind": prediction["raw_measure_kind"],
+        "raw_measure_scale": prediction["raw_measure_scale"],
+        "selection_rationale": manifest["selection_rationale"],
+        "split": sample["split"],
+        "split_sha256_short": short_hash(model_metadata["split_sha256"], tail=6),
+        "source_license": "VisA dataset license recorded as CC BY 4.0",
+    }
+
+    return {
+        "assets": {
+            RUNTIME_VISUAL_INPUT_ASSET: input_bytes,
+            RUNTIME_VISUAL_HEATMAP_ASSET: heatmap_bytes,
+            RUNTIME_VISUAL_ANOMALY_OVERLAY_ASSET: anomaly_overlay_bytes,
+            RUNTIME_VISUAL_LOCALIZATION_ASSET: localization_bytes,
+            RUNTIME_VISUAL_MANIFEST_ASSET: manifest_bytes,
+        },
+        "bundle": bundle,
+    }
+
+
 def build_runtime_bundle(
-    projection: Mapping[str, Any],
+    runtime_visual: Mapping[str, Any],
     integration: Mapping[str, Any],
     runtime_replay: Mapping[str, Any],
     model_sha256: str,
@@ -317,47 +667,55 @@ def build_runtime_bundle(
         "determinism": "single-thread \u00b7 ORT_DISABLE_ALL \u00b7 CPU EP",
         "feature_contract": _short_feature_contract(feature_contract),
         "input": {
-            "class_name": "candle",
-            "content_hash_short": short_hash(
-                require_path(projection, "contentHash", "local provider projection"),
-                tail=6,
+            "category": require_path(runtime_visual, "category", "runtime visual"),
+            "class_name": require_path(runtime_visual, "category", "runtime visual"),
+            "content_hash_short": require_path(
+                runtime_visual, "input.content_hash_short", "runtime visual"
             ),
-            "fixture": "4\u00d74 PGM",
-            "fixture_tag": "INPUT \u00b7 4\u00d74 PGM fixture",
-            "name": require_path(projection, "file", "local provider projection"),
-            "projection_label": "Local-provider projection",
+            "dataset_label": require_path(
+                runtime_visual, "dataset_label", "runtime visual"
+            ),
+            "fixture": "governed VisA-proxy image",
+            "fixture_tag": "INPUT \u00b7 governed VisA-proxy image",
+            "name": require_path(runtime_visual, "input.sample_label", "runtime visual"),
+            "projection_label": "Recorded governed case",
+            "sample_id": require_path(
+                runtime_visual, "input.sample_id", "runtime visual"
+            ),
+            "split": require_path(runtime_visual, "split", "runtime visual"),
         },
         "integration_status": require_path(
             integration, "status", "artifacts/runtime/integration_metadata.json"
         ),
         "localization": {
-            "display_label": (
-                "LOCALIZATION \u00b7 "
-                + _localization_display(
-                    require_path(
-                        projection,
-                        "localization",
-                        "local provider projection",
-                    )
-                )
+            "display_label": require_path(
+                runtime_visual, "localization.display_label", "runtime visual"
             ),
-            "x": "0.25\u20130.75",
-            "y": "0.25\u20130.75",
+            "kind": require_path(runtime_visual, "localization.kind", "runtime visual"),
+            "x": _range_text(
+                require_path(runtime_visual, "localization.region.x_min", "runtime visual"),
+                require_path(runtime_visual, "localization.region.x_max", "runtime visual"),
+            ),
+            "y": _range_text(
+                require_path(runtime_visual, "localization.region.y_min", "runtime visual"),
+                require_path(runtime_visual, "localization.region.y_max", "runtime visual"),
+            ),
         },
         "model_identity": model_identity,
         "model_sha256_short": short_hash(model_sha256),
         "precomputed_note": (
-            "Precomputed from a governed offline run. Kalibra does not run "
-            "inference in your browser \u2014 this is a projection of a recorded "
-            "local-provider result."
+            "Precomputed from a governed offline run on the VisA proxy dataset. "
+            "Kalibra does not run inference in your browser \u2014 this single case "
+            "is illustrative evidence, not proof of generalized performance."
         ),
         "raw_anomaly_measure": require_path(
-            projection, "rawText", "local provider projection"
+            runtime_visual, "raw_anomaly_measure", "runtime visual"
         ),
         "raw_bar_percent": str(
-            require_path(projection, "rawBarPercent", "local provider projection")
+            require_path(runtime_visual, "raw_bar_percent", "runtime visual")
         ),
-        "raw_scale_max": "100",
+        "raw_scale_max": "10+",
+        "raw_statement": "Raw anomaly measure \u2014 not calibrated confidence",
         "session_config_hash_short": short_hash(session_config_hash),
         "toolchain": (
             f"onnxruntime {require_path(toolchain, 'onnxruntime', 'toolchain')} "
@@ -373,8 +731,9 @@ def build_runtime_bundle(
             "state": "not_yet_demonstrated",
         },
         "verdict": require_path(
-            projection, "result", "local provider projection"
+            {"result": "DEFECT"}, "result", "runtime visual"
         ),
+        "visual": runtime_visual,
     }
 
 
@@ -877,6 +1236,218 @@ def _localization_display(localization: Mapping[str, Any]) -> str:
         f"y {float(localization['yMin']):.2f}\u2013"
         f"{float(localization['yMax']):.2f}"
     )
+
+
+def _find_inference_sample(
+    inputs: Mapping[str, Any],
+    input_id: str,
+) -> tuple[int, Mapping[str, Any]]:
+    samples = require_path(
+        inputs,
+        "samples",
+        "data/visa/derived/padim/inference/metadata/inference_inputs.json",
+    )
+    for index, sample in enumerate(samples):
+        if sample.get("input_id") == input_id:
+            return index, sample
+    raise PortfolioEvidenceError(f"missing runtime visual sample: {input_id}")
+
+
+def _find_prediction_record(repo_root: Path, split: str, input_id: str) -> dict[str, Any]:
+    path = (
+        repo_root
+        / f"data/visa/derived/padim/inference/predictions/{split}_predictions.jsonl"
+    )
+    if not path.exists():
+        raise PortfolioEvidenceError(f"missing source file: {path}")
+    with path.open(encoding="utf-8") as file:
+        for line in file:
+            record = json.loads(line)
+            if record.get("input_id") == input_id:
+                return record
+    raise PortfolioEvidenceError(f"missing runtime visual prediction: {input_id}")
+
+
+def _read_file_with_sha256(path: Path, expected_sha256: str) -> bytes:
+    if not path.exists():
+        raise PortfolioEvidenceError(f"missing source file: {path}")
+    content = path.read_bytes()
+    actual = _sha256_bytes(content)
+    if actual != expected_sha256:
+        raise PortfolioEvidenceError(
+            f"hash mismatch for {path}: expected {expected_sha256}, got {actual}"
+        )
+    return content
+
+
+def _require_file_manifest_entry(
+    repo_root: Path,
+    *,
+    relative_path: str,
+    expected_sha256: str,
+) -> None:
+    manifest_path = repo_root / "data/visa/manifests/files.sha256"
+    if not manifest_path.exists():
+        raise PortfolioEvidenceError(f"missing source file: {manifest_path}")
+    expected_line = f"{expected_sha256}  {relative_path}"
+    if expected_line not in manifest_path.read_text(encoding="utf-8").splitlines():
+        raise PortfolioEvidenceError(
+            f"files.sha256 is missing governed sample entry: {relative_path}"
+        )
+
+
+def _load_selected_anomaly_map(path: Path, sample_index: int):
+    try:
+        import numpy as np
+    except ImportError as exc:
+        raise PortfolioEvidenceError("numpy is required to render the runtime visual") from exc
+    maps = np.load(path, allow_pickle=False)
+    if sample_index >= len(maps):
+        raise PortfolioEvidenceError("runtime visual sample index exceeds map array")
+    anomaly_map = maps[sample_index]
+    if anomaly_map.shape != (64, 64):
+        raise PortfolioEvidenceError(
+            f"unexpected anomaly-map shape for runtime visual: {anomaly_map.shape}"
+        )
+    return anomaly_map
+
+
+def _npy_sha256(array: Any) -> str:
+    try:
+        import numpy as np
+    except ImportError as exc:
+        raise PortfolioEvidenceError("numpy is required to verify the runtime visual") from exc
+    buffer = io.BytesIO()
+    np.save(buffer, array, allow_pickle=False)
+    return _sha256_bytes(buffer.getvalue())
+
+
+def _render_anomaly_map_png(anomaly_map: Any) -> bytes:
+    try:
+        import numpy as np
+        from PIL import Image
+    except ImportError as exc:
+        raise PortfolioEvidenceError(
+            "numpy and Pillow are required to render the runtime visual"
+        ) from exc
+
+    rgb = _colourize_anomaly_map(anomaly_map)
+    image = Image.fromarray(rgb).resize((768, 768), Image.Resampling.NEAREST)
+    return _png_bytes(image)
+
+
+def _colourize_anomaly_map(anomaly_map: Any):
+    try:
+        import numpy as np
+    except ImportError as exc:
+        raise PortfolioEvidenceError(
+            "numpy is required to colour-map the runtime visual"
+        ) from exc
+
+    values = np.asarray(anomaly_map, dtype=np.float64)
+    low = float(values.min())
+    high = float(values.max())
+    if high <= low:
+        normalized = np.zeros_like(values, dtype=np.float64)
+    else:
+        normalized = np.clip((values - low) / (high - low), 0.0, 1.0)
+
+    palette = np.asarray(RUNTIME_VISUAL_PALETTE, dtype=np.float64)
+    scaled = normalized * (len(palette) - 1)
+    left = np.floor(scaled).astype(int)
+    right = np.clip(left + 1, 0, len(palette) - 1)
+    mix = (scaled - left)[..., None]
+    return (palette[left] * (1.0 - mix) + palette[right] * mix).round().astype(
+        "uint8"
+    )
+
+
+def _render_anomaly_overlay_png(
+    image_path: Path,
+    anomaly_map: Any,
+    *,
+    alpha: float,
+    localization_region: Mapping[str, Any],
+) -> bytes:
+    try:
+        from PIL import Image
+        from PIL.PngImagePlugin import PngInfo
+    except ImportError as exc:
+        raise PortfolioEvidenceError(
+            "Pillow is required to render the runtime anomaly overlay"
+        ) from exc
+    if not 0.0 <= alpha <= 1.0:
+        raise PortfolioEvidenceError("runtime anomaly overlay alpha must be in [0, 1]")
+
+    governed_input = Image.open(image_path).convert("RGB")
+    colour_layer = Image.fromarray(_colourize_anomaly_map(anomaly_map)).resize(
+        governed_input.size,
+        Image.Resampling.BILINEAR,
+    )
+    overlay = Image.blend(governed_input, colour_layer, alpha)
+    metadata = PngInfo()
+    metadata.add_text(
+        "kalibra.recorded_localization_region",
+        json.dumps(localization_region, sort_keys=True, separators=(",", ":")),
+    )
+    metadata.add_text(
+        "kalibra.scientific_boundary",
+        "presentation-only; raw anomaly intensity; not calibrated confidence",
+    )
+    return _png_bytes(overlay, pnginfo=metadata)
+
+
+def _render_localization_overlay_png(
+    image_path: Path,
+    region: Mapping[str, Any],
+) -> bytes:
+    try:
+        from PIL import Image, ImageDraw
+    except ImportError as exc:
+        raise PortfolioEvidenceError("Pillow is required to render the runtime visual") from exc
+
+    image = Image.open(image_path).convert("RGB")
+    image.thumbnail((900, 900), Image.Resampling.LANCZOS)
+    overlay = image.copy()
+    draw = ImageDraw.Draw(overlay, "RGBA")
+    x_min = float(region["x_min"]) * image.width
+    x_max = float(region["x_max"]) * image.width
+    y_min = float(region["y_min"]) * image.height
+    y_max = float(region["y_max"]) * image.height
+    draw.rectangle(
+        [x_min, y_min, x_max, y_max],
+        fill=(229, 81, 78, 58),
+        outline=(229, 81, 78, 255),
+        width=max(3, round(image.width / 180)),
+    )
+    return _png_bytes(overlay)
+
+
+def _png_bytes(image: Any, *, pnginfo: Any | None = None) -> bytes:
+    buffer = io.BytesIO()
+    image.save(
+        buffer,
+        format="PNG",
+        optimize=False,
+        compress_level=9,
+        pnginfo=pnginfo,
+    )
+    return buffer.getvalue()
+
+
+def _sha256_bytes(content: bytes) -> str:
+    return hashlib.sha256(content).hexdigest()
+
+
+def _region_display(region: Mapping[str, Any]) -> str:
+    return (
+        f"x {float(region['x_min']):.3f}\u2013{float(region['x_max']):.3f}, "
+        f"y {float(region['y_min']):.3f}\u2013{float(region['y_max']):.3f}"
+    )
+
+
+def _range_text(start: Any, end: Any) -> str:
+    return f"{float(start):.3f}\u2013{float(end):.3f}"
 
 
 def _extract_metric(source: str, name: str) -> str:

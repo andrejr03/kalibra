@@ -172,6 +172,7 @@ def test_fail_closed_if_placeholder_becomes_canonical_again(monkeypatch) -> None
     )
 
 
+@pytest.mark.governed_data
 def test_canonical_onnx_provider_uses_governed_padim_artifact() -> None:
     pytest.importorskip("onnxruntime")
     provider = OnnxInspectionInferenceProvider()
