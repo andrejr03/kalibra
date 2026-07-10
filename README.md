@@ -91,6 +91,10 @@ Overview of the static evidence presentation and project boundary.
 
 ![Portfolio overview station](assets/portfolio-experience/screenshots/hero.png)
 
+Governed runtime-inspection case showing the real VisA-proxy input, presentation-only PaDiM anomaly overlay, native raw anomaly map, recorded localization, and non-calibrated raw anomaly measure.
+
+![Governed runtime inspection with PCB input, anomaly overlay, raw map, and localization](assets/portfolio-experience/screenshots/runtime-inspection.png)
+
 Runtime-equivalence station showing sample count, tolerance, maximum deviation, and replay status.
 
 ![Runtime equivalence station](assets/portfolio-experience/screenshots/runtime-equivalence.png)
