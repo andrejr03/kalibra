@@ -85,7 +85,10 @@ Kalibra is an offline, batch-oriented, single-seed, VisA-proxy, non-production e
 
 ## Portfolio Experience
 
-The portfolio is a static presentation that renders committed governed artifacts; it performs no browser inference and requires no network request. Static source: [portfolio/](portfolio/).
+The portfolio is a static presentation that renders committed governed artifacts; it performs no browser inference and requires no network request.
+
+- **Live portfolio:** https://andrejr03.github.io/kalibra/
+- **Repository source:** [portfolio/](portfolio/)
 
 Overview of the static evidence presentation and project boundary.
 
