@@ -101,7 +101,7 @@ def main(argv: list[str] | None = None) -> int:
                     print(f"- {diff}", file=sys.stderr)
                 return 1
             return 0
-        review_head = args.review_head or current_git_head(repo_root)
+        review_head = args.review_head or generation_review_head(repo_root)
         generate_portfolio(repo_root, review_head=review_head)
         return 0
     except PortfolioEvidenceError as exc:
@@ -130,6 +130,14 @@ def committed_portfolio_review_head(repo_root: Path) -> str:
             f"{meta_path} has invalid required field review_head"
         )
     return review_head
+
+
+def generation_review_head(repo_root: Path) -> str:
+    """Preserve the reviewed evidence snapshot unless explicitly advanced."""
+    meta_path = repo_root / "portfolio/data/meta.json"
+    if meta_path.exists():
+        return committed_portfolio_review_head(repo_root)
+    return current_git_head(repo_root)
 
 
 def generate_portfolio(repo_root: Path, *, review_head: str) -> None:
@@ -277,6 +285,10 @@ def build_bundles(
         "model_sha256_short": short_hash(model_sha256),
         "offline_mode": True,
         "review_head": review_head,
+        "review_head_explanation": (
+            "Commit against which the displayed evidence bundle was reviewed; "
+            "not the current repository HEAD."
+        ),
     }
     evidence = build_evidence_bundle(
         model_sha256,

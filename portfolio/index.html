@@ -47,7 +47,7 @@
     <div class="railfoot">
       <div class="blk"><div class="k">MODE</div><div class="v">Offline · Batch · Reproducible</div></div>
       <div class="blk"><div class="k">EVIDENCE BASIS</div><div class="v" data-bind="meta.evidence_basis">Single-seed · VisA-proxy</div></div>
-      <div class="blk"><div class="k">REVIEW HEAD</div><div class="v mn" data-bind="meta.review_head">d8bba98</div></div>
+      <div class="blk"><div class="k">EVIDENCE REVIEW HEAD</div><div class="v mn" data-bind="meta.review_head">d8bba98</div><div class="review-explanation" data-bind="meta.review_head_explanation">Commit against which the displayed evidence bundle was reviewed; not the current repository HEAD.</div></div>
     </div>
   </nav>
 
@@ -576,30 +576,34 @@
       </div>
 
       <div class="verify-grid">
-        <div>
-          <div class="term">
-            <div class="bar"><b style="background:#e5514e"></b><b style="background:#e6a23c"></b><b style="background:#45c46a"></b><span class="l">verify — governed re-check</span></div>
-<pre><span class="c"># 1 · confirm the model artifact fingerprint</span>
-<span class="a">sha256sum</span> artifacts/padim/model.onnx
-<span class="g" data-bind="meta.model_sha256_short">0437ae28…741a</span>
-
-<span class="c"># 2 · runtime provider integration</span>
-<span class="a">python3</span> scripts/run_runtime_provider_integration.py verify
-<span class="g" data-bind="runtime.integration_status" data-prefix="status: ">status: passed</span>
-
-<span class="c"># 3 · runtime equivalence</span>
-<span class="a">python3</span> scripts/verify_padim_runtime_equivalence.py verify
-<span class="g"><span data-bind="equivalence.samples_compared_plain">6492</span> samples · max_abs_dev <span data-bind="equivalence.max_abs_deviation">7.105e-15</span> &lt; <span data-bind="equivalence.atol">1e-12</span></span>
-
-<span class="c"># 4 · placeholder retirement</span>
-<span class="a">python3</span> scripts/verify_placeholder_retirement.py verify
-<span class="g" data-bind="runtime.carried.3.source_field">placeholder_used_on_canonical_runtime_path: false</span></pre>
+        <div class="verify-levels">
+          <div class="verify-level">
+            <div class="level-label">Level 1 · Public clean-clone verification</div>
+            <p class="verify-note">Works from a normal public clone using tracked repository contents only.</p>
+            <div class="term">
+              <div class="bar"><b style="background:#e5514e"></b><b style="background:#e6a23c"></b><b style="background:#45c46a"></b><span class="l">verify — public clone</span></div>
+<pre><span class="a">python3 -m pytest -q</span>
+<span class="a">python3 scripts/verify_public_clone.py</span>
+<span class="a">python3 scripts/build_portfolio_evidence_bundle.py --check</span></pre>
+            </div>
+          </div>
+          <div class="verify-level">
+            <div class="level-label">Level 2 · Governed-data verification</div>
+            <p class="verify-note">Requires separately acquired governed VisA data and is expected to fail closed when that data is absent.</p>
+            <div class="term">
+              <div class="bar"><b style="background:#e5514e"></b><b style="background:#e6a23c"></b><b style="background:#45c46a"></b><span class="l">verify — governed data</span></div>
+<pre><span class="a">python3 scripts/verify_padim_runtime_equivalence.py verify</span>
+<span class="a">python3 scripts/verify_placeholder_retirement.py verify</span>
+<span class="a">python3 -m pytest -q -m governed_data</span></pre>
+            </div>
+            <p class="verify-note level-three">Level 3 · Full scientific reproduction is a separate workflow after governed acquisition; follow the repository methodology.</p>
           </div>
           <div class="repo-cta">
             <svg class="hex" width="30" height="34" viewBox="0 0 34 38"><polygon points="17,2 32,10.5 32,27.5 17,36 2,27.5 2,10.5" fill="none" stroke="#e6a23c" stroke-width="2"></polygon><circle cx="17" cy="19" r="3.4" fill="#e6a23c"></circle></svg>
             <div>
               <div style="font:500 14px var(--disp);color:var(--ink)">Kalibra repository</div>
-              <div style="font:400 12px var(--body);color:var(--mut3);margin-top:2px">Static site lives next to the source · GitHub Pages · review HEAD <span class="mono" data-bind="meta.review_head">d8bba98</span></div>
+              <div style="font:400 12px var(--body);color:var(--mut3);margin-top:2px">Static site lives next to the source · GitHub Pages · evidence review HEAD <span class="mono" data-bind="meta.review_head">d8bba98</span></div>
+              <div class="review-explanation" data-bind="meta.review_head_explanation">Commit against which the displayed evidence bundle was reviewed; not the current repository HEAD.</div>
             </div>
           </div>
         </div>
@@ -859,7 +863,8 @@
     "model_sha256": "0437ae28e172489387da07c4bd1f0c6b1ed95f3970ca3c7fa1dcd55935bd741a",
     "model_sha256_short": "0437ae28…741a",
     "offline_mode": true,
-    "review_head": "d8bba98"
+    "review_head": "d8bba98",
+    "review_head_explanation": "Commit against which the displayed evidence bundle was reviewed; not the current repository HEAD."
   },
   "runtime": {
     "carried": [

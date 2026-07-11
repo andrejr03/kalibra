@@ -1,14 +1,17 @@
 # Kalibra — Portfolio Experience · Static Baseline Asset
 
-Static frontend baseline for the portfolio experience. These four files
-preserve that design exactly. Open `index.html` in any browser — it works
-fully offline, with no build step, no server, and no network access.
+Static frontend baseline for the portfolio experience. This package preserves
+the complete public static baseline, including the HTML, CSS, JavaScript, and
+deterministic local media assets used by the portfolio. Open `index.html` in
+any browser — it works fully offline, with no build step, no server, and no
+runtime dependency on external services or data sources.
 
 ```
 index.html    markup + content (semantic, static)
 styles.css    all visual styling (single stylesheet)
 app.js        interaction only (vanilla, ~40 lines)
 README.md     this file
+media/        committed local Runtime Inspection assets
 ```
 
 This document exists only to help you reproduce the public portfolio look and feel.
@@ -127,17 +130,36 @@ Reusable classes in `styles.css` (selector → purpose):
 - **Static content.** All governed values (SHA prefixes, `6,492`, `7.105e-15`,
   the three AUROC/AUPRO metrics) are literal text. They are correct as written;
   do not compute or "improve" them, and never invent confidence or metrics.
-- **The two inspection images are inline SVG `data:` URIs** in the markup. No
-  binary inspection-image assets ship with this package. They render pixelated
-  by design.
 - **`app.js` is optional to behaviour, not to content.** With JS disabled the
   page is fully readable; only copy/scrollspy degrade.
 - **No dependencies.** No framework, no CDN, no fonts fetched over the network.
-  Keep it that way: the offline guarantee is part of the public baseline.
+  No analytics or runtime dependency on external services is required. Keep it
+  that way: the offline guarantee is part of the public baseline.
 - **Typography.** Space Grotesk, IBM Plex Sans, and IBM Plex Mono define the
   intended identity, with system fallbacks already wired through
   `--disp` / `--body` / `--mono`. Any future font hosting should keep those
   roles intact.
 - **Accessibility expectations.** Keep semantic landmarks (`header`, `nav`,
-  `main`, `section`), `alt` text on both SVG images, and native `<details>` for
-  disclosures.
+  `main`, `section`), `alt` text on every Runtime Inspection image, and native
+  `<details>` for disclosures.
+
+## 9 · Runtime Inspection media
+
+The Runtime Inspection station uses committed local governed media under
+`media/runtime-inspection/`:
+
+- the governed PCB input;
+- a presentation-only PaDiM anomaly overlay;
+- the native raw anomaly map; and
+- the recorded localization.
+
+The overlay is presentation-only. The raw anomaly map remains the inspectable
+model output, the browser performs no inference, and the displayed case is
+derived from committed governed evidence.
+
+### Deterministic generation
+
+Runtime Inspection media are generated deterministically from governed source
+artifacts, tracked through the local manifest, and protected by SHA-256
+identities. They remain presentation-only and do not alter predictions or
+metrics.
